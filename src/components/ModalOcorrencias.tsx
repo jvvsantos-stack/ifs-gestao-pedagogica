@@ -1,0 +1,237 @@
+import React, { useState, useRef } from 'react';
+import { db } from '../db/database';
+import type { Ocorrencia, Aluno } from '../db/database';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { X, Trash2, Eye, Upload } from 'lucide-react';
+
+interface Props {
+  aluno: Aluno;
+  onClose: () => void;
+}
+
+export const ModalOcorrencias: React.FC<Props> = ({ aluno, onClose }) => {
+  const [data, setData] = useState(new Date().toISOString().split('T')[0]);
+  const [tipo, setTipo] = useState('Outros');
+  const [descricao, setDescricao] = useState('');
+  const [anexoNome, setAnexoNome] = useState<string | undefined>(undefined);
+  const [anexoDados, setAnexoDados] = useState<string | ArrayBuffer | undefined>(undefined);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const ocorrencias = useLiveQuery(() => 
+    db.ocorrencias.where('alunoId').equals(aluno.id!).toArray()
+  ) || [];
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (reader.result) {
+          setAnexoNome(file.name);
+          setAnexoDados(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!descricao.trim()) {
+      alert('A descrição é obrigatória.');
+      return;
+    }
+
+    try {
+      await db.ocorrencias.add({
+        alunoId: aluno.id!,
+        data,
+        tipo,
+        descricao,
+        anexoNome,
+        anexoDados
+      });
+
+      // Reset formulário
+      setData(new Date().toISOString().split('T')[0]);
+      setTipo('Outros');
+      setDescricao('');
+      setAnexoNome(undefined);
+      setAnexoDados(undefined);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao salvar ocorrência.');
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm('Tem certeza que deseja excluir esta ocorrência?')) {
+      await db.ocorrencias.delete(id);
+    }
+  };
+
+  const handleViewAnexo = (dados: string | ArrayBuffer) => {
+    if (typeof dados === 'string') {
+      // É uma string Base64 (Data URL)
+      const newWindow = window.open();
+      if (newWindow) {
+        if (dados.startsWith('data:application/pdf')) {
+            newWindow.document.write(`<iframe src="${dados}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+        } else {
+            newWindow.document.write(`<img src="${dados}" style="max-width: 100%; max-height: 100%;" />`);
+        }
+      } else {
+        // Fallback for popups blocked: create a temporary link to download
+        const a = document.createElement('a');
+        a.href = dados;
+        a.download = 'anexo';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div className="flex justify-between items-center p-5 border-b border-gray-200">
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">Ocorrências: {aluno.nome}</h2>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div className="flex-1 overflow-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Parte Superior / Esquerda: Formulário */}
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 h-fit">
+            <h3 className="font-bold text-gray-700 mb-4 text-lg">Nova Ocorrência</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                <input 
+                  type="date" 
+                  value={data}
+                  onChange={e => setData(e.target.value)}
+                  className="w-full border border-gray-300 rounded p-2 text-sm outline-none focus:border-indigo-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                <select 
+                  value={tipo}
+                  onChange={e => setTipo(e.target.value)}
+                  className="w-full border border-gray-300 rounded p-2 text-sm outline-none focus:border-indigo-500 bg-white"
+                >
+                  <option value="Atestado Médico">Atestado Médico</option>
+                  <option value="Atestado de Dispensa">Atestado de Dispensa</option>
+                  <option value="Advertência Verbal">Advertência Verbal</option>
+                  <option value="Advertência Escrita">Advertência Escrita</option>
+                  <option value="Suspensão">Suspensão</option>
+                  <option value="Indisciplina">Indisciplina</option>
+                  <option value="Elogio/Mérito Pedagógico">Elogio/Mérito Pedagógico</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                <textarea 
+                  rows={4}
+                  value={descricao}
+                  onChange={e => setDescricao(e.target.value)}
+                  placeholder="Detalhes do ocorrido..."
+                  className="w-full border border-gray-300 rounded p-2 text-sm outline-none focus:border-indigo-500 resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Anexo (PDF / Imagem)</label>
+                <div className="flex gap-2 items-center">
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="bg-white border border-gray-300 hover:border-indigo-400 text-gray-700 px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium transition-colors"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Escolher Arquivo
+                  </button>
+                  <input 
+                    type="file" 
+                    accept=".pdf, image/*" 
+                    className="hidden" 
+                    ref={fileInputRef}
+                    onChange={handleFile}
+                  />
+                  {anexoNome && <span className="text-xs text-gray-500 truncate max-w-[200px]">{anexoNome}</span>}
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200 mt-4">
+                <button 
+                  onClick={handleSave}
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition-colors text-sm"
+                >
+                  Salvar Ocorrência
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Parte Inferior / Direita: Histórico */}
+          <div className="flex flex-col">
+            <h3 className="font-bold text-gray-700 mb-4 text-lg">Histórico do Aluno</h3>
+            
+            {ocorrencias.length === 0 ? (
+              <div className="text-center py-8 text-gray-500 border border-dashed border-gray-300 rounded-xl bg-gray-50">
+                Nenhuma ocorrência registrada.
+              </div>
+            ) : (
+              <div className="space-y-4 overflow-auto pr-2">
+                {ocorrencias.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).map(oc => (
+                  <div key={oc.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm relative group">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <span className="bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded font-bold">
+                          {oc.tipo}
+                        </span>
+                        <span className="text-xs text-gray-500 ml-2">
+                          {new Date(oc.data + 'T12:00:00').toLocaleDateString('pt-BR')}
+                        </span>
+                      </div>
+                      <button 
+                        onClick={() => handleDelete(oc.id!)}
+                        className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity bg-red-50 p-1 rounded"
+                        title="Excluir Ocorrência"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{oc.descricao}</p>
+                    
+                    {oc.anexoDados && (
+                      <div className="mt-3 pt-3 border-t border-gray-100">
+                        <button 
+                          onClick={() => handleViewAnexo(oc.anexoDados!)}
+                          className="text-indigo-600 hover:text-indigo-800 text-xs font-medium flex items-center gap-1 bg-indigo-50 px-2 py-1 rounded"
+                        >
+                          <Eye className="w-3 h-3" />
+                          Visualizar Anexo ({oc.anexoNome || 'Documento'})
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
