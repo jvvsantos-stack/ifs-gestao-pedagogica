@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { TurmasView } from './components/TurmasView';
 import { CadastrosView } from './components/CadastrosView';
 import { ConsolidacaoView } from './components/ConsolidacaoView';

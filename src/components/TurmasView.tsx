@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { db } from '../db/database';
-import type { Turma, Curso, Aluno, Disciplina, Nota, AvaliacaoFinal } from '../db/database';
+import type { Turma, Aluno, Disciplina, Nota, AvaliacaoFinal } from '../db/database';
 import { Users, FolderOpen, ArrowLeft, UserPlus, BookOpen, Edit2, Trash2, Upload, X, ClipboardList } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import * as XLSX from 'xlsx';

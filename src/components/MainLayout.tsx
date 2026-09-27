@@ -13,7 +13,6 @@ interface MainLayoutProps {
 export const MainLayout: React.FC<MainLayoutProps> = ({
   activeTab,
   setActiveTab,
-  onLogout,
   children,
 }) => {
   const navItems = [

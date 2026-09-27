@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { db } from '../db/database';
-import type { Ocorrencia, Aluno } from '../db/database';
+import type { Aluno } from '../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { X, Trash2, Eye, Upload } from 'lucide-react';
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
-import type { Turma, Disciplina, Aluno, Nota, AvaliacaoFinal } from '../db/database';
-import { ArrowLeft, CheckCircle, Users, Scale, Activity, BarChart2, AlertTriangle, Award } from 'lucide-react';
+import type { Turma, Disciplina } from '../db/database';
+import { ArrowLeft, Users, Scale, Activity, BarChart2, AlertTriangle, Award } from 'lucide-react';
 
 export const ConsolidacaoView: React.FC = () => {
   const [selectedTurma, setSelectedTurma] = useState<Turma | null>(null);
@@ -201,7 +201,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
   const alunosRisco = alunosProcessed.filter(a => a.disciplinasRisco.length >= 2).map(a => {
      const isMuitoAlto = a.disciplinasRisco.some(d => d.percent >= 1.0);
      return { ...a, nivelRisco: isMuitoAlto ? 'Muito Alto' : 'Alto' };
-  }).sort((a, b) => (a.nivelRisco === 'Muito Alto' ? -1 : 1));
+  }).sort((a) => (a.nivelRisco === 'Muito Alto' ? -1 : 1));
 
   const rankingMonitoria = monitoriaDiscId 
     ? [...alunosProcessed]

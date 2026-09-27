@@ -49,7 +49,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
         let maxEtapa = 0;
         for (const n of discNotas) {
           if (n.nota !== undefined && n.nota !== null && String(n.nota) !== '') {
-            if (n.etapa > maxEtapa) maxEtapa = n.etapa;
+            if ((n.etapa ?? 1) > maxEtapa) maxEtapa = n.etapa ?? 1;
           }
         }
 

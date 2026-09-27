@@ -1,7 +1,7 @@
 import { AppDatabase } from '../db/database';
 
 export const exportarBancoParaJSON = async (db: AppDatabase): Promise<any> => {
-  return await db.transaction('r', db.cursos, db.turmas, db.disciplinas, db.alunos, db.notas, db.avaliacoes_finais, db.ocorrencias, async () => {
+  return await db.transaction('r', [db.cursos, db.turmas, db.disciplinas, db.alunos, db.notas, db.avaliacoes_finais, db.ocorrencias], async () => {
     const cursos = await db.cursos.toArray();
     const turmas = await db.turmas.toArray();
     const disciplinas = await db.disciplinas.toArray();
@@ -28,7 +28,7 @@ export const importarJSONParaBanco = async (db: AppDatabase, jsonData: any): Pro
     throw new Error('Dados de backup inválidos.');
   }
 
-  await db.transaction('rw', db.cursos, db.turmas, db.disciplinas, db.alunos, db.notas, db.avaliacoes_finais, db.ocorrencias, async () => {
+  await db.transaction('rw', [db.cursos, db.turmas, db.disciplinas, db.alunos, db.notas, db.avaliacoes_finais, db.ocorrencias], async () => {
     await db.cursos.clear();
     await db.turmas.clear();
     await db.disciplinas.clear();

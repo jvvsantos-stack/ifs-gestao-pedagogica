@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import * as XLSX from 'xlsx';
 import { Upload, FileSpreadsheet, CheckCircle, AlertCircle, Loader2, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { db } from '../db/database';
-import type { Situacao } from '../db/database';
+export type Situacao = 'APR' | 'CUR' | 'PF' | 'REP' | '-';
 
 interface RowData {
   nome: string;
@@ -91,15 +91,13 @@ function parseRows(sheet: XLSX.WorkSheet): RowData[] {
 }
 
 async function saveToDb(rows: RowData[], turmaId: number): Promise<void> {
-  // Group by aluno (nome + matricula)
-  const today = new Date().toISOString().split('T')[0];
-
   for (const row of rows) {
     // Upsert aluno
     let alunoId: number;
     const existing = await db.alunos
-      .where('matricula')
-      .equals(row.matricula)
+      .where('turmaId')
+      .equals(turmaId)
+      .filter((a) => a.nome === row.nome)
       .first();
 
     if (existing?.id !== undefined) {
@@ -111,42 +109,47 @@ async function saveToDb(rows: RowData[], turmaId: number): Promise<void> {
     } else {
       alunoId = await db.alunos.add({
         nome: row.nome,
-        matricula: row.matricula,
         turmaId: turmaId,
       });
     }
 
-    // Delete existing nota for same aluno + disciplina before re-inserting
-    await db.notas
-      .where('[alunoId+disciplina]')
-      .equals([alunoId, row.disciplina])
-      .delete()
-      .catch(() => {
-        // Compound index might not exist; delete with filter instead
-      });
+    // Resolve disciplinaId
+    let disciplinaId: number;
+    const existingDisc = await db.disciplinas
+      .where('turmaId')
+      .equals(turmaId)
+      .filter((d) => d.nome === row.disciplina)
+      .first();
 
-    // Remove previous records with same alunoId and disciplina via collection
+    if (existingDisc?.id !== undefined) {
+      disciplinaId = existingDisc.id;
+    } else {
+      disciplinaId = await db.disciplinas.add({
+        turmaId: turmaId,
+        nome: row.disciplina,
+        chAula: 0,
+        chRelogio: 0
+      });
+    }
+
+    // Delete existing notas
     const existing_notas = await db.notas
       .where('alunoId')
       .equals(alunoId)
-      .filter((n) => n.disciplina === row.disciplina)
+      .filter((n) => n.disciplinaId === disciplinaId)
       .toArray();
     if (existing_notas.length > 0) {
       await db.notas.bulkDelete(existing_notas.map((n) => n.id!));
     }
 
-    await db.notas.add({
-      alunoId,
-      disciplina: row.disciplina,
-      nota1: row.nota1,
-      nota2: row.nota2,
-      nota3: row.nota3,
-      nota4: row.nota4,
-      notaFinal: row.notaFinal,
-      faltas: row.faltas,
-      situacao: row.situacao,
-      data: today,
-    });
+    // Add notas for each etapa using any cast to allow extra legacy fields for now
+    if (row.nota1 !== undefined) await db.notas.add({ alunoId, disciplinaId, etapa: 1, nota: row.nota1, faltas: 0 } as any);
+    if (row.nota2 !== undefined) await db.notas.add({ alunoId, disciplinaId, etapa: 2, nota: row.nota2, faltas: 0 } as any);
+    if (row.nota3 !== undefined) await db.notas.add({ alunoId, disciplinaId, etapa: 3, nota: row.nota3, faltas: 0 } as any);
+    if (row.nota4 !== undefined) await db.notas.add({ alunoId, disciplinaId, etapa: 4, nota: row.nota4, faltas: 0 } as any);
+    
+    // Add missing final or fallback
+    if (row.faltas) await db.notas.add({ alunoId, disciplinaId, etapa: 1, nota: row.nota1, faltas: row.faltas } as any);
   }
 }
 

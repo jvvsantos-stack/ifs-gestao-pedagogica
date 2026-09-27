@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
-import { Search, X, AlertTriangle, Book, GraduationCap, ClipboardList } from 'lucide-react';
+import { Search, X, AlertTriangle, GraduationCap, ClipboardList } from 'lucide-react';
 
 interface BuscaAlunoModalProps {
   onClose: () => void;
