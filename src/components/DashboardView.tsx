@@ -86,6 +86,12 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
         
         const freqGlobal = chTotGlobal > 0 ? ((chTotGlobal - faltasTotGlobal) / chTotGlobal) * 100 : 100;
         
+        if (freqGlobal <= 84) {
+          if (!alertasEvasaoMap.has(aluno.id!)) {
+            alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome, turmaNome: turma.nome, disciplinas: [], freqGlobal });
+          }
+        }
+        
         for (const disc of disciplinasTurma) {
           const limiteFaltas = Math.floor(disc.chRelogio * 0.25);
           const notasDaDisc = alunoDiscNotas.filter(n => n.disciplinaId === disc.id);
@@ -346,18 +352,28 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
                       </div>
                     )}
                     
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-bold text-base mb-1">{alerta.alunoNome} <span className="font-normal text-sm text-red-600">(Turma {alerta.turmaNome})</span></p>
-                        <p className="mb-1">Está no limite de faltas nas seguintes disciplinas:</p>
-                        <ul className="list-disc list-inside ml-1 text-red-700">
-                          {alerta.disciplinas.map((d, i) => (
-                            <li key={i}>{d}</li>
-                          ))}
-                        </ul>
+                    {alerta.disciplinas.length > 0 ? (
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-bold text-base mb-1">{alerta.alunoNome} <span className="font-normal text-sm text-red-600">(Turma {alerta.turmaNome})</span></p>
+                          <p className="mb-1">Está no limite de faltas nas seguintes disciplinas:</p>
+                          <ul className="list-disc list-inside ml-1 text-red-700">
+                            {alerta.disciplinas.map((d, i) => (
+                              <li key={i}>{d}</li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-bold text-base mb-1">{alerta.alunoNome} <span className="font-normal text-sm text-red-600">(Turma {alerta.turmaNome})</span></p>
+                          <p className="text-sm text-gray-700">Frequência geral prejudicada, mas não ultrapassou o limite acadêmico (25%) em nenhuma disciplina isolada.</p>
+                        </div>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
