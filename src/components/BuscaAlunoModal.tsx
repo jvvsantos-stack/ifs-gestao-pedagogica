@@ -240,7 +240,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                           <tr>
                             <th className="px-6 py-4">Disciplina</th>
                             {[...Array(numEtapas)].map((_, i) => (
-                              <th key={i} className="px-4 py-4 text-center">{i + 1}º Bi</th>
+                              <th key={i} className="px-4 py-4 text-center">Etapa {i + 1}</th>
                             ))}
                             <th className="px-4 py-4 text-center">Final</th>
                             <th className="px-4 py-4 text-center">Média</th>
