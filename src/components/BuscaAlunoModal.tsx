@@ -111,6 +111,8 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                 let countDisciplinasAvaliadas = 0;
                 let pendenciasCount = 0;
                 let hasRiscoFaltas = false;
+                let totalCargaHoraria = 0;
+                let totalFaltasGlobal = 0;
 
                 const boletim = disciplinas.map(disc => {
                   const limiteFaltas = Math.floor(disc.chRelogio * 0.25);
@@ -133,6 +135,9 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                       }
                     }
                   }
+
+                  totalCargaHoraria += disc.chRelogio;
+                  totalFaltasGlobal += faltas;
 
                   let mediaAtual = notasPreenchidas > 0 ? (somaNotas / (notasPreenchidas === numEtapas ? numEtapas : notasPreenchidas)) : null;
                   let mediaFinal = mediaAtual;
@@ -172,6 +177,9 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
 
                 const mediaGeral = countDisciplinasAvaliadas > 0 ? (somaMediasGlobais / countDisciplinasAvaliadas).toFixed(1) : '-';
                 
+                const freqGlobal = totalCargaHoraria > 0 ? ((totalCargaHoraria - totalFaltasGlobal) / totalCargaHoraria) * 100 : 100;
+                const isPeDeMeiaApto = freqGlobal >= 80;
+                
                 // Determina situação no conselho
                 let conselhoGlobal = null;
                 const disciplinasEmConselho = boletim.filter(b => b.af?.statusConselho || b.af?.aprovadoConselho);
@@ -195,6 +203,12 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                             <span><strong>Turma:</strong> {turma?.nome} ({turma?.codigo})</span>
                             <span><strong>Curso:</strong> {curso?.nome} ({curso?.modalidade})</span>
                             {turma?.anoLetivo && <span><strong>Ano Letivo:</strong> {turma.anoLetivo}</span>}
+                          </div>
+                          
+                          <div className="mt-3">
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold border ${isPeDeMeiaApto ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                              {isPeDeMeiaApto ? '✅ Habilitado Pé de Meia' : '❌ Não Habilitado Pé de Meia'} ({freqGlobal.toFixed(1)}%)
+                            </span>
                           </div>
                         </div>
                         <div className="flex gap-4">

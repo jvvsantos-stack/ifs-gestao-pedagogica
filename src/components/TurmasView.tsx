@@ -884,7 +884,25 @@ const DiarioDisciplina: React.FC<{
                 return (
                   <tr key={aluno.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-2 font-medium text-gray-800 sticky left-0 bg-white group-hover:bg-gray-50 z-10 shadow-[1px_0_0_0_#f3f4f6]">
-                      <div className="truncate">{aluno.nome}</div>
+                      <div className="truncate flex items-center gap-2">
+                        <span>{aluno.nome}</span>
+                        {(() => {
+                          let faltasTot = 0;
+                          for (let i = 1; i <= (isSubsequente ? 2 : 4); i++) {
+                            faltasTot += notas[i]?.faltas || 0;
+                          }
+                          const freq = disciplina.chRelogio > 0 ? ((disciplina.chRelogio - faltasTot) / disciplina.chRelogio) * 100 : 100;
+                          const isApto = freq >= 80;
+                          return (
+                            <span 
+                              className={`text-[10px] px-1.5 py-0.5 rounded font-bold cursor-help ${isApto ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}
+                              title={`Pé de Meia: ${freq.toFixed(1)}% de frequência na disciplina`}
+                            >
+                              {isApto ? 'PM ✅' : 'PM ❌'}
+                            </span>
+                          );
+                        })()}
+                      </div>
                     </td>
 
                     {/* Visão de Etapa (1 a 4) */}

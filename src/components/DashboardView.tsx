@@ -28,7 +28,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
     const alunosAtivos = await db.alunos.where('turmaId').anyOf(turmasIds).toArray();
 
     const alertasConselho: { turma: Turma, alunos: string[] }[] = [];
-    const alertasEvasaoMap = new Map<number, { alunoNome: string, turmaNome: string, disciplinas: string[] }>();
+    const alertasEvasaoMap = new Map<number, { alunoNome: string, turmaNome: string, disciplinas: string[], freqGlobal?: number }>();
     const diariosPendentesDisciplinas: { disciplina: string, turma: string }[] = [];
 
     // Lógica de Pendências do Conselho
@@ -70,19 +70,38 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
           diariosPendentesDisciplinas.push({ disciplina: disc.nome, turma: turma.nome });
         }
 
-        // Checar faltas
+        // Checar faltas e preparar cálculo global
         for (const aluno of alunosTurma) {
-          const alunoDiscNotas = discNotas.filter(n => n.alunoId === aluno.id);
-          let faltasTot = 0;
-          for (const n of alunoDiscNotas) {
-             faltasTot += n.faltas || 0;
+          const alunoDiscNotas = notas.filter(n => n.alunoId === aluno.id);
+          let faltasTotGlobal = 0;
+          let chTotGlobal = 0;
+          
+          for (const d of disciplinasTurma) {
+             chTotGlobal += d.chRelogio;
           }
-
-          if (faltasTot >= limiteFaltas * 0.8) {
-            if (!alertasEvasaoMap.has(aluno.id!)) {
-              alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome, turmaNome: turma.nome, disciplinas: [] });
+          
+          for (const n of alunoDiscNotas) {
+             faltasTotGlobal += n.faltas || 0;
+          }
+          
+          const freqGlobal = chTotGlobal > 0 ? ((chTotGlobal - faltasTotGlobal) / chTotGlobal) * 100 : 100;
+          
+          for (const disc of disciplinasTurma) {
+            const limiteFaltas = Math.floor(disc.chRelogio * 0.25);
+            const notasDaDisc = alunoDiscNotas.filter(n => n.disciplinaId === disc.id);
+            let faltasNaDisc = 0;
+            for (const n of notasDaDisc) {
+              faltasNaDisc += n.faltas || 0;
             }
-            alertasEvasaoMap.get(aluno.id!)!.disciplinas.push(disc.nome);
+
+            if (faltasNaDisc >= limiteFaltas * 0.8) {
+              if (!alertasEvasaoMap.has(aluno.id!)) {
+                alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome, turmaNome: turma.nome, disciplinas: [], freqGlobal });
+              }
+              if (!alertasEvasaoMap.get(aluno.id!)!.disciplinas.includes(disc.nome)) {
+                alertasEvasaoMap.get(aluno.id!)!.disciplinas.push(disc.nome);
+              }
+            }
           }
         }
       }
@@ -316,16 +335,29 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
             <div className="p-6">
               <ul className="space-y-3">
                 {dashboardData.alertasEvasao.map((alerta, idx) => (
-                  <li key={`evasao-${idx}`} className="flex items-start gap-3 p-4 bg-red-50 border border-red-100 text-red-800 rounded-xl text-sm">
-                    <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-bold text-base mb-1">{alerta.alunoNome} <span className="font-normal text-sm text-red-600">(Turma {alerta.turmaNome})</span></p>
-                      <p className="mb-1">Está no limite de faltas nas seguintes disciplinas:</p>
-                      <ul className="list-disc list-inside ml-1 text-red-700">
-                        {alerta.disciplinas.map((d, i) => (
-                          <li key={i}>{d}</li>
-                        ))}
-                      </ul>
+                  <li key={`evasao-${idx}`} className="flex flex-col p-4 bg-red-50 border border-red-100 text-red-800 rounded-xl text-sm gap-2">
+                    {alerta.freqGlobal !== undefined && alerta.freqGlobal < 80 && (
+                      <div className="bg-red-600 text-white font-bold py-1 px-3 rounded-lg text-center w-full shadow-sm mb-2">
+                        ❌ Não Elegível Pé de meia (Frequência: {alerta.freqGlobal.toFixed(1)}%)
+                      </div>
+                    )}
+                    {alerta.freqGlobal !== undefined && alerta.freqGlobal >= 80 && alerta.freqGlobal <= 84 && (
+                      <div className="bg-amber-500 text-white font-bold py-1 px-3 rounded-lg text-center w-full shadow-sm mb-2">
+                        ⚠️ Iminência de perder Pé de meia (Frequência: {alerta.freqGlobal.toFixed(1)}%)
+                      </div>
+                    )}
+                    
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-base mb-1">{alerta.alunoNome} <span className="font-normal text-sm text-red-600">(Turma {alerta.turmaNome})</span></p>
+                        <p className="mb-1">Está no limite de faltas nas seguintes disciplinas:</p>
+                        <ul className="list-disc list-inside ml-1 text-red-700">
+                          {alerta.disciplinas.map((d, i) => (
+                            <li key={i}>{d}</li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   </li>
                 ))}
