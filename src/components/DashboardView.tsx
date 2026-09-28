@@ -43,7 +43,6 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
       const aguardandoConselhoAlunos: string[] = [];
 
       for (const disc of disciplinasTurma) {
-        const limiteFaltas = Math.floor(disc.chRelogio * 0.25);
         const discNotas = notas.filter(n => n.disciplinaId === disc.id);
         
         let temPendenciaNesteDiario = false;
@@ -69,38 +68,38 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
         if (temPendenciaNesteDiario) {
           diariosPendentesDisciplinas.push({ disciplina: disc.nome, turma: turma.nome });
         }
+      }
 
-        // Checar faltas e preparar cálculo global
-        for (const aluno of alunosTurma) {
-          const alunoDiscNotas = notas.filter(n => n.alunoId === aluno.id);
-          let faltasTotGlobal = 0;
-          let chTotGlobal = 0;
-          
-          for (const d of disciplinasTurma) {
-             chTotGlobal += d.chRelogio;
+      // Checar faltas e preparar cálculo global
+      for (const aluno of alunosTurma) {
+        const alunoDiscNotas = notas.filter(n => n.alunoId === aluno.id);
+        let faltasTotGlobal = 0;
+        let chTotGlobal = 0;
+        
+        for (const d of disciplinasTurma) {
+           chTotGlobal += d.chRelogio;
+        }
+        
+        for (const n of alunoDiscNotas) {
+           faltasTotGlobal += n.faltas || 0;
+        }
+        
+        const freqGlobal = chTotGlobal > 0 ? ((chTotGlobal - faltasTotGlobal) / chTotGlobal) * 100 : 100;
+        
+        for (const disc of disciplinasTurma) {
+          const limiteFaltas = Math.floor(disc.chRelogio * 0.25);
+          const notasDaDisc = alunoDiscNotas.filter(n => n.disciplinaId === disc.id);
+          let faltasNaDisc = 0;
+          for (const n of notasDaDisc) {
+            faltasNaDisc += n.faltas || 0;
           }
-          
-          for (const n of alunoDiscNotas) {
-             faltasTotGlobal += n.faltas || 0;
-          }
-          
-          const freqGlobal = chTotGlobal > 0 ? ((chTotGlobal - faltasTotGlobal) / chTotGlobal) * 100 : 100;
-          
-          for (const disc of disciplinasTurma) {
-            const limiteFaltas = Math.floor(disc.chRelogio * 0.25);
-            const notasDaDisc = alunoDiscNotas.filter(n => n.disciplinaId === disc.id);
-            let faltasNaDisc = 0;
-            for (const n of notasDaDisc) {
-              faltasNaDisc += n.faltas || 0;
+
+          if (faltasNaDisc >= limiteFaltas * 0.8) {
+            if (!alertasEvasaoMap.has(aluno.id!)) {
+              alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome, turmaNome: turma.nome, disciplinas: [], freqGlobal });
             }
-
-            if (faltasNaDisc >= limiteFaltas * 0.8) {
-              if (!alertasEvasaoMap.has(aluno.id!)) {
-                alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome, turmaNome: turma.nome, disciplinas: [], freqGlobal });
-              }
-              if (!alertasEvasaoMap.get(aluno.id!)!.disciplinas.includes(disc.nome)) {
-                alertasEvasaoMap.get(aluno.id!)!.disciplinas.push(disc.nome);
-              }
+            if (!alertasEvasaoMap.get(aluno.id!)!.disciplinas.includes(disc.nome)) {
+              alertasEvasaoMap.get(aluno.id!)!.disciplinas.push(disc.nome);
             }
           }
         }
