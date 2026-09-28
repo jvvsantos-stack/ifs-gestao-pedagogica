@@ -10,7 +10,7 @@ export const EstagiosView: React.FC = () => {
   
   const [selectedCursoId, setSelectedCursoId] = useState<number | ''>('');
   const [selectedTurmaId, setSelectedTurmaId] = useState<number | ''>('');
-  const [selectedAlunoId, setSelectedAlunoId] = useState<number | ''>('');
+  const [formAlunoId, setFormAlunoId] = useState<number | ''>('');
 
   const [showForm, setShowForm] = useState(false);
   const [showFinalizar, setShowFinalizar] = useState(false);
@@ -27,10 +27,8 @@ export const EstagiosView: React.FC = () => {
     loadCursos();
   }, []);
 
-  // Load Turmas when course changes
   useEffect(() => {
     setSelectedTurmaId('');
-    setSelectedAlunoId('');
     setAlunos([]);
     if (selectedCursoId) {
       db.turmas.where('cursoId').equals(Number(selectedCursoId)).toArray().then(setTurmas);
@@ -41,7 +39,6 @@ export const EstagiosView: React.FC = () => {
 
   // Load Alunos when turma changes
   useEffect(() => {
-    setSelectedAlunoId('');
     if (selectedTurmaId) {
       db.alunos.where('turmaId').equals(Number(selectedTurmaId)).toArray().then(setAlunos);
     } else {
@@ -50,26 +47,32 @@ export const EstagiosView: React.FC = () => {
   }, [selectedTurmaId]);
 
   const estagios = useLiveQuery(
-    () => selectedAlunoId ? db.estagios.where('alunoId').equals(Number(selectedAlunoId)).toArray() : [],
-    [selectedAlunoId]
+    () => selectedTurmaId ? db.estagios.where('turmaId').equals(Number(selectedTurmaId)).toArray() : [],
+    [selectedTurmaId]
   ) || [];
+
+  const getAlunoNome = (id: number) => alunos.find(a => a.id === id)?.nome || 'Aluno não encontrado';
 
   const handleSaveEstagio = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentEstagio || !selectedAlunoId || !selectedTurmaId) return;
+    if (!currentEstagio || !formAlunoId || !selectedTurmaId) return;
 
     if (currentEstagio.id) {
-      await db.estagios.update(currentEstagio.id, currentEstagio as Estagio);
+      await db.estagios.update(currentEstagio.id, {
+        ...currentEstagio,
+        alunoId: Number(formAlunoId),
+      } as Estagio);
     } else {
       await db.estagios.add({
         ...currentEstagio,
-        alunoId: Number(selectedAlunoId),
+        alunoId: Number(formAlunoId),
         turmaId: Number(selectedTurmaId),
         status: currentEstagio.status || 'Ativo',
       } as Estagio);
     }
     setShowForm(false);
     setCurrentEstagio(null);
+    setFormAlunoId('');
   };
 
   const handleExcluir = async (id: number) => {
@@ -101,6 +104,7 @@ export const EstagiosView: React.FC = () => {
       dadosEstagio: { inicio: '', funcaoPrincipal: '', areasAtuacao: '', chDiaria: '' },
       status: 'Ativo'
     });
+    setFormAlunoId('');
     setShowForm(true);
   };
 
@@ -142,21 +146,10 @@ export const EstagiosView: React.FC = () => {
           </select>
         </div>
 
-        <div className="flex-1 min-w-[200px]">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Aluno</label>
-          <select
-            value={selectedAlunoId}
-            onChange={(e) => setSelectedAlunoId(e.target.value ? Number(e.target.value) : '')}
-            disabled={!selectedTurmaId}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          >
-            <option value="">Selecione o Aluno...</option>
-            {alunos.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
-          </select>
         </div>
       </div>
 
-      {selectedAlunoId && (
+      {selectedTurmaId && (
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Estágios Cadastrados</h2>
@@ -188,8 +181,22 @@ export const EstagiosView: React.FC = () => {
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900">{estagio.dadosEmpresa?.nome}</h3>
-                      <p className="text-sm text-gray-600">{estagio.dadosEstagio?.funcaoPrincipal}</p>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-lg text-gray-900">{getAlunoNome(estagio.alunoId)}</span>
+                      </div>
+                      <h3 className="font-semibold text-indigo-700">{estagio.dadosEmpresa?.nome}</h3>
+                      <p className="text-sm text-gray-600 mt-1"><span className="font-medium">Função:</span> {estagio.dadosEstagio?.funcaoPrincipal}</p>
+                      {estagio.dadosEstagio?.areasAtuacao && (
+                        <p className="text-sm text-gray-600"><span className="font-medium">Área:</span> {estagio.dadosEstagio.areasAtuacao}</p>
+                      )}
+                      <div className="text-sm text-gray-500 mt-2 flex gap-4">
+                        {estagio.dadosEstagio?.inicio && (
+                          <span>Início: {new Date(estagio.dadosEstagio.inicio + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
+                        )}
+                        {estagio.dadosFinalizacao?.termino && (
+                          <span>Término: {new Date(estagio.dadosFinalizacao.termino + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
+                        )}
+                      </div>
                     </div>
                     <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
                       estagio.status === 'Finalizado' ? 'bg-green-100 text-green-800' :
@@ -202,7 +209,7 @@ export const EstagiosView: React.FC = () => {
 
                   <div className="mt-4 flex flex-wrap gap-2">
                     <button
-                      onClick={() => { setCurrentEstagio(estagio); setShowForm(true); }}
+                      onClick={() => { setCurrentEstagio(estagio); setFormAlunoId(estagio.alunoId); setShowForm(true); }}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Editar"
                     >
@@ -256,6 +263,22 @@ export const EstagiosView: React.FC = () => {
             
             <form onSubmit={handleSaveEstagio} className="flex-1 overflow-y-auto p-6 space-y-8">
               
+              <section>
+                <h3 className="text-lg font-semibold text-indigo-900 border-b pb-2 mb-4">Vínculo do Estágio</h3>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Aluno</label>
+                  <select
+                    required
+                    value={formAlunoId}
+                    onChange={(e) => setFormAlunoId(e.target.value ? Number(e.target.value) : '')}
+                    className="mt-1 w-full p-2 border border-gray-300 rounded"
+                  >
+                    <option value="">Selecione o Aluno...</option>
+                    {alunos.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
+                  </select>
+                </div>
+              </section>
+
               <section>
                 <h3 className="text-lg font-semibold text-indigo-900 border-b pb-2 mb-4">Dados da Empresa</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
