@@ -97,7 +97,7 @@ export const EstagiosView: React.FC = () => {
     setCurrentEstagio({
       dadosEmpresa: { nome: '', ramo: '', endereco: '', telefone: '', bairroCidade: '', cep: '' },
       supervisor: { nome: '' },
-      dadosEstagiario: { curso: '', anoConclusao: '', endereco: '', telefone: '', bairroCidade: '', cep: '' },
+      dadosEstagiario: { anoConclusao: '', endereco: '', telefone: '', bairroCidade: '', cep: '' },
       dadosEstagio: { inicio: '', funcaoPrincipal: '', areasAtuacao: '', chDiaria: '' },
       status: 'Ativo'
     });
@@ -159,7 +159,7 @@ export const EstagiosView: React.FC = () => {
       {selectedAlunoId && (
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Estágios do Aluno</h2>
+            <h2 className="text-xl font-semibold text-gray-800">Estágios Cadastrados</h2>
             <button
               onClick={openNewForm}
               className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
@@ -171,7 +171,7 @@ export const EstagiosView: React.FC = () => {
           {estagios.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
               <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500">Nenhum estágio cadastrado para este aluno.</p>
+              <p className="text-gray-500">Nenhum estágio cadastrado.</p>
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
@@ -276,10 +276,9 @@ export const EstagiosView: React.FC = () => {
               <section>
                 <h3 className="text-lg font-semibold text-indigo-900 border-b pb-2 mb-4">Dados do Estagiário</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium text-gray-700">Curso</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.curso || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, curso: e.target.value}})} /></div>
                   <div><label className="block text-sm font-medium text-gray-700">Ano de Conclusão</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.anoConclusao || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, anoConclusao: e.target.value}})} /></div>
-                  <div className="md:col-span-2"><label className="block text-sm font-medium text-gray-700">Endereço</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.endereco || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, endereco: e.target.value}})} /></div>
                   <div><label className="block text-sm font-medium text-gray-700">Telefone</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.telefone || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, telefone: e.target.value}})} /></div>
+                  <div className="md:col-span-2"><label className="block text-sm font-medium text-gray-700">Endereço</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.endereco || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, endereco: e.target.value}})} /></div>
                   <div><label className="block text-sm font-medium text-gray-700">Bairro/Cidade</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.bairroCidade || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, bairroCidade: e.target.value}})} /></div>
                   <div><label className="block text-sm font-medium text-gray-700">CEP</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.cep || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, cep: e.target.value}})} /></div>
                 </div>

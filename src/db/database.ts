@@ -76,7 +76,7 @@ export interface Estagio {
     nome: string;
   };
   dadosEstagiario: {
-    curso: string;
+    curso?: string;
     anoConclusao: string;
     endereco: string;
     telefone: string;
