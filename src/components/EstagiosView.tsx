@@ -22,18 +22,18 @@ export const EstagiosView: React.FC = () => {
   useEffect(() => {
     const loadCursos = async () => {
       const allCursos = await db.cursos.toArray();
-      setCursos(allCursos.filter(c => c.modalidade.toLowerCase() === 'integrado'));
+      setCursos(allCursos.filter(c => c.modalidade && c.modalidade.toLowerCase().includes('integrado')));
     };
     loadCursos();
   }, []);
 
   // Load Turmas when course changes
   useEffect(() => {
+    setSelectedTurmaId('');
+    setSelectedAlunoId('');
+    setAlunos([]);
     if (selectedCursoId) {
       db.turmas.where('cursoId').equals(Number(selectedCursoId)).toArray().then(setTurmas);
-      setSelectedTurmaId('');
-      setAlunos([]);
-      setSelectedAlunoId('');
     } else {
       setTurmas([]);
     }
@@ -41,9 +41,9 @@ export const EstagiosView: React.FC = () => {
 
   // Load Alunos when turma changes
   useEffect(() => {
+    setSelectedAlunoId('');
     if (selectedTurmaId) {
       db.alunos.where('turmaId').equals(Number(selectedTurmaId)).toArray().then(setAlunos);
-      setSelectedAlunoId('');
     } else {
       setAlunos([]);
     }
