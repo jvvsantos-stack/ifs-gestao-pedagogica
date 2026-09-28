@@ -145,10 +145,7 @@ export const EstagiosView: React.FC = () => {
             {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
           </select>
         </div>
-
-        </div>
       </div>
-
       {selectedTurmaId && (
         <div>
           <div className="flex justify-between items-center mb-4">
