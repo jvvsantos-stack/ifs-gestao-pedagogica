@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
-import { Search, X, AlertTriangle, GraduationCap, ClipboardList } from 'lucide-react';
+import { Search, X, AlertTriangle, GraduationCap, ClipboardList, Briefcase, Gavel } from 'lucide-react';
 
 interface BuscaAlunoModalProps {
   onClose: () => void;
@@ -20,6 +20,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
   const notasAll = useLiveQuery(() => db.notas.toArray()) || [];
   const avaliacoesAll = useLiveQuery(() => db.avaliacoes_finais.toArray()) || [];
   const ocorrenciasAll = useLiveQuery(() => db.ocorrencias.toArray()) || [];
+  const estagiosAll = useLiveQuery(() => db.estagios.toArray()) || [];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,6 +103,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                 const curso = cursosAll.find(c => c.id === turma?.cursoId);
                 const disciplinas = disciplinasAll.filter(d => d.turmaId === aluno.turmaId);
                 const ocorrenciasDoAluno = ocorrenciasAll.filter(o => o.alunoId === aluno.id);
+                const estagio = estagiosAll.find(e => e.alunoId === aluno.id);
                 const isSubsequente = curso?.modalidade === 'Técnico Subsequente';
                 const numEtapas = isSubsequente ? 2 : 4;
                 
@@ -169,6 +171,14 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                 });
 
                 const mediaGeral = countDisciplinasAvaliadas > 0 ? (somaMediasGlobais / countDisciplinasAvaliadas).toFixed(1) : '-';
+                
+                // Determina situação no conselho
+                let conselhoGlobal = null;
+                const disciplinasEmConselho = boletim.filter(b => b.af?.statusConselho || b.af?.aprovadoConselho);
+                if (disciplinasEmConselho.length > 0) {
+                  const hasReprovacao = disciplinasEmConselho.some(b => b.af?.statusConselho === 'reprovado' || (b.af?.statusConselho === undefined && !b.af?.aprovadoConselho && b.situacao.includes('Reprovado (Conselho)')));
+                  conselhoGlobal = hasReprovacao ? 'Reprovado pelo Conselho' : 'Aprovado pelo Conselho';
+                }
 
                 return (
                   <div key={aluno.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -256,6 +266,44 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                           ))}
                         </tbody>
                       </table>
+                    </div>
+
+                    {/* Estágio & Conselho */}
+                    <div className="bg-white border-t border-gray-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Estágio */}
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <h4 className="text-md font-bold text-gray-800 mb-3 flex items-center gap-2">
+                          <Briefcase className="w-5 h-5 text-indigo-600" />
+                          Estágio
+                        </h4>
+                        {estagio ? (
+                          <div className="text-sm space-y-2">
+                            <p><strong>Empresa:</strong> {estagio.dadosEmpresa.nome}</p>
+                            <p><strong>Status:</strong> <span className={`font-semibold ${estagio.status === 'Finalizado' ? 'text-emerald-600' : estagio.status === 'Não Finalizado' ? 'text-orange-600' : 'text-blue-600'}`}>{estagio.status}</span></p>
+                            <p><strong>Início:</strong> {new Date(estagio.dadosEstagio.inicio + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+                            {estagio.dadosFinalizacao?.termino && (
+                              <p><strong>Término:</strong> {new Date(estagio.dadosFinalizacao.termino + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500">Nenhum estágio cadastrado.</p>
+                        )}
+                      </div>
+
+                      {/* Conselho de Classe */}
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <h4 className="text-md font-bold text-gray-800 mb-3 flex items-center gap-2">
+                          <Gavel className="w-5 h-5 text-indigo-600" />
+                          Conselho de Classe
+                        </h4>
+                        {conselhoGlobal ? (
+                          <div className={`text-sm font-semibold p-3 rounded-lg border ${conselhoGlobal.includes('Aprovado') ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-red-100 text-red-800 border-red-200'}`}>
+                            {conselhoGlobal}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500">O aluno não passou por decisão de conselho.</p>
+                        )}
+                      </div>
                     </div>
 
                     {/* Ocorrências Section */}

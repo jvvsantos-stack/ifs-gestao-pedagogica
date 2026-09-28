@@ -27,9 +27,9 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
     const turmasIds = turmasAtivas.map(t => t.id!);
     const alunosAtivos = await db.alunos.where('turmaId').anyOf(turmasIds).toArray();
 
-    const alertasConselho: { turma: Turma, count: number }[] = [];
-    const alertasEvasao: { alunoNome: string, turmaNome: string, disciplinaNome: string }[] = [];
-    let diariosPendentesCount = 0;
+    const alertasConselho: { turma: Turma, alunos: string[] }[] = [];
+    const alertasEvasaoMap = new Map<number, { alunoNome: string, turmaNome: string, disciplinas: string[] }>();
+    const diariosPendentesDisciplinas: { disciplina: string, turma: string }[] = [];
 
     // Lógica de Pendências do Conselho
     for (const turma of turmasAtivas) {
@@ -40,21 +40,37 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
       const alunosTurma = alunosAtivos.filter(a => a.turmaId === turma.id);
       const disciplinasTurma = disciplinasAtivas.filter(d => d.turmaId === turma.id);
       
-      let aguardandoConselhoCount = 0;
+      const aguardandoConselhoAlunos: string[] = [];
 
       for (const disc of disciplinasTurma) {
         const limiteFaltas = Math.floor(disc.chRelogio * 0.25);
         const discNotas = notas.filter(n => n.disciplinaId === disc.id);
         
-        let maxEtapa = 0;
-        for (const n of discNotas) {
-          if (n.nota !== undefined && n.nota !== null && String(n.nota) !== '') {
-            if ((n.etapa ?? 1) > maxEtapa) maxEtapa = n.etapa ?? 1;
+        let temPendenciaNesteDiario = false;
+
+        for (let i = 1; i <= numEtapas; i++) {
+          let temNotaCount = 0;
+          let semNotaCount = 0;
+
+          for (const aluno of alunosTurma) {
+            const n = discNotas.find(x => x.alunoId === aluno.id && x.etapa === i);
+            if (n && n.nota !== undefined && n.nota !== null && String(n.nota) !== '') {
+              temNotaCount++;
+            } else {
+              semNotaCount++;
+            }
+          }
+
+          if (temNotaCount > 0 && semNotaCount > 0) {
+            temPendenciaNesteDiario = true;
           }
         }
 
-        let temPendenciaNesteDiario = false;
+        if (temPendenciaNesteDiario) {
+          diariosPendentesDisciplinas.push({ disciplina: disc.nome, turma: turma.nome });
+        }
 
+        // Checar faltas
         for (const aluno of alunosTurma) {
           const alunoDiscNotas = discNotas.filter(n => n.alunoId === aluno.id);
           let faltasTot = 0;
@@ -63,23 +79,11 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
           }
 
           if (faltasTot >= limiteFaltas * 0.8) {
-            alertasEvasao.push({
-               alunoNome: aluno.nome,
-               turmaNome: turma.nome,
-               disciplinaNome: disc.nome
-            });
-          }
-
-          for (let i = 1; i <= maxEtapa; i++) {
-            const n = alunoDiscNotas.find(x => x.etapa === i);
-            if (!n || n.nota === undefined || n.nota === null || String(n.nota) === '') {
-              temPendenciaNesteDiario = true;
+            if (!alertasEvasaoMap.has(aluno.id!)) {
+              alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome, turmaNome: turma.nome, disciplinas: [] });
             }
+            alertasEvasaoMap.get(aluno.id!)!.disciplinas.push(disc.nome);
           }
-        }
-
-        if (temPendenciaNesteDiario) {
-          diariosPendentesCount++;
         }
       }
 
@@ -146,14 +150,16 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
         const isEligible = cursandoCount === 0 && !hasReprovacaoPorFalta && qtdReprovacoes > 0 && qtdReprovacoes <= 2 && pendencias.every(p => p.eligible);
         
         if (isEligible && !conselhoDecision) {
-          aguardandoConselhoCount++;
+          aguardandoConselhoAlunos.push(aluno.nome);
         }
       }
 
-      if (aguardandoConselhoCount > 0) {
-        alertasConselho.push({ turma, count: aguardandoConselhoCount });
+      if (aguardandoConselhoAlunos.length > 0) {
+        alertasConselho.push({ turma, alunos: aguardandoConselhoAlunos });
       }
     }
+
+    const alertasEvasao = Array.from(alertasEvasaoMap.values());
 
     // Ordenar turmas por último acesso (decrescente) e pegar as 3 primeiras
     const turmasRecentes = [...turmasAtivas]
@@ -167,10 +173,10 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
       totalAlunos: alunosAtivos.length,
       alertasConselho,
       alertasEvasao,
-      diariosPendentesCount,
+      diariosPendentesDisciplinas,
       cursos
     };
-  }) || { turmas: [], totalTurmas: 0, totalDisciplinas: 0, totalAlunos: 0, alertasConselho: [], alertasEvasao: [], diariosPendentesCount: 0, cursos: [] };
+  }) || { turmas: [], totalTurmas: 0, totalDisciplinas: 0, totalAlunos: 0, alertasConselho: [], alertasEvasao: [], diariosPendentesDisciplinas: [], cursos: [] };
 
   return (
     <div className="flex-1 bg-gray-50 min-h-screen">
@@ -237,44 +243,60 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
             </h3>
           </div>
           <div className="p-6">
-            {dashboardData.alertasConselho.length === 0 && dashboardData.diariosPendentesCount === 0 ? (
+            {dashboardData.alertasConselho.length === 0 && dashboardData.diariosPendentesDisciplinas.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-emerald-600">
                 <CheckCircle2 className="w-12 h-12 mb-3 text-emerald-200" />
                 <p className="font-semibold">Tudo limpo!</p>
                 <p className="text-sm text-emerald-600/70">Nenhuma pendência operacional no momento.</p>
               </div>
             ) : (
-              <ul className="space-y-3">
-                {dashboardData.diariosPendentesCount > 0 && (
-                  <li className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl">
-                    <div className="flex items-center gap-3">
-                      <AlertTriangle className="w-5 h-5 text-blue-600 shrink-0" />
-                      <span>
-                        ℹ️ Faltam lançamentos (notas em branco em etapas passadas) em <strong>{dashboardData.diariosPendentesCount} diário(s)</strong>.
-                      </span>
+              <ul className="space-y-4">
+                {dashboardData.diariosPendentesDisciplinas.length > 0 && (
+                  <li className="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl shadow-md shadow-red-500/10">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold mb-2">Falta de lançamento (notas em branco parcial):</p>
+                          <ul className="list-disc list-inside space-y-1 text-sm text-red-700">
+                            {dashboardData.diariosPendentesDisciplinas.map((d, i) => (
+                              <li key={i}><strong>{d.disciplina}</strong> (Turma {d.turma})</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => setActiveTab('turmas')}
+                        className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 font-semibold rounded-lg text-sm transition-colors whitespace-nowrap ml-4"
+                      >
+                        Ver Turmas
+                      </button>
                     </div>
-                    <button 
-                      onClick={() => setActiveTab('turmas')}
-                      className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold rounded-lg text-sm transition-colors whitespace-nowrap"
-                    >
-                      Ver Turmas
-                    </button>
                   </li>
                 )}
                 {dashboardData.alertasConselho.map((alerta, idx) => (
-                  <li key={`conselho-${idx}`} className="flex items-center justify-between p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl">
-                    <div className="flex items-center gap-3">
-                      <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
-                      <span>
-                        ⚠️ Você tem <strong>{alerta.count} aluno(s)</strong> aguardando decisão de Conselho na turma <strong>{alerta.turma.nome} ({alerta.turma.codigo})</strong>.
-                      </span>
+                  <li key={`conselho-${idx}`} className="p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold mb-2">
+                            ⚠️ <strong>{alerta.alunos.length} aluno(s)</strong> aguardando decisão de Conselho na turma <strong>{alerta.turma.nome} ({alerta.turma.codigo})</strong>:
+                          </p>
+                          <ul className="list-disc list-inside space-y-1 text-sm text-amber-700 ml-1">
+                            {alerta.alunos.map((alunoNome, i) => (
+                              <li key={i}>{alunoNome}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => setActiveTab('consolidacao')}
+                        className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold rounded-lg text-sm transition-colors whitespace-nowrap ml-4"
+                      >
+                        Resolver
+                      </button>
                     </div>
-                    <button 
-                      onClick={() => setActiveTab('consolidacao')}
-                      className="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold rounded-lg text-sm transition-colors whitespace-nowrap"
-                    >
-                      Resolver
-                    </button>
                   </li>
                 ))}
               </ul>
@@ -297,7 +319,13 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
                   <li key={`evasao-${idx}`} className="flex items-start gap-3 p-4 bg-red-50 border border-red-100 text-red-800 rounded-xl text-sm">
                     <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                     <div>
-                      O aluno <strong>{alerta.alunoNome}</strong> (Turma {alerta.turmaNome}) está no limite de faltas em <strong>{alerta.disciplinaNome}</strong>.
+                      <p className="font-bold text-base mb-1">{alerta.alunoNome} <span className="font-normal text-sm text-red-600">(Turma {alerta.turmaNome})</span></p>
+                      <p className="mb-1">Está no limite de faltas nas seguintes disciplinas:</p>
+                      <ul className="list-disc list-inside ml-1 text-red-700">
+                        {alerta.disciplinas.map((d, i) => (
+                          <li key={i}>{d}</li>
+                        ))}
+                      </ul>
                     </div>
                   </li>
                 ))}
