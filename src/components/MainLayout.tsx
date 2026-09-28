@@ -1,7 +1,7 @@
 import React from 'react';
-import { LayoutDashboard, BookOpen, Database, BarChart, Cloud, Layers } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Database, BarChart, Cloud, Layers, Briefcase } from 'lucide-react';
 
-export type TabId = 'dashboard' | 'turmas' | 'cadastros' | 'analises' | 'consolidacao' | 'sync';
+export type TabId = 'dashboard' | 'turmas' | 'cadastros' | 'estagios' | 'analises' | 'consolidacao' | 'sync';
 
 interface MainLayoutProps {
   activeTab: TabId;
@@ -19,6 +19,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'cadastros', label: 'Cadastros', icon: Database },
     { id: 'turmas', label: 'Turmas', icon: BookOpen },
+    { id: 'estagios', label: 'Estágios', icon: Briefcase },
     { id: 'consolidacao', label: 'Consolidação', icon: Layers },
     { id: 'analises', label: 'Análises', icon: BarChart },
     { id: 'sync', label: 'Sync e Backup', icon: Cloud },

@@ -60,6 +60,45 @@ export interface Ocorrencia {
   anexoDados?: string | ArrayBuffer;
 }
 
+export interface Estagio {
+  id?: number;
+  alunoId: number;
+  turmaId: number;
+  dadosEmpresa: {
+    nome: string;
+    ramo: string;
+    endereco: string;
+    telefone: string;
+    bairroCidade: string;
+    cep: string;
+  };
+  supervisor: {
+    nome: string;
+  };
+  dadosEstagiario: {
+    curso: string;
+    anoConclusao: string;
+    endereco: string;
+    telefone: string;
+    bairroCidade: string;
+    cep: string;
+  };
+  dadosEstagio: {
+    inicio: string;
+    funcaoPrincipal: string;
+    areasAtuacao: string;
+    chDiaria: string;
+  };
+  dadosFinalizacao?: {
+    termino: string;
+    nota: string;
+    chTotal: string;
+    avaliacao: 'Fraco' | 'Regular' | 'Bom' | 'Ótimo' | '';
+    comentarios: string;
+  };
+  status: 'Ativo' | 'Finalizado' | 'Arquivado';
+}
+
 export class AppDatabase extends Dexie {
   cursos!: Dexie.Table<Curso, number>;
   turmas!: Dexie.Table<Turma, number>;
@@ -68,6 +107,7 @@ export class AppDatabase extends Dexie {
   notas!: Dexie.Table<Nota, number>;
   avaliacoes_finais!: Dexie.Table<AvaliacaoFinal, number>;
   ocorrencias!: Dexie.Table<Ocorrencia, number>;
+  estagios!: Dexie.Table<Estagio, number>;
 
   constructor() {
     super('GestaoPedagogicaDB');
@@ -154,6 +194,16 @@ export class AppDatabase extends Dexie {
       notas: '++id, alunoId, disciplinaId, etapa, nota, faltas',
       avaliacoes_finais: '++id, alunoId, disciplinaId, recuperacao, provaFinal, aprovadoConselho, statusConselho',
       ocorrencias: '++id, alunoId, data, tipo'
+    });
+    this.version(12).stores({
+      cursos: '++id, nome, modalidade',
+      turmas: '++id, cursoId, nome, codigo, anoLetivo, arquivado, lastAccessed',
+      disciplinas: '++id, turmaId, nome, chAula, chRelogio, arquivado',
+      alunos: '++id, turmaId, nome',
+      notas: '++id, alunoId, disciplinaId, etapa, nota, faltas',
+      avaliacoes_finais: '++id, alunoId, disciplinaId, recuperacao, provaFinal, aprovadoConselho, statusConselho',
+      ocorrencias: '++id, alunoId, data, tipo',
+      estagios: '++id, alunoId, turmaId, status'
     });
   }
 }

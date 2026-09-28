@@ -5,6 +5,7 @@ import { ConsolidacaoView } from './components/ConsolidacaoView';
 import { DashboardView } from './components/DashboardView';
 import { AnalisesView } from './components/AnalisesView';
 import { SyncBackupView } from './components/SyncBackupView';
+import { EstagiosView } from './components/EstagiosView';
 import { MainLayout } from './components/MainLayout';
 import { LoginView } from './components/LoginView';
 import type { TabId } from './components/MainLayout';
@@ -103,6 +104,8 @@ function App() {
         <CadastrosView />
       ) : activeTab === 'consolidacao' ? (
         <ConsolidacaoView />
+      ) : activeTab === 'estagios' ? (
+        <EstagiosView />
       ) : activeTab === 'analises' ? (
         <AnalisesView />
       ) : activeTab === 'sync' ? (
