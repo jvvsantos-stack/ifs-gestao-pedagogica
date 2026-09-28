@@ -187,6 +187,7 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
           {disciplinas.map(d => {
             const discNotas = notasAll.filter(n => n.disciplinaId === d.id);
             let hasLancamentoParcial = false;
+            let totalEtapasCompletas = 0;
 
             for (const etapa of etapasParaRenderizar) {
               let temNotaCount = 0;
@@ -204,24 +205,44 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
               if (temNotaCount > 0 && semNotaCount > 0) {
                 hasLancamentoParcial = true;
                 break;
+              } else if (temNotaCount > 0 && semNotaCount === 0) {
+                totalEtapasCompletas++;
               }
             }
 
-            const cardStyle = hasLancamentoParcial 
-              ? "bg-red-50/20 rounded-xl shadow-md shadow-red-500/30 border border-red-400 p-5 hover:shadow-lg transition-shadow" 
-              : "bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow";
+            let hasLancamentoCompleto = false;
+            if (!hasLancamentoParcial && totalEtapasCompletas === etapasParaRenderizar.length && alunos.length > 0) {
+              hasLancamentoCompleto = true;
+            }
+
+            let cardStyle = "bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow";
+            let iconBgClass = "bg-blue-100";
+            let iconTextClass = "text-blue-600";
+            let statusText = null;
+
+            if (hasLancamentoCompleto) {
+              cardStyle = "bg-green-50/20 rounded-xl shadow-md shadow-green-500/30 border border-green-400 p-5 hover:shadow-lg transition-shadow";
+              iconBgClass = "bg-green-100";
+              iconTextClass = "text-green-600";
+              statusText = <span className="text-green-600 font-bold">✔️ Lançamento Completo</span>;
+            } else if (hasLancamentoParcial) {
+              cardStyle = "bg-red-50/20 rounded-xl shadow-md shadow-red-500/30 border border-red-400 p-5 hover:shadow-lg transition-shadow";
+              iconBgClass = "bg-red-100";
+              iconTextClass = "text-red-600";
+              statusText = <span className="text-red-600 font-bold">⚠️ Falta lançamento</span>;
+            }
 
             return (
             <div key={d.id} className={cardStyle}>
               <div className="flex items-center gap-3 mb-4">
-                <div className={`${hasLancamentoParcial ? 'bg-red-100' : 'bg-blue-100'} p-2 rounded-lg`}>
-                  <BookOpen className={`w-5 h-5 ${hasLancamentoParcial ? 'text-red-600' : 'text-blue-600'}`} />
+                <div className={`${iconBgClass} p-2 rounded-lg`}>
+                  <BookOpen className={`w-5 h-5 ${iconTextClass}`} />
                 </div>
                 <h3 className="font-bold text-gray-800 text-lg flex-1 truncate" title={d.nome}>{d.nome}</h3>
               </div>
               <p className="text-xs text-gray-500 mb-4 flex justify-between">
                 <span>Carga Horária: {d.chAula}h</span>
-                {hasLancamentoParcial && <span className="text-red-600 font-bold">⚠️ Falta lançamento</span>}
+                {statusText}
               </p>
 
               <div className="grid grid-cols-2 gap-2">
