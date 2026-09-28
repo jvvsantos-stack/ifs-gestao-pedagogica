@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, Turma, Curso, Aluno, Estagio } from '../db/database';
+import { db, type Turma, type Curso, type Aluno, type Estagio } from '../db/database';
 import { Plus, Edit2, Trash2, CheckCircle, Archive, Save, X, Briefcase } from 'lucide-react';
 
 export const EstagiosView: React.FC = () => {
@@ -121,7 +121,7 @@ export const EstagiosView: React.FC = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Curso (Integrado)</label>
           <select
             value={selectedCursoId}
-            onChange={(e) => setSelectedCursoId(e.target.value)}
+            onChange={(e) => setSelectedCursoId(e.target.value ? Number(e.target.value) : '')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">Selecione o Curso...</option>
@@ -133,7 +133,7 @@ export const EstagiosView: React.FC = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Turma</label>
           <select
             value={selectedTurmaId}
-            onChange={(e) => setSelectedTurmaId(e.target.value)}
+            onChange={(e) => setSelectedTurmaId(e.target.value ? Number(e.target.value) : '')}
             disabled={!selectedCursoId}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
@@ -146,7 +146,7 @@ export const EstagiosView: React.FC = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Aluno</label>
           <select
             value={selectedAlunoId}
-            onChange={(e) => setSelectedAlunoId(e.target.value)}
+            onChange={(e) => setSelectedAlunoId(e.target.value ? Number(e.target.value) : '')}
             disabled={!selectedTurmaId}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >

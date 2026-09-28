@@ -9,8 +9,6 @@ export const exportarBancoParaJSON = async (db: AppDatabase): Promise<any> => {
     const notas = await db.notas.toArray();
     const avaliacoes_finais = await db.avaliacoes_finais.toArray();
     const ocorrencias = await db.ocorrencias.toArray();
-
-    const ocorrencias = await db.ocorrencias.toArray();
     const estagios = await db.estagios.toArray();
 
     return {
