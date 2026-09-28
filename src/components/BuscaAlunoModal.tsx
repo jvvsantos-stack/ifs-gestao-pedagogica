@@ -265,7 +265,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                               </td>
                               <td className="px-4 py-3 text-center">
                                 <span className={`${b.faltas >= b.limiteFaltas ? 'text-red-600 font-bold' : b.faltas >= b.limiteFaltas * 0.8 ? 'text-amber-600 font-bold' : 'text-gray-600'}`}>
-                                  {b.faltas} / {b.limiteFaltas}
+                                  {b.faltas}
                                 </span>
                               </td>
                               <td className="px-6 py-3">
