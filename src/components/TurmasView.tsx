@@ -139,6 +139,7 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
   const disciplinas = disciplinasTodas.filter(d => !d.arquivado);
   const alunos = useLiveQuery(() => db.alunos.where('turmaId').equals(turma.id!).toArray()) || [];
   const curso = useLiveQuery(() => db.cursos.get(turma.cursoId));
+  const notasAll = useLiveQuery(() => db.notas.toArray()) || [];
   const isSubsequente = curso?.modalidade === 'Técnico Subsequente';
   const etapasParaRenderizar = isSubsequente ? [1, 2] : [1, 2, 3, 4];
 
@@ -183,15 +184,45 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {disciplinas.map(d => (
-            <div key={d.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+          {disciplinas.map(d => {
+            const discNotas = notasAll.filter(n => n.disciplinaId === d.id);
+            let hasLancamentoParcial = false;
+
+            for (const etapa of etapasParaRenderizar) {
+              let temNotaCount = 0;
+              let semNotaCount = 0;
+
+              for (const aluno of alunos) {
+                const n = discNotas.find(x => x.alunoId === aluno.id && x.etapa === etapa);
+                if (n && n.nota !== undefined && n.nota !== null && String(n.nota) !== '') {
+                  temNotaCount++;
+                } else {
+                  semNotaCount++;
+                }
+              }
+
+              if (temNotaCount > 0 && semNotaCount > 0) {
+                hasLancamentoParcial = true;
+                break;
+              }
+            }
+
+            const cardStyle = hasLancamentoParcial 
+              ? "bg-red-50/20 rounded-xl shadow-md shadow-red-500/30 border border-red-400 p-5 hover:shadow-lg transition-shadow" 
+              : "bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow";
+
+            return (
+            <div key={d.id} className={cardStyle}>
               <div className="flex items-center gap-3 mb-4">
-                <div className="bg-blue-100 p-2 rounded-lg">
-                  <BookOpen className="w-5 h-5 text-blue-600" />
+                <div className={`${hasLancamentoParcial ? 'bg-red-100' : 'bg-blue-100'} p-2 rounded-lg`}>
+                  <BookOpen className={`w-5 h-5 ${hasLancamentoParcial ? 'text-red-600' : 'text-blue-600'}`} />
                 </div>
                 <h3 className="font-bold text-gray-800 text-lg flex-1 truncate" title={d.nome}>{d.nome}</h3>
               </div>
-              <p className="text-xs text-gray-500 mb-4">Carga Horária: {d.chAula}h</p>
+              <p className="text-xs text-gray-500 mb-4 flex justify-between">
+                <span>Carga Horária: {d.chAula}h</span>
+                {hasLancamentoParcial && <span className="text-red-600 font-bold">⚠️ Falta lançamento</span>}
+              </p>
 
               <div className="grid grid-cols-2 gap-2">
                 {etapasParaRenderizar.map(etapa => (
@@ -211,7 +242,7 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
                 </button>
               </div>
             </div>
-          ))}
+          )})}
           {disciplinas.length === 0 && (
             <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">
               Nenhuma disciplina cadastrada para esta turma.
