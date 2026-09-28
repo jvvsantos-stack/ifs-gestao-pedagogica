@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
-import { Search, X, AlertTriangle, GraduationCap, ClipboardList, Briefcase, Gavel } from 'lucide-react';
+import { Search, X, AlertTriangle, GraduationCap, ClipboardList, Briefcase, Gavel, Wallet } from 'lucide-react';
 
 interface BuscaAlunoModalProps {
   onClose: () => void;
@@ -199,26 +199,20 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                             <GraduationCap className="w-6 h-6 text-indigo-600" />
                             {aluno.nome}
                           </h3>
-                          <div className="mt-2 text-sm text-gray-600 flex items-center gap-4">
-                            <span><strong>Turma:</strong> {turma?.nome} ({turma?.codigo})</span>
-                            <span><strong>Curso:</strong> {curso?.nome} ({curso?.modalidade})</span>
-                            {turma?.anoLetivo && <span><strong>Ano Letivo:</strong> {turma.anoLetivo}</span>}
-                          </div>
-                          
-                          <div className="mt-3">
-                            <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold border ${isPeDeMeiaApto ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
-                              {isPeDeMeiaApto ? '✅ Habilitado Pé de Meia' : '❌ Não Habilitado Pé de Meia'} ({freqGlobal.toFixed(1)}%)
-                            </span>
+                          <div className="mt-2 text-sm text-gray-600 flex flex-wrap md:flex-nowrap items-center gap-3 sm:gap-4">
+                            <span className="whitespace-nowrap"><strong>Turma:</strong> {turma?.nome}</span>
+                            <span className="whitespace-nowrap"><strong>Curso:</strong> {curso?.nome}</span>
+                            {turma?.anoLetivo && <span className="whitespace-nowrap"><strong>Ano Letivo:</strong> {turma.anoLetivo}</span>}
                           </div>
                         </div>
-                        <div className="flex gap-4">
-                          <div className="text-center px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-100">
-                            <div className="text-xs font-bold text-gray-500 uppercase">Média Geral</div>
-                            <div className="text-2xl font-bold text-indigo-600">{mediaGeral}</div>
+                        <div className="flex flex-col gap-2">
+                          <div className="text-center px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-100">
+                            <div className="text-[10px] font-bold text-gray-500 uppercase">Média Geral</div>
+                            <div className="text-xl font-bold text-indigo-600">{mediaGeral}</div>
                           </div>
-                          <div className="text-center px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-100">
-                            <div className="text-xs font-bold text-gray-500 uppercase">Pendências</div>
-                            <div className={`text-2xl font-bold ${pendenciasCount > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                          <div className="text-center px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-100">
+                            <div className="text-[10px] font-bold text-gray-500 uppercase">Pendências</div>
+                            <div className={`text-xl font-bold ${pendenciasCount > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
                               {pendenciasCount}
                             </div>
                           </div>
@@ -282,8 +276,8 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                       </table>
                     </div>
 
-                    {/* Estágio & Conselho */}
-                    <div className="bg-white border-t border-gray-200 p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Estágio, Conselho e Pé de Meia */}
+                    <div className="bg-white border-t border-gray-200 p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                       {/* Estágio */}
                       <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                         <h4 className="text-md font-bold text-gray-800 mb-3 flex items-center gap-2">
@@ -317,6 +311,17 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                         ) : (
                           <p className="text-sm text-gray-500">O aluno não passou por decisão de conselho.</p>
                         )}
+                      </div>
+
+                      {/* Programa Pé de Meia */}
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <h4 className="text-md font-bold text-gray-800 mb-3 flex items-center gap-2">
+                          <Wallet className="w-5 h-5 text-emerald-600" />
+                          Programa Pé de Meia
+                        </h4>
+                        <div className={`text-sm font-semibold p-3 rounded-lg border ${isPeDeMeiaApto ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-red-100 text-red-800 border-red-200'}`}>
+                          {isPeDeMeiaApto ? '✅ Habilitado' : '❌ Não Habilitado'} ({freqGlobal.toFixed(1)}%)
+                        </div>
                       </div>
                     </div>
 
