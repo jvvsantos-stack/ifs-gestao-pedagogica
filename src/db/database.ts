@@ -95,8 +95,9 @@ export interface Estagio {
     chTotal: string;
     avaliacao: 'Fraco' | 'Regular' | 'Bom' | 'Ótimo' | '';
     comentarios: string;
+    motivoNaoFinalizado?: 'Desistiu' | 'Não entregou relatório' | string;
   };
-  status: 'Ativo' | 'Finalizado' | 'Arquivado';
+  status: 'Ativo' | 'Finalizado' | 'Arquivado' | 'Não Finalizado';
 }
 
 export class AppDatabase extends Dexie {

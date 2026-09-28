@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Turma, type Curso, type Aluno, type Estagio } from '../db/database';
-import { Plus, Edit2, Trash2, CheckCircle, Archive, Save, X, Briefcase } from 'lucide-react';
+import { Plus, Edit2, Trash2, CheckCircle, Archive, Save, X, Briefcase, RotateCcw } from 'lucide-react';
 
 export const EstagiosView: React.FC = () => {
   const [cursos, setCursos] = useState<Curso[]>([]);
@@ -14,9 +14,11 @@ export const EstagiosView: React.FC = () => {
 
   const [showForm, setShowForm] = useState(false);
   const [showFinalizar, setShowFinalizar] = useState(false);
+  const [showNaoFinalizado, setShowNaoFinalizado] = useState(false);
   
   const [currentEstagio, setCurrentEstagio] = useState<Partial<Estagio> | null>(null);
   const [finalizarData, setFinalizarData] = useState({ termino: '', nota: '', chTotal: '', avaliacao: '', comentarios: '' });
+  const [motivoNaoFinalizado, setMotivoNaoFinalizado] = useState('');
 
   // Load Integrado courses
   useEffect(() => {
@@ -96,6 +98,33 @@ export const EstagiosView: React.FC = () => {
     setFinalizarData({ termino: '', nota: '', chTotal: '', avaliacao: '', comentarios: '' });
   };
 
+  const handleSaveNaoFinalizado = async () => {
+    if (!currentEstagio?.id || !motivoNaoFinalizado) return;
+    await db.estagios.update(currentEstagio.id, {
+      status: 'Não Finalizado',
+      dadosFinalizacao: {
+        termino: new Date().toISOString().split('T')[0],
+        nota: '',
+        chTotal: '',
+        avaliacao: '',
+        comentarios: '',
+        motivoNaoFinalizado
+      }
+    });
+    setShowNaoFinalizado(false);
+    setCurrentEstagio(null);
+    setMotivoNaoFinalizado('');
+  };
+
+  const handleReverterStatus = async (estagio: Estagio) => {
+    if (window.confirm('Deseja reverter este estágio para o status "Ativo"?')) {
+      await db.estagios.update(estagio.id!, {
+        status: 'Ativo',
+        dadosFinalizacao: undefined
+      });
+    }
+  };
+
   const openNewForm = () => {
     setCurrentEstagio({
       dadosEmpresa: { nome: '', ramo: '', endereco: '', telefone: '', bairroCidade: '', cep: '' },
@@ -171,6 +200,8 @@ export const EstagiosView: React.FC = () => {
                   className={`p-5 rounded-xl border ${
                     estagio.status === 'Finalizado' 
                       ? 'shadow-lg border-l-4 border-l-green-500 bg-green-50 border-gray-200' 
+                      : estagio.status === 'Não Finalizado'
+                      ? 'shadow-lg border-l-4 border-l-orange-500 bg-orange-50 border-gray-200'
                       : estagio.status === 'Arquivado'
                       ? 'bg-gray-100 border-gray-200 opacity-75'
                       : 'bg-white border-gray-200 shadow-sm border-l-4 border-l-indigo-500'
@@ -186,17 +217,24 @@ export const EstagiosView: React.FC = () => {
                       {estagio.dadosEstagio?.areasAtuacao && (
                         <p className="text-sm text-gray-600"><span className="font-medium">Área:</span> {estagio.dadosEstagio.areasAtuacao}</p>
                       )}
-                      <div className="text-sm text-gray-500 mt-2 flex gap-4">
+                      <div className="text-sm text-gray-500 mt-2 flex flex-wrap gap-x-4 gap-y-1">
                         {estagio.dadosEstagio?.inicio && (
                           <span>Início: {new Date(estagio.dadosEstagio.inicio + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
                         )}
                         {estagio.dadosFinalizacao?.termino && (
                           <span>Término: {new Date(estagio.dadosFinalizacao.termino + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
                         )}
+                        {estagio.status === 'Finalizado' && estagio.dadosFinalizacao?.nota && (
+                          <span className="font-medium text-gray-900">Nota: {estagio.dadosFinalizacao.nota}</span>
+                        )}
+                        {estagio.status === 'Não Finalizado' && estagio.dadosFinalizacao?.motivoNaoFinalizado && (
+                          <span className="font-medium text-orange-600">Motivo: {estagio.dadosFinalizacao.motivoNaoFinalizado}</span>
+                        )}
                       </div>
                     </div>
                     <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
                       estagio.status === 'Finalizado' ? 'bg-green-100 text-green-800' :
+                      estagio.status === 'Não Finalizado' ? 'bg-orange-100 text-orange-800' :
                       estagio.status === 'Arquivado' ? 'bg-gray-200 text-gray-800' :
                       'bg-indigo-100 text-indigo-800'
                     }`}>
@@ -213,12 +251,30 @@ export const EstagiosView: React.FC = () => {
                       <Edit2 className="w-4 h-4" />
                     </button>
                     {estagio.status === 'Ativo' && (
+                      <>
+                        <button
+                          onClick={() => { setCurrentEstagio(estagio); setShowFinalizar(true); }}
+                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
+                          title="Finalizar Estágio"
+                        >
+                          <CheckCircle className="w-4 h-4" /> <span className="text-sm font-medium">Finalizar</span>
+                        </button>
+                        <button
+                          onClick={() => { setCurrentEstagio(estagio); setShowNaoFinalizado(true); }}
+                          className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-1"
+                          title="Marcar como Não Finalizado"
+                        >
+                          <X className="w-4 h-4" /> <span className="text-sm font-medium">Não Finalizou</span>
+                        </button>
+                      </>
+                    )}
+                    {(estagio.status === 'Finalizado' || estagio.status === 'Não Finalizado') && (
                       <button
-                        onClick={() => { setCurrentEstagio(estagio); setShowFinalizar(true); }}
-                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
-                        title="Finalizar Estágio"
+                        onClick={() => handleReverterStatus(estagio)}
+                        className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1"
+                        title="Reverter para Ativo"
                       >
-                        <CheckCircle className="w-4 h-4" /> <span className="text-sm font-medium">Finalizar</span>
+                        <RotateCcw className="w-4 h-4" /> <span className="text-sm font-medium">Reverter</span>
                       </button>
                     )}
                     {estagio.status !== 'Arquivado' && (
@@ -356,6 +412,39 @@ export const EstagiosView: React.FC = () => {
                 <button onClick={() => setShowFinalizar(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancelar</button>
                 <button onClick={handleSaveFinalizar} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2">
                   <CheckCircle className="w-4 h-4" /> Confirmar Término
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Não Finalizado Modal */}
+      {showNaoFinalizado && currentEstagio && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-900">Estágio Não Finalizado</h2>
+              <button onClick={() => setShowNaoFinalizado(false)} className="text-gray-400 hover:text-gray-600"><X className="w-6 h-6" /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Motivo</label>
+                <select
+                  required
+                  value={motivoNaoFinalizado}
+                  onChange={e => setMotivoNaoFinalizado(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded"
+                >
+                  <option value="">Selecione o motivo...</option>
+                  <option value="Desistiu">Desistiu</option>
+                  <option value="Não entregou relatório">Não entregou relatório</option>
+                </select>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <button onClick={() => setShowNaoFinalizado(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancelar</button>
+                <button onClick={handleSaveNaoFinalizado} disabled={!motivoNaoFinalizado} className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50">
+                  Confirmar
                 </button>
               </div>
             </div>
