@@ -243,9 +243,9 @@ export const EstagiosView: React.FC = () => {
 
       {/* Form Modal */}
       {showForm && currentEstagio && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl my-8">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50 rounded-t-xl sticky top-0 z-10">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50 rounded-t-xl shrink-0">
               <h2 className="text-xl font-bold text-gray-900">
                 {currentEstagio.id ? 'Editar Estágio' : 'Cadastrar Novo Estágio'}
               </h2>
@@ -254,7 +254,7 @@ export const EstagiosView: React.FC = () => {
               </button>
             </div>
             
-            <form onSubmit={handleSaveEstagio} className="p-6 space-y-8">
+            <form onSubmit={handleSaveEstagio} className="flex-1 overflow-y-auto p-6 space-y-8">
               
               <section>
                 <h3 className="text-lg font-semibold text-indigo-900 border-b pb-2 mb-4">Dados da Empresa</h3>
@@ -294,7 +294,7 @@ export const EstagiosView: React.FC = () => {
                 </div>
               </section>
 
-              <div className="flex justify-end gap-3 pt-4 border-t sticky bottom-0 bg-white py-4">
+              <div className="flex justify-end gap-3 pt-4 mt-6 border-t shrink-0">
                 <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancelar</button>
                 <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
                   <Save className="w-4 h-4" /> Salvar Estágio
