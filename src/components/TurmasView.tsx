@@ -188,6 +188,7 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
             const discNotas = notasAll.filter(n => n.disciplinaId === d.id);
             let hasLancamentoParcial = false;
             let totalEtapasCompletas = 0;
+            const etapaStatus: Record<number, 'vazio' | 'parcial' | 'completo'> = {};
 
             for (const etapa of etapasParaRenderizar) {
               let temNotaCount = 0;
@@ -203,10 +204,13 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
               }
 
               if (temNotaCount > 0 && semNotaCount > 0) {
+                etapaStatus[etapa] = 'parcial';
                 hasLancamentoParcial = true;
-                break;
               } else if (temNotaCount > 0 && semNotaCount === 0) {
+                etapaStatus[etapa] = 'completo';
                 totalEtapasCompletas++;
+              } else {
+                etapaStatus[etapa] = 'vazio';
               }
             }
 
@@ -246,15 +250,24 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
               </p>
 
               <div className="grid grid-cols-2 gap-2">
-                {etapasParaRenderizar.map(etapa => (
-                  <button
-                    key={etapa}
-                    onClick={() => { setActiveTab(etapa); setSelectedDisciplinaId(d.id!); }}
-                    className="border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 text-gray-600 hover:text-indigo-700 py-1.5 rounded text-sm font-medium transition-colors"
-                  >
-                    {etapa}ª Etapa
-                  </button>
-                ))}
+                {etapasParaRenderizar.map(etapa => {
+                  let btnStyle = "border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 text-gray-600 hover:text-indigo-700 py-1.5 rounded text-sm font-medium transition-colors";
+                  if (etapaStatus[etapa] === 'parcial') {
+                    btnStyle = "bg-red-50 border border-red-400 text-red-700 shadow-sm shadow-red-500/40 hover:bg-red-100 hover:border-red-500 py-1.5 rounded text-sm font-bold transition-colors";
+                  } else if (etapaStatus[etapa] === 'completo') {
+                    btnStyle = "bg-green-50 border border-green-400 text-green-700 shadow-sm shadow-green-500/40 hover:bg-green-100 hover:border-green-500 py-1.5 rounded text-sm font-bold transition-colors";
+                  }
+                  
+                  return (
+                    <button
+                      key={etapa}
+                      onClick={() => { setActiveTab(etapa); setSelectedDisciplinaId(d.id!); }}
+                      className={btnStyle}
+                    >
+                      {etapa}ª Etapa
+                    </button>
+                  );
+                })}
                 <button
                   onClick={() => { setActiveTab('consolidacao'); setSelectedDisciplinaId(d.id!); }}
                   className="col-span-2 mt-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded text-sm font-bold transition-colors"
