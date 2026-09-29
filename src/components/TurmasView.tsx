@@ -759,7 +759,7 @@ const DiarioDisciplina: React.FC<{
     let situacaoCor = 'text-gray-600';
 
     if (faltasTot > limiteFaltas) {
-        situacao = 'Rep. Faltas';
+        situacao = 'Limite de faltas excedido';
         situacaoCor = 'text-red-600 font-bold';
     } else if (!todasNotasDigitadas) {
         situacao = 'Cursando';
