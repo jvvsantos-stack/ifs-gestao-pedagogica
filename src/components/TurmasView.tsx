@@ -649,6 +649,13 @@ const DiarioDisciplina: React.FC<{
   const notasRaw = useLiveQuery(() => db.notas.where('disciplinaId').equals(disciplina.id!).toArray(), [disciplina.id, activeTab]) || [];
   const avaliacoesRaw = useLiveQuery(() => db.avaliacoes_finais.where('disciplinaId').equals(disciplina.id!).toArray(), [disciplina.id, activeTab]) || [];
 
+  const todasDisciplinas = useLiveQuery(() => db.disciplinas.where('turmaId').equals(turma.id!).toArray(), [turma.id]) || [];
+  const allNotasDaTurma = useLiveQuery(() => {
+    if (todasDisciplinas.length === 0) return [];
+    const discIds = todasDisciplinas.map(d => d.id!);
+    return db.notas.where('disciplinaId').anyOf(discIds).toArray();
+  }, [todasDisciplinas]) || [];
+
   const notasMap = React.useMemo(() => {
     const map: Record<number, Record<number, Nota>> = {};
     notasRaw.forEach(n => {
@@ -918,16 +925,25 @@ const DiarioDisciplina: React.FC<{
                       <div className="truncate flex items-center gap-2">
                         <span>{aluno.nome}</span>
                         {(() => {
-                          let faltasTot = 0;
-                          for (let i = 1; i <= (isSubsequente ? 2 : 4); i++) {
-                            faltasTot += notas[i]?.faltas || 0;
+                          let totalCargaHoraria = 0;
+                          let totalFaltasGlobal = 0;
+                          
+                          for (const d of todasDisciplinas) {
+                            totalCargaHoraria += d.chRelogio;
                           }
-                          const freq = disciplina.chRelogio > 0 ? ((disciplina.chRelogio - faltasTot) / disciplina.chRelogio) * 100 : 100;
+                          
+                          const alunoNotas = allNotasDaTurma.filter(n => n.alunoId === aluno.id);
+                          for (const n of alunoNotas) {
+                            totalFaltasGlobal += n.faltas || 0;
+                          }
+                          
+                          const freq = totalCargaHoraria > 0 ? ((totalCargaHoraria - totalFaltasGlobal) / totalCargaHoraria) * 100 : 100;
                           const isApto = freq >= 80;
+                          
                           return (
                             <span 
                               className={`text-[10px] px-1.5 py-0.5 rounded font-bold cursor-help ${isApto ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}
-                              title={`Pé de Meia: ${freq.toFixed(1)}% de frequência na disciplina`}
+                              title={`Pé de Meia: ${freq.toFixed(1)}% de frequência global`}
                             >
                               {isApto ? 'PM ✅' : 'PM ❌'}
                             </span>
