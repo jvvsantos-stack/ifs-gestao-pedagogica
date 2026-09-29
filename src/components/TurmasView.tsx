@@ -758,10 +758,9 @@ const DiarioDisciplina: React.FC<{
     let situacao = '';
     let situacaoCor = 'text-gray-600';
 
-    if (faltasTot > limiteFaltas) {
-        situacao = 'Limite de faltas excedido';
-        situacaoCor = 'text-red-600 font-bold';
-    } else if (!todasNotasDigitadas) {
+    const faltasExcedidas = faltasTot > limiteFaltas;
+
+    if (!todasNotasDigitadas) {
         situacao = 'Cursando';
         situacaoCor = 'text-blue-600';
     } else if (av?.statusConselho === 'aprovado' || av?.aprovadoConselho) {
@@ -796,7 +795,7 @@ const DiarioDisciplina: React.FC<{
         }
     }
 
-    return { status: situacao, cor: situacaoCor, mediaParcial: mediaParcialStr, mediaFinal: mediaFinalStr, totalFaltas: faltasTot };
+    return { status: situacao, cor: situacaoCor, mediaParcial: mediaParcialStr, mediaFinal: mediaFinalStr, totalFaltas: faltasTot, faltasExcedidas };
   };
 
   return (
@@ -966,8 +965,13 @@ const DiarioDisciplina: React.FC<{
                           <td className="px-2 py-2 border-l border-gray-200 bg-gray-50 text-center font-bold text-gray-900">
                             {sit.mediaFinal}
                           </td>
-                          <td className={`px-4 py-2 border-l border-gray-100 font-bold ${sit.cor}`}>
-                            {sit.status}
+                          <td className="px-4 py-2 border-l border-gray-100">
+                            <div className="flex flex-col items-center justify-center text-center">
+                              <span className={`font-bold ${sit.cor}`}>{sit.status}</span>
+                              {sit.faltasExcedidas && (
+                                <span className="text-xs text-red-600 mt-1 font-bold">Faltas acima do limite</span>
+                              )}
+                            </div>
                           </td>
                         </>
                       );

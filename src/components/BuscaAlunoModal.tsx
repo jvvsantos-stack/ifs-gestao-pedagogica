@@ -157,18 +157,19 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                   const isFinished = notasPreenchidas === numEtapas;
 
                   if (isFinished) {
-                    if (faltas > limiteFaltas) situacao = 'Limite de Faltas excedido';
-                    else if (af?.statusConselho) situacao = af.statusConselho === 'aprovado' ? 'Aprovado (Conselho)' : 'Reprovado (Conselho)';
+                    if (af?.statusConselho) situacao = af.statusConselho === 'aprovado' ? 'Aprovado (Conselho)' : 'Reprovado (Conselho)';
                     else if (af?.aprovadoConselho) situacao = 'Aprovado (Conselho)';
                     else if (mediaFinal! >= 6.0) situacao = 'Aprovado';
                     else situacao = 'Reprovado';
                   }
 
+                  const faltasExcedidas = faltas > limiteFaltas;
+
                   if (situacao.includes('Reprovado')) {
                     pendenciasCount++;
                   }
 
-                  return { disc, notasEtapas, faltas, limiteFaltas, mediaFinal, situacao, af };
+                  return { disc, notasEtapas, faltas, limiteFaltas, mediaFinal, situacao, af, faltasExcedidas };
                 });
 
                 const mediaGeral = countDisciplinasAvaliadas > 0 ? (somaMediasGlobais / countDisciplinasAvaliadas).toFixed(1) : '-';
@@ -260,12 +261,17 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                                 </span>
                               </td>
                               <td className="px-6 py-3">
-                                <span className={`px-2 py-1 rounded text-xs font-bold inline-block
-                                  ${b.situacao === 'Cursando' ? 'bg-blue-100 text-blue-800' : 
-                                    b.situacao.includes('Aprovado') ? 'bg-emerald-100 text-emerald-800' : 
-                                    'bg-red-100 text-red-800'}`}>
-                                  {b.situacao}
-                                </span>
+                                <div className="flex flex-col items-center justify-center text-center">
+                                  <span className={`px-2 py-1 rounded text-xs font-bold inline-block
+                                    ${b.situacao === 'Cursando' ? 'bg-blue-100 text-blue-800' : 
+                                      b.situacao.includes('Aprovado') ? 'bg-emerald-100 text-emerald-800' : 
+                                      'bg-red-100 text-red-800'}`}>
+                                    {b.situacao}
+                                  </span>
+                                  {b.faltasExcedidas && (
+                                    <span className="text-xs text-red-600 mt-1 font-bold">Faltas acima do limite</span>
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           ))}
