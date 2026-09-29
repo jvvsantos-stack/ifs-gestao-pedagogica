@@ -739,6 +739,8 @@ const DiarioDisciplina: React.FC<{
 
     let mediaParcialStr = '-';
     let mediaFinalStr = '-';
+    let mediaFinalOrigStr: string | null = null;
+    let isAprovadoConselho = false;
     let mediaParcialNum = 0;
 
     if (todasNotasDigitadas) {
@@ -746,12 +748,19 @@ const DiarioDisciplina: React.FC<{
       mediaParcialStr = mediaParcialNum.toFixed(1);
       
       const notaProvaFinal = av?.provaFinal;
+      let finalMediaOrig = mediaParcialNum;
+      if (notaProvaFinal !== undefined && notaProvaFinal !== null && String(notaProvaFinal) !== '') {
+          finalMediaOrig = (mediaParcialNum + Number(notaProvaFinal)) / 2;
+      }
+      mediaFinalOrigStr = finalMediaOrig.toFixed(1);
+
       if (av?.statusConselho === 'aprovado' || av?.aprovadoConselho) {
         mediaFinalStr = '5.0';
+        isAprovadoConselho = true;
       } else if (notaProvaFinal === undefined || notaProvaFinal === null || String(notaProvaFinal) === '') {
         mediaFinalStr = mediaParcialStr;
       } else {
-        mediaFinalStr = ((mediaParcialNum + Number(notaProvaFinal)) / 2).toFixed(1);
+        mediaFinalStr = finalMediaOrig.toFixed(1);
       }
     }
 
@@ -795,7 +804,7 @@ const DiarioDisciplina: React.FC<{
         }
     }
 
-    return { status: situacao, cor: situacaoCor, mediaParcial: mediaParcialStr, mediaFinal: mediaFinalStr, totalFaltas: faltasTot, faltasExcedidas };
+    return { status: situacao, cor: situacaoCor, mediaParcial: mediaParcialStr, mediaFinal: mediaFinalStr, mediaFinalOrig: mediaFinalOrigStr, isAprovadoConselho, totalFaltas: faltasTot, faltasExcedidas };
   };
 
   return (
@@ -963,7 +972,14 @@ const DiarioDisciplina: React.FC<{
                             />
                           </td>
                           <td className="px-2 py-2 border-l border-gray-200 bg-gray-50 text-center font-bold text-gray-900">
-                            {sit.mediaFinal}
+                            {sit.isAprovadoConselho ? (
+                               <div className="flex flex-col items-center justify-center">
+                                  <span className="text-blue-600 font-semibold">{sit.mediaFinal}</span>
+                                  <span className="text-xs text-gray-500 font-normal">({sit.mediaFinalOrig})</span>
+                               </div>
+                            ) : (
+                               <span>{sit.mediaFinal}</span>
+                            )}
                           </td>
                           <td className="px-4 py-2 border-l border-gray-100">
                             <div className="flex flex-col items-center justify-center text-center">

@@ -82,6 +82,8 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
     let cursandoCount = 0;
     let conselhoDecision: 'aprovado' | 'reprovado' | null = null;
     let gradesByDisc: Record<number, number | null> = {};
+    let gradesOrigByDisc: Record<number, number | null> = {};
+    let isConselhoAprovadoByDisc: Record<number, boolean> = {};
     let disciplinasRisco: { disc: Disciplina, faltasTot: number, limite: number, percent: number }[] = [];
 
     let cargaHorariaTotal = 0;
@@ -115,6 +117,8 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
 
       if (notasPreenchidas.length === 0) {
         gradesByDisc[disc.id!] = null;
+        gradesOrigByDisc[disc.id!] = null;
+        isConselhoAprovadoByDisc[disc.id!] = false;
         cursandoCount++;
         return;
       }
@@ -134,11 +138,15 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
       }
 
       let finalMedia = finalMediaOrig;
+      let isConselho = false;
       if (av?.statusConselho === 'aprovado' || av?.aprovadoConselho) {
          finalMedia = 5.0;
+         isConselho = true;
       }
 
       gradesByDisc[disc.id!] = finalMedia;
+      gradesOrigByDisc[disc.id!] = finalMediaOrig;
+      isConselhoAprovadoByDisc[disc.id!] = isConselho;
 
       if (!todasNotasDigitadas) {
         return; // não calcula retenções se não fechou
@@ -155,7 +163,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
         pendencias.push({
           disc,
           mediaStr: finalMediaOrig.toFixed(1),
-          eligible: finalMediaOrig >= 4.0
+          eligible: true
         });
       }
     });
@@ -163,7 +171,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
     const limiteFaltasGlobal = Math.floor(cargaHorariaTotal * 0.25);
     const hasReprovacaoPorFalta = faltasGlobaisTotais > limiteFaltasGlobal;
 
-    const isEligible = cursandoCount === 0 && !hasReprovacaoPorFalta && qtdReprovacoes > 0 && qtdReprovacoes <= 2 && pendencias.every(p => p.eligible);
+    const isEligible = cursandoCount === 0 && !hasReprovacaoPorFalta && qtdReprovacoes > 0 && qtdReprovacoes <= 2;
 
     let statusText = '';
     if (cursandoCount > 0) {
@@ -197,6 +205,8 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
       conselhoDecision,
       alreadyApprovedAll: qtdReprovacoes === 0 && cursandoCount === 0 && !hasReprovacaoPorFalta,
       gradesByDisc,
+      gradesOrigByDisc,
+      isConselhoAprovadoByDisc,
       disciplinasRisco
     };
   });
@@ -405,10 +415,17 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                     </td>
                     {disciplinas.map(d => {
                       const nota = item.gradesByDisc[d.id!];
+                      const isConselho = item.isConselhoAprovadoByDisc[d.id!];
+                      const notaOrig = item.gradesOrigByDisc[d.id!];
                       return (
                         <td key={d.id} className="px-4 py-3 text-center align-middle font-bold">
                           {nota === null || nota === undefined ? (
                             <span className="text-gray-300">-</span>
+                          ) : isConselho ? (
+                            <div className="flex flex-col items-center justify-center">
+                              <span className="text-blue-600 font-semibold">{nota.toFixed(1)}</span>
+                              <span className="text-xs text-gray-500 font-normal">({notaOrig?.toFixed(1)})</span>
+                            </div>
                           ) : (
                             <span className={nota >= 6.0 ? 'text-green-600' : 'text-red-600'}>
                               {nota.toFixed(1)}

@@ -146,6 +146,14 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                     mediaFinal = (mediaAtual + Number(af.provaFinal)) / 2;
                   }
 
+                  let mediaFinalOrig = mediaFinal;
+                  let isAprovadoConselho = false;
+                  const isFinishedTemp = notasPreenchidas === numEtapas;
+                  if (isFinishedTemp && (af?.statusConselho === 'aprovado' || af?.aprovadoConselho)) {
+                    mediaFinal = 5.0;
+                    isAprovadoConselho = true;
+                  }
+
                   if (mediaFinal !== null) {
                     somaMediasGlobais += mediaFinal;
                     countDisciplinasAvaliadas++;
@@ -169,7 +177,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                     pendenciasCount++;
                   }
 
-                  return { disc, notasEtapas, faltas, limiteFaltas, mediaFinal, situacao, af, faltasExcedidas };
+                  return { disc, notasEtapas, faltas, limiteFaltas, mediaFinal, mediaFinalOrig, isAprovadoConselho, situacao, af, faltasExcedidas };
                 });
 
                 const mediaGeral = countDisciplinasAvaliadas > 0 ? (somaMediasGlobais / countDisciplinasAvaliadas).toFixed(1) : '-';
@@ -253,7 +261,16 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                                 {b.af?.provaFinal !== undefined && b.af.provaFinal !== null ? Number(b.af.provaFinal).toFixed(1) : '-'}
                               </td>
                               <td className="px-4 py-3 text-center font-bold text-gray-800">
-                                {b.mediaFinal !== null ? b.mediaFinal.toFixed(1) : '-'}
+                                {b.mediaFinal !== null ? (
+                                   b.isAprovadoConselho ? (
+                                      <div className="flex flex-col items-center justify-center">
+                                         <span className="text-blue-600 font-semibold">{b.mediaFinal.toFixed(1)}</span>
+                                         <span className="text-xs text-gray-500 font-normal">({b.mediaFinalOrig?.toFixed(1)})</span>
+                                      </div>
+                                   ) : (
+                                      <span>{b.mediaFinal.toFixed(1)}</span>
+                                   )
+                                ) : '-'}
                               </td>
                               <td className="px-4 py-3 text-center">
                                 <span className={`${b.faltas >= b.limiteFaltas ? 'text-red-600 font-bold' : b.faltas >= b.limiteFaltas * 0.8 ? 'text-amber-600 font-bold' : 'text-gray-600'}`}>
