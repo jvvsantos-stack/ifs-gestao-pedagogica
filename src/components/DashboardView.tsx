@@ -339,7 +339,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
                       <div>
                         <p className="font-bold text-base mb-1">{alerta.alunoNome} <span className="font-normal text-sm text-red-600">(Turma {alerta.turmaNome})</span></p>
                         {alerta.freqGlobal !== undefined && alerta.freqGlobal < 75 ? (
-                          <p className="text-sm text-red-700 font-semibold">Reprovação Escolar (Faltas Globais superam 25% da carga horária total).</p>
+                          <p className="text-sm text-red-700 font-semibold">Reprovado por Faltas</p>
                         ) : (
                           <p className="text-sm text-gray-700">Frequência geral prejudicada, mas ainda dentro do limite acadêmico de 25%.</p>
                         )}
