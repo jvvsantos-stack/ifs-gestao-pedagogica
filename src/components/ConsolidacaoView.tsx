@@ -79,13 +79,16 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
   const alunosProcessed = alunos.map(aluno => {
     let qtdReprovacoes = 0;
     let pendencias: { disc: Disciplina, mediaStr: string, eligible: boolean }[] = [];
-    let hasReprovacaoPorFalta = false;
     let cursandoCount = 0;
     let conselhoDecision: 'aprovado' | 'reprovado' | null = null;
     let gradesByDisc: Record<number, number | null> = {};
     let disciplinasRisco: { disc: Disciplina, faltasTot: number, limite: number, percent: number }[] = [];
 
+    let cargaHorariaTotal = 0;
+    let faltasGlobaisTotais = 0;
+
     disciplinas.forEach(disc => {
+      cargaHorariaTotal += disc.chRelogio;
       const limiteFaltas = Math.floor(disc.chRelogio * 0.25);
       const discNotas = notas.filter(n => n.alunoId === aluno.id && n.disciplinaId === disc.id);
       const av = avaliacoes.find(a => a.alunoId === aluno.id && a.disciplinaId === disc.id);
@@ -100,6 +103,8 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
         }
         faltasTot += (notaObj?.faltas || 0);
       }
+
+      faltasGlobaisTotais += faltasTot;
 
       if (faltasTot > 0) {
         const percent = faltasTot / limiteFaltas;
@@ -139,11 +144,6 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
         return; // não calcula retenções se não fechou
       }
 
-      if (faltasTot > limiteFaltas) {
-        hasReprovacaoPorFalta = true;
-        return;
-      }
-
       if (av?.statusConselho) {
          conselhoDecision = av.statusConselho;
       } else if (av?.aprovadoConselho) {
@@ -159,6 +159,9 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
         });
       }
     });
+
+    const limiteFaltasGlobal = Math.floor(cargaHorariaTotal * 0.25);
+    const hasReprovacaoPorFalta = faltasGlobaisTotais > limiteFaltasGlobal;
 
     const isEligible = cursandoCount === 0 && !hasReprovacaoPorFalta && qtdReprovacoes > 0 && qtdReprovacoes <= 2 && pendencias.every(p => p.eligible);
 
@@ -179,6 +182,8 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
       } else {
         statusText = 'Aguardando Decisão';
       }
+    } else if (qtdReprovacoes === 0 && !hasReprovacaoPorFalta) {
+      statusText = 'Aprovado';
     }
 
     return {
@@ -373,6 +378,9 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                   <th className="px-4 py-3 text-left font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[200px] sticky left-0 bg-gray-100 z-20">
                     Aluno
                   </th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[150px] sticky left-[200px] bg-gray-100 z-20">
+                    Situação
+                  </th>
                   {disciplinas.map(d => (
                     <th key={d.id} className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 min-w-[120px]">
                       <div className="truncate max-w-[150px]" title={d.nome}>{d.nome}</div>
@@ -385,6 +393,15 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                   <tr key={item.aluno.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 font-medium text-gray-800 align-middle border-r sticky left-0 bg-white group-hover:bg-gray-50">
                       {item.aluno.nome}
+                    </td>
+                    <td className="px-4 py-3 text-center align-middle border-r sticky left-[200px] bg-white group-hover:bg-gray-50 font-bold">
+                      <span className={`px-2 py-1 rounded text-xs font-bold inline-block
+                        ${item.statusText.includes('Aprovado') ? 'bg-emerald-100 text-emerald-800' :
+                          item.statusText.includes('Retido') || item.statusText.includes('Reprovado') ? 'bg-red-100 text-red-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                        {item.statusText}
+                      </span>
                     </td>
                     {disciplinas.map(d => {
                       const nota = item.gradesByDisc[d.id!];
