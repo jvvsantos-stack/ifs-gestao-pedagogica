@@ -649,12 +649,7 @@ const DiarioDisciplina: React.FC<{
   const notasRaw = useLiveQuery(() => db.notas.where('disciplinaId').equals(disciplina.id!).toArray(), [disciplina.id, activeTab]) || [];
   const avaliacoesRaw = useLiveQuery(() => db.avaliacoes_finais.where('disciplinaId').equals(disciplina.id!).toArray(), [disciplina.id, activeTab]) || [];
 
-  const todasDisciplinas = useLiveQuery(() => db.disciplinas.where('turmaId').equals(turma.id!).toArray(), [turma.id]) || [];
-  const allNotasDaTurma = useLiveQuery(() => {
-    if (todasDisciplinas.length === 0) return [];
-    const discIds = todasDisciplinas.map(d => d.id!);
-    return db.notas.where('disciplinaId').anyOf(discIds).toArray();
-  }, [todasDisciplinas]) || [];
+
 
   const notasMap = React.useMemo(() => {
     const map: Record<number, Record<number, Nota>> = {};
