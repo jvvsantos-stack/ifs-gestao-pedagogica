@@ -194,6 +194,9 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
       statusText = 'Aprovado';
     }
 
+    const freqGlobal = cargaHorariaTotal > 0 ? ((cargaHorariaTotal - faltasGlobaisTotais) / cargaHorariaTotal) * 100 : 100;
+    const isPeDeMeiaApto = freqGlobal >= 80;
+
     return {
       aluno,
       qtdReprovacoes,
@@ -207,7 +210,9 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
       gradesByDisc,
       gradesOrigByDisc,
       isConselhoAprovadoByDisc,
-      disciplinasRisco
+      disciplinasRisco,
+      isPeDeMeiaApto,
+      freqGlobal
     };
   });
 
@@ -389,6 +394,9 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                     Aluno
                   </th>
                   <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[150px] sticky left-[200px] bg-gray-100 z-20">
+                    Status Pé de Meia
+                  </th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[150px] sticky left-[350px] bg-gray-100 z-20">
                     Situação
                   </th>
                   {disciplinas.map(d => (
@@ -405,6 +413,11 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                       {item.aluno.nome}
                     </td>
                     <td className="px-4 py-3 text-center align-middle border-r sticky left-[200px] bg-white group-hover:bg-gray-50 font-bold">
+                      <span className={`px-2 py-1 rounded text-xs font-bold inline-block ${item.isPeDeMeiaApto ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
+                        {item.isPeDeMeiaApto ? 'Apto' : 'Não Apto'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center align-middle border-r sticky left-[350px] bg-white group-hover:bg-gray-50 font-bold">
                       <span className={`px-2 py-1 rounded text-xs font-bold inline-block
                         ${item.statusText.includes('Aprovado') ? 'bg-emerald-100 text-emerald-800' :
                           item.statusText.includes('Retido') || item.statusText.includes('Reprovado') ? 'bg-red-100 text-red-800' :

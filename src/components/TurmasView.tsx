@@ -924,31 +924,6 @@ const DiarioDisciplina: React.FC<{
                     <td className="px-4 py-2 font-medium text-gray-800 sticky left-0 bg-white group-hover:bg-gray-50 z-10 shadow-[1px_0_0_0_#f3f4f6]">
                       <div className="truncate flex items-center gap-2">
                         <span>{aluno.nome}</span>
-                        {(() => {
-                          let totalCargaHoraria = 0;
-                          let totalFaltasGlobal = 0;
-                          
-                          for (const d of todasDisciplinas) {
-                            totalCargaHoraria += d.chRelogio;
-                          }
-                          
-                          const alunoNotas = allNotasDaTurma.filter(n => n.alunoId === aluno.id);
-                          for (const n of alunoNotas) {
-                            totalFaltasGlobal += n.faltas || 0;
-                          }
-                          
-                          const freq = totalCargaHoraria > 0 ? ((totalCargaHoraria - totalFaltasGlobal) / totalCargaHoraria) * 100 : 100;
-                          const isApto = freq >= 80;
-                          
-                          return (
-                            <span 
-                              className={`text-[10px] px-1.5 py-0.5 rounded font-bold cursor-help ${isApto ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}
-                              title={`Pé de Meia: ${freq.toFixed(1)}% de frequência global`}
-                            >
-                              {isApto ? 'PM ✅' : 'PM ❌'}
-                            </span>
-                          );
-                        })()}
                       </div>
                     </td>
 
