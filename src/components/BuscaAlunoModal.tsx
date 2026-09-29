@@ -151,17 +151,13 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                     countDisciplinasAvaliadas++;
                   }
 
-                  if (faltas > limiteFaltas) {
-                    hasRiscoFaltas = true;
-                  } else if (faltas >= limiteFaltas * 0.8) {
-                    hasRiscoFaltas = true;
-                  }
+                  // Risco de faltas agora é avaliado globalmente fora do loop
 
                   let situacao = 'Cursando';
                   const isFinished = notasPreenchidas === numEtapas;
 
                   if (isFinished) {
-                    if (faltas > limiteFaltas) situacao = 'Reprovado por Faltas';
+                    if (faltas > limiteFaltas) situacao = 'Limite de Faltas excedido';
                     else if (af?.statusConselho) situacao = af.statusConselho === 'aprovado' ? 'Aprovado (Conselho)' : 'Reprovado (Conselho)';
                     else if (af?.aprovadoConselho) situacao = 'Aprovado (Conselho)';
                     else if (mediaFinal! >= 6.0) situacao = 'Aprovado';
@@ -179,6 +175,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                 
                 const freqGlobal = totalCargaHoraria > 0 ? ((totalCargaHoraria - totalFaltasGlobal) / totalCargaHoraria) * 100 : 100;
                 const isPeDeMeiaApto = freqGlobal >= 80;
+                hasRiscoFaltas = totalCargaHoraria > 0 && totalFaltasGlobal > (totalCargaHoraria * 0.25);
                 
                 // Determina situação no conselho
                 let conselhoGlobal = null;
@@ -222,7 +219,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                       {hasRiscoFaltas && (
                         <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-red-700 bg-red-100 p-3 rounded-lg border border-red-200">
                           <AlertTriangle className="w-5 h-5" />
-                          Alerta: Este aluno possui disciplinas com risco de reprovação por faltas (≥ 80% do limite).
+                          Alerta: Este aluno ultrapassou o limite global de faltas (25% da carga horária total).
                         </div>
                       )}
                     </div>

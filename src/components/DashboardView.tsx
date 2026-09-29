@@ -91,24 +91,6 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
             alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome, turmaNome: turma.nome, disciplinas: [], freqGlobal });
           }
         }
-        
-        for (const disc of disciplinasTurma) {
-          const limiteFaltas = Math.floor(disc.chRelogio * 0.25);
-          const notasDaDisc = alunoDiscNotas.filter(n => n.disciplinaId === disc.id);
-          let faltasNaDisc = 0;
-          for (const n of notasDaDisc) {
-            faltasNaDisc += n.faltas || 0;
-          }
-
-          if (faltasNaDisc >= limiteFaltas * 0.8) {
-            if (!alertasEvasaoMap.has(aluno.id!)) {
-              alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome, turmaNome: turma.nome, disciplinas: [], freqGlobal });
-            }
-            if (!alertasEvasaoMap.get(aluno.id!)!.disciplinas.includes(disc.nome)) {
-              alertasEvasaoMap.get(aluno.id!)!.disciplinas.push(disc.nome);
-            }
-          }
-        }
       }
 
       for (const aluno of alunosTurma) {
@@ -352,28 +334,17 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
                       </div>
                     )}
                     
-                    {alerta.disciplinas.length > 0 ? (
-                      <div className="flex items-start gap-3">
-                        <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-bold text-base mb-1">{alerta.alunoNome} <span className="font-normal text-sm text-red-600">(Turma {alerta.turmaNome})</span></p>
-                          <p className="mb-1">Está no limite de faltas nas seguintes disciplinas:</p>
-                          <ul className="list-disc list-inside ml-1 text-red-700">
-                            {alerta.disciplinas.map((d, i) => (
-                              <li key={i}>{d}</li>
-                            ))}
-                          </ul>
-                        </div>
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${alerta.freqGlobal !== undefined && alerta.freqGlobal < 75 ? 'text-red-500' : 'text-amber-500'}`} />
+                      <div>
+                        <p className="font-bold text-base mb-1">{alerta.alunoNome} <span className="font-normal text-sm text-red-600">(Turma {alerta.turmaNome})</span></p>
+                        {alerta.freqGlobal !== undefined && alerta.freqGlobal < 75 ? (
+                          <p className="text-sm text-red-700 font-semibold">Reprovação Escolar (Faltas Globais superam 25% da carga horária total).</p>
+                        ) : (
+                          <p className="text-sm text-gray-700">Frequência geral prejudicada, mas ainda dentro do limite acadêmico de 25%.</p>
+                        )}
                       </div>
-                    ) : (
-                      <div className="flex items-start gap-3">
-                        <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-bold text-base mb-1">{alerta.alunoNome} <span className="font-normal text-sm text-red-600">(Turma {alerta.turmaNome})</span></p>
-                          <p className="text-sm text-gray-700">Frequência geral prejudicada, mas não ultrapassou o limite acadêmico (25%) em nenhuma disciplina isolada.</p>
-                        </div>
-                      </div>
-                    )}
+                    </div>
                   </li>
                 ))}
               </ul>
