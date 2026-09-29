@@ -12,6 +12,8 @@ export const EstagiosView: React.FC = () => {
   const [selectedCursoId, setSelectedCursoId] = useState<number | ''>('');
   const [selectedTurmaId, setSelectedTurmaId] = useState<number | ''>('');
   const [formAlunoId, setFormAlunoId] = useState<number | ''>('');
+  
+  const [currentEstagio, setCurrentEstagio] = useState<Partial<Estagio> | null>(null);
 
   const [showForm, setShowForm] = useState(false);
   const [showFinalizar, setShowFinalizar] = useState(false);
