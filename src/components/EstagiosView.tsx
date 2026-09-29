@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Turma, type Curso, type Aluno, type Estagio } from '../db/database';
 import { Plus, Edit2, Trash2, CheckCircle, Archive, Save, X, Briefcase, RotateCcw } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 
 export const EstagiosView: React.FC = () => {
   const [cursos, setCursos] = useState<Curso[]>([]);
@@ -16,9 +17,9 @@ export const EstagiosView: React.FC = () => {
   const [showFinalizar, setShowFinalizar] = useState(false);
   const [showNaoFinalizado, setShowNaoFinalizado] = useState(false);
   
-  const [currentEstagio, setCurrentEstagio] = useState<Partial<Estagio> | null>(null);
   const [finalizarData, setFinalizarData] = useState({ termino: '', nota: '', chTotal: '', avaliacao: '', comentarios: '' });
   const [motivoNaoFinalizado, setMotivoNaoFinalizado] = useState('');
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
 
   // Load Integrado courses
   useEffect(() => {
@@ -78,9 +79,15 @@ export const EstagiosView: React.FC = () => {
   };
 
   const handleExcluir = async (id: number) => {
-    if (window.confirm('Tem certeza que deseja excluir este estágio?')) {
-      await db.estagios.delete(id);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Excluir Estágio',
+      message: 'Tem certeza que deseja excluir este estágio?',
+      onConfirm: async () => {
+        await db.estagios.delete(id);
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleArquivar = async (estagio: Estagio) => {
@@ -117,12 +124,18 @@ export const EstagiosView: React.FC = () => {
   };
 
   const handleReverterStatus = async (estagio: Estagio) => {
-    if (window.confirm('Deseja reverter este estágio para o status "Ativo"?')) {
-      await db.estagios.update(estagio.id!, {
-        status: 'Ativo',
-        dadosFinalizacao: undefined
-      });
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Reverter Estágio',
+      message: 'Deseja reverter este estágio para o status "Ativo"?',
+      onConfirm: async () => {
+        await db.estagios.update(estagio.id!, {
+          status: 'Ativo',
+          dadosFinalizacao: undefined
+        });
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const openNewForm = () => {
@@ -451,6 +464,14 @@ export const EstagiosView: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };

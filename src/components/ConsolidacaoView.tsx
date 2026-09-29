@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
 import type { Turma, Disciplina } from '../db/database';
 import { ArrowLeft, Users, Scale, Activity, BarChart2, AlertTriangle, Award } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 
 export const ConsolidacaoView: React.FC = () => {
   const [selectedTurma, setSelectedTurma] = useState<Turma | null>(null);
@@ -56,6 +57,7 @@ export const ConsolidacaoView: React.FC = () => {
 const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma, onBack }) => {
   const [activeTab, setActiveTab] = useState<'mapa' | 'conselho' | 'estatisticas' | 'risco' | 'monitoria' | 'ranking'>('mapa');
   const [monitoriaDiscId, setMonitoriaDiscId] = useState<number | ''>('');
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
   
   const curso = useLiveQuery(() => db.cursos.get(turma.cursoId));
   const isSubsequente = curso?.modalidade === 'Técnico Subsequente';
@@ -300,30 +302,44 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
   });
 
   const handleDecisaoConselho = async (alunoId: number, pendencias: { disc: Disciplina }[], decisao: 'aprovado' | 'reprovado') => {
-    if (!window.confirm(`Deseja confirmar a decisão: ${decisao.toUpperCase()} para este aluno?`)) return;
-    await Promise.all(pendencias.map(async (p) => {
-      const existing = await db.avaliacoes_finais.where({ alunoId, disciplinaId: p.disc.id! }).first();
-      if (existing && existing.id) {
-        await db.avaliacoes_finais.update(existing.id, { statusConselho: decisao, aprovadoConselho: decisao === 'aprovado' });
-      } else {
-        await db.avaliacoes_finais.add({
-          alunoId,
-          disciplinaId: p.disc.id!,
-          statusConselho: decisao,
-          aprovadoConselho: decisao === 'aprovado'
-        });
+    setConfirmModal({
+      isOpen: true,
+      title: 'Decisão do Conselho',
+      message: `Deseja confirmar a decisão: ${decisao.toUpperCase()} para este aluno?`,
+      onConfirm: async () => {
+        await Promise.all(pendencias.map(async (p) => {
+          const existing = await db.avaliacoes_finais.where({ alunoId, disciplinaId: p.disc.id! }).first();
+          if (existing && existing.id) {
+            await db.avaliacoes_finais.update(existing.id, { statusConselho: decisao, aprovadoConselho: decisao === 'aprovado' });
+          } else {
+            await db.avaliacoes_finais.add({
+              alunoId,
+              disciplinaId: p.disc.id!,
+              statusConselho: decisao,
+              aprovadoConselho: decisao === 'aprovado'
+            });
+          }
+        }));
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
       }
-    }));
+    });
   };
 
   const handleDesfazerDecisao = async (alunoId: number, pendencias: { disc: Disciplina }[]) => {
-    if (!window.confirm('Deseja desfazer a decisão do conselho?')) return;
-    await Promise.all(pendencias.map(async (p) => {
-      const existing = await db.avaliacoes_finais.where({ alunoId, disciplinaId: p.disc.id! }).first();
-      if (existing && existing.id) {
-        await db.avaliacoes_finais.update(existing.id, { statusConselho: null, aprovadoConselho: false });
+    setConfirmModal({
+      isOpen: true,
+      title: 'Desfazer Decisão',
+      message: 'Deseja desfazer a decisão do conselho?',
+      onConfirm: async () => {
+        await Promise.all(pendencias.map(async (p) => {
+          const existing = await db.avaliacoes_finais.where({ alunoId, disciplinaId: p.disc.id! }).first();
+          if (existing && existing.id) {
+            await db.avaliacoes_finais.update(existing.id, { statusConselho: null, aprovadoConselho: false });
+          }
+        }));
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
       }
-    }));
+    });
   };
 
   return (
@@ -787,6 +803,14 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
           </div>
         )}
       </main>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };

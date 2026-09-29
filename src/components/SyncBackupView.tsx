@@ -2,6 +2,7 @@ import React from 'react';
 import { db } from '../db/database';
 import { Cloud, CloudUpload, CloudDownload, RefreshCw, CheckCircle2, AlertTriangle, LogOut, User as UserIcon } from 'lucide-react';
 import { fazerUploadBackup, fazerDownloadBackup, getStoredToken } from '../utils/googleDriveSync';
+import { ConfirmModal } from './ConfirmModal';
 import type { GoogleUserInfo } from '../utils/googleDriveSync';
 
 interface SyncBackupViewProps {
@@ -12,6 +13,7 @@ interface SyncBackupViewProps {
 export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userInfo }) => {
   const [syncStatus, setSyncStatus] = React.useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = React.useState('');
+  const [confirmModal, setConfirmModal] = React.useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
 
 
 
@@ -33,10 +35,15 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
   };
 
   const handleForceDownload = async () => {
-    if (window.confirm('Atenção: Isso irá sobreescrever todos os seus dados locais com o que está no Google Drive. Tem certeza?')) {
-      try {
-        const token = getStoredToken();
-        if (!token) throw new Error('Sem token');
+    setConfirmModal({
+      isOpen: true,
+      title: 'Restaurar Backup',
+      message: 'Atenção: Isso irá sobreescrever todos os seus dados locais com o que está no Google Drive. Tem certeza?',
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        try {
+          const token = getStoredToken();
+          if (!token) throw new Error('Sem token');
         setSyncStatus('syncing');
         setStatusMessage('A transferir backup...');
         await fazerDownloadBackup(db, token);
@@ -47,8 +54,9 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
         console.error(e);
         setSyncStatus('error');
         setStatusMessage('Erro ao restaurar backup.');
+        }
       }
-    }
+    });
   };
 
   return (
@@ -144,6 +152,14 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
           </div>
         </div>
       </main>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };

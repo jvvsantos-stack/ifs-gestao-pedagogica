@@ -3,6 +3,7 @@ import { db } from '../db/database';
 import type { Aluno } from '../db/database';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { X, Trash2, Eye, Upload } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 
 interface Props {
   aluno: Aluno;
@@ -15,6 +16,7 @@ export const ModalOcorrencias: React.FC<Props> = ({ aluno, onClose }) => {
   const [descricao, setDescricao] = useState('');
   const [anexoNome, setAnexoNome] = useState<string | undefined>(undefined);
   const [anexoDados, setAnexoDados] = useState<string | ArrayBuffer | undefined>(undefined);
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -68,9 +70,15 @@ export const ModalOcorrencias: React.FC<Props> = ({ aluno, onClose }) => {
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Tem certeza que deseja excluir esta ocorrência?')) {
-      await db.ocorrencias.delete(id);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Excluir Ocorrência',
+      message: 'Tem certeza que deseja excluir esta ocorrência?',
+      onConfirm: async () => {
+        await db.ocorrencias.delete(id);
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleViewAnexo = (dados: string | ArrayBuffer) => {
@@ -232,6 +240,14 @@ export const ModalOcorrencias: React.FC<Props> = ({ aluno, onClose }) => {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };

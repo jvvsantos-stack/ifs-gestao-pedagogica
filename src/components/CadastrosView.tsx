@@ -4,6 +4,7 @@ import { db } from '../db/database';
 import type { Curso, Turma, Disciplina } from '../db/database';
 import { Edit, Trash2, X, Archive, ArchiveRestore } from 'lucide-react';
 import { catalogoPPC } from '../utils/catalogoPPC';
+import { ConfirmModal } from './ConfirmModal';
 
 export const CadastrosView: React.FC = () => {
   // --- Estados de Edição ---
@@ -32,6 +33,8 @@ export const CadastrosView: React.FC = () => {
 
   const [viewTurmas, setViewTurmas] = useState<'ativas' | 'arquivadas'>('ativas');
   const [viewDisciplinas, setViewDisciplinas] = useState<'ativas' | 'arquivadas'>('ativas');
+  
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
 
   // --- Consultas em Tempo Real ---
   const cursos = useLiveQuery(() => db.cursos.toArray()) || [];
@@ -70,19 +73,25 @@ export const CadastrosView: React.FC = () => {
   };
 
   const handleDeleteCurso = async (id: number) => {
-    if (window.confirm('Tem certeza que deseja excluir este curso? Todas as turmas e disciplinas vinculadas também serão excluídas.')) {
-      const turmasDoCurso = await db.turmas.where('cursoId').equals(id).toArray();
-      const turmasIds = turmasDoCurso.map(t => t.id!);
-      
-      const disciplinasDasTurmas = await db.disciplinas.where('turmaId').anyOf(turmasIds).toArray();
-      const disciplinasIds = disciplinasDasTurmas.map(d => d.id!);
+    setConfirmModal({
+      isOpen: true,
+      title: 'Excluir Curso',
+      message: 'Tem certeza que deseja excluir este curso? Todas as turmas e disciplinas vinculadas também serão excluídas.',
+      onConfirm: async () => {
+        const turmasDoCurso = await db.turmas.where('cursoId').equals(id).toArray();
+        const turmasIds = turmasDoCurso.map(t => t.id!);
+        
+        const disciplinasDasTurmas = await db.disciplinas.where('turmaId').anyOf(turmasIds).toArray();
+        const disciplinasIds = disciplinasDasTurmas.map(d => d.id!);
 
-      await db.disciplinas.bulkDelete(disciplinasIds);
-      await db.turmas.bulkDelete(turmasIds);
-      await db.cursos.delete(id);
+        await db.disciplinas.bulkDelete(disciplinasIds);
+        await db.turmas.bulkDelete(turmasIds);
+        await db.cursos.delete(id);
 
-      if (editingCursoId === id) cancelEditCurso();
-    }
+        if (editingCursoId === id) cancelEditCurso();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleSaveCurso = async (e: React.FormEvent) => {
@@ -126,15 +135,21 @@ export const CadastrosView: React.FC = () => {
   };
 
   const handleDeleteTurma = async (id: number) => {
-    if (window.confirm('Tem certeza que deseja excluir esta turma? Todas as disciplinas vinculadas também serão excluídas.')) {
-      const disciplinasDaTurma = await db.disciplinas.where('turmaId').equals(id).toArray();
-      const disciplinasIds = disciplinasDaTurma.map(d => d.id!);
+    setConfirmModal({
+      isOpen: true,
+      title: 'Excluir Turma',
+      message: 'Tem certeza que deseja excluir esta turma? Todas as disciplinas vinculadas também serão excluídas.',
+      onConfirm: async () => {
+        const disciplinasDaTurma = await db.disciplinas.where('turmaId').equals(id).toArray();
+        const disciplinasIds = disciplinasDaTurma.map(d => d.id!);
 
-      await db.disciplinas.bulkDelete(disciplinasIds);
-      await db.turmas.delete(id);
+        await db.disciplinas.bulkDelete(disciplinasIds);
+        await db.turmas.delete(id);
 
-      if (editingTurmaId === id) cancelEditTurma();
-    }
+        if (editingTurmaId === id) cancelEditTurma();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleSaveTurma = async (e: React.FormEvent) => {
@@ -184,10 +199,16 @@ export const CadastrosView: React.FC = () => {
   };
 
   const handleDeleteDisciplina = async (id: number) => {
-    if (window.confirm('Tem certeza que deseja excluir esta disciplina?')) {
-      await db.disciplinas.delete(id);
-      if (editingDisciplinaId === id) cancelEditDisciplina();
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Excluir Disciplina',
+      message: 'Tem certeza que deseja excluir esta disciplina?',
+      onConfirm: async () => {
+        await db.disciplinas.delete(id);
+        if (editingDisciplinaId === id) cancelEditDisciplina();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleSaveDisciplina = async (e: React.FormEvent) => {
@@ -636,6 +657,14 @@ export const CadastrosView: React.FC = () => {
         </section>
 
       </div>
+      
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };
