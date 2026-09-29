@@ -251,10 +251,10 @@ export const CadastrosView: React.FC = () => {
         <p className="text-gray-500 text-sm">Gerencie os cursos, turmas e disciplinas da instituição</p>
       </header>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="flex flex-col gap-8 w-full">
         
         {/* CARD: CURSOS */}
-        <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col h-[600px]">
+        <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col w-full">
           <div className="p-4 border-b border-gray-100 bg-indigo-50/30 flex justify-between items-center">
             <h2 className="text-lg font-bold text-gray-800">1. Cursos</h2>
             {editingCursoId && (
@@ -294,7 +294,7 @@ export const CadastrosView: React.FC = () => {
             </form>
           </div>
 
-          <div className="p-4 flex-1 overflow-y-auto bg-gray-50/50">
+          <div className="p-4 flex-1 bg-gray-50/50">
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Cursos Cadastrados</h3>
             <ul className="space-y-2">
               {cursos.map(c => (
@@ -319,7 +319,7 @@ export const CadastrosView: React.FC = () => {
         </section>
 
         {/* CARD: TURMAS */}
-        <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col h-[600px]">
+        <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col w-full">
           <div className="p-4 border-b border-gray-100 bg-indigo-50/30 flex justify-between items-center">
             <h2 className="text-lg font-bold text-gray-800">2. Turmas</h2>
             {editingTurmaId && (
@@ -394,7 +394,7 @@ export const CadastrosView: React.FC = () => {
             </form>
           </div>
 
-          <div className="p-4 flex-1 overflow-y-auto bg-gray-50/50 flex flex-col">
+          <div className="p-4 flex-1 bg-gray-50/50 flex flex-col">
             <div className="flex gap-2 mb-4 border-b border-gray-200 pb-2">
               <button 
                 onClick={() => setViewTurmas('ativas')} 
@@ -468,7 +468,7 @@ export const CadastrosView: React.FC = () => {
         </section>
 
         {/* CARD: DISCIPLINAS */}
-        <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col h-[600px]">
+        <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col w-full">
           <div className="p-4 border-b border-gray-100 bg-indigo-50/30 flex justify-between items-center">
             <h2 className="text-lg font-bold text-gray-800">3. Disciplinas</h2>
             {editingDisciplinaId && (
@@ -573,7 +573,7 @@ export const CadastrosView: React.FC = () => {
             </form>
           </div>
 
-          <div className="p-4 flex-1 overflow-y-auto bg-gray-50/50 flex flex-col">
+          <div className="p-4 flex-1 bg-gray-50/50 flex flex-col">
             <div className="flex gap-2 mb-4 border-b border-gray-200 pb-2">
               <button 
                 onClick={() => setViewDisciplinas('ativas')} 
