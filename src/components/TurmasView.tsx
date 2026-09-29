@@ -666,8 +666,31 @@ const DiarioDisciplina: React.FC<{
     return map;
   }, [avaliacoesRaw]);
 
-  const handleSaveNota = async (alunoId: number, etapa: number, field: keyof Nota, value: string) => {
+  const handleSaveNota = async (alunoId: number, etapa: number, field: keyof Nota, value: string, e?: React.FocusEvent<HTMLInputElement>) => {
     const numValue = value === '' ? undefined : Number(value);
+
+    if (field === 'faltas' && numValue !== undefined) {
+      let faltasOutrasEtapas = 0;
+      for (let i = 1; i <= (isSubsequente ? 2 : 4); i++) {
+        if (i !== etapa) {
+          const n = notasMap[alunoId]?.[i];
+          if (n && n.faltas !== undefined && n.faltas !== null) {
+            faltasOutrasEtapas += n.faltas;
+          }
+        }
+      }
+      
+      const somaProvisoria = faltasOutrasEtapas + numValue;
+      if (somaProvisoria > disciplina.chAula) {
+        alert(`Erro: O limite de faltas excede a carga horária total da disciplina (${disciplina.chAula} horas).`);
+        if (e && e.target) {
+           const existingVal = notasMap[alunoId]?.[etapa]?.faltas;
+           e.target.value = existingVal !== undefined && existingVal !== null ? String(existingVal) : '';
+        }
+        return;
+      }
+    }
+
     const existing = await db.notas.where({ alunoId, disciplinaId: disciplina.id!, etapa }).first();
 
     if (existing && existing.id) {
@@ -937,7 +960,7 @@ const DiarioDisciplina: React.FC<{
                             step="1" min="0"
                             className="w-full bg-transparent outline-none text-center" 
                             defaultValue={notas[currentEtapa]?.faltas !== undefined && notas[currentEtapa]?.faltas !== null ? notas[currentEtapa].faltas : ''}
-                            onBlur={(e) => handleSaveNota(aluno.id!, currentEtapa, 'faltas', e.target.value)}
+                            onBlur={(e) => handleSaveNota(aluno.id!, currentEtapa, 'faltas', e.target.value, e)}
                             onKeyDown={(e) => handleKeyDown(e, 'faltas', index)}
                           />
                         </td>
