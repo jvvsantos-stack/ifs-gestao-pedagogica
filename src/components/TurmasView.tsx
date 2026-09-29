@@ -667,18 +667,18 @@ const DiarioDisciplina: React.FC<{
   }, [avaliacoesRaw]);
 
   const handleSaveNota = async (alunoId: number, etapa: number, field: keyof Nota, value: string) => {
-    const numValue = value === '' ? 0 : Number(value);
+    const numValue = value === '' ? undefined : Number(value);
     const existing = await db.notas.where({ alunoId, disciplinaId: disciplina.id!, etapa }).first();
 
     if (existing && existing.id) {
       await db.notas.update(existing.id, { [field]: numValue });
-    } else {
+    } else if (numValue !== undefined) {
       await db.notas.add({
         alunoId,
         disciplinaId: disciplina.id!,
         etapa,
-        nota: field === 'nota' ? numValue : 0,
-        faltas: field === 'faltas' ? numValue : 0
+        nota: field === 'nota' ? numValue : undefined,
+        faltas: field === 'faltas' ? numValue : undefined
       });
     }
   };
@@ -913,7 +913,7 @@ const DiarioDisciplina: React.FC<{
                             type="number" 
                             step="0.1" min="0" max="10"
                             className="w-full bg-transparent outline-none text-center font-medium" 
-                            defaultValue={notas[currentEtapa]?.nota !== undefined ? Number(notas[currentEtapa].nota).toFixed(1) : ''}
+                            defaultValue={notas[currentEtapa]?.nota !== undefined && notas[currentEtapa]?.nota !== null ? Number(notas[currentEtapa].nota).toFixed(1) : ''}
                             onBlur={(e) => {
                               formatNotaBlur(e);
                               handleSaveNota(aluno.id!, currentEtapa, 'nota', e.target.value);
@@ -927,7 +927,7 @@ const DiarioDisciplina: React.FC<{
                             type="number" 
                             step="1" min="0"
                             className="w-full bg-transparent outline-none text-center" 
-                            defaultValue={notas[currentEtapa]?.faltas ?? ''}
+                            defaultValue={notas[currentEtapa]?.faltas !== undefined && notas[currentEtapa]?.faltas !== null ? notas[currentEtapa].faltas : ''}
                             onBlur={(e) => handleSaveNota(aluno.id!, currentEtapa, 'faltas', e.target.value)}
                             onKeyDown={(e) => handleKeyDown(e, 'faltas', index)}
                           />
