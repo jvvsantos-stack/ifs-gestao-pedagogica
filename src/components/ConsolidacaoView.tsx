@@ -181,7 +181,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
     } else if (hasReprovacaoPorFalta) {
       statusText = 'Reprovado por Faltas';
     } else if (qtdReprovacoes > 2) {
-      statusText = 'Retido (Mais de 2 rep.)';
+      statusText = 'Reprovado';
     } else if (qtdReprovacoes > 0 && !isEligible) {
       statusText = 'Retido (Critérios não atingidos)';
     } else if (isEligible) {
@@ -522,7 +522,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                       {item.statusText === 'Aguardando Decisão' && <span className="text-amber-600 font-bold">{item.statusText}</span>}
                       {item.statusText === 'Aprovado no Conselho' && <span className="text-green-600 font-bold">{item.statusText}</span>}
                       {item.statusText === 'Reprovado no Conselho' && <span className="text-red-600 font-bold">{item.statusText}</span>}
-                      {(item.statusText.startsWith('Retido') || item.statusText === 'Reprovado por Faltas') && <span className="text-red-600">{item.statusText}</span>}
+                      {(item.statusText.startsWith('Retido') || item.statusText.startsWith('Reprovado por') || item.statusText === 'Reprovado') && <span className="text-red-600">{item.statusText}</span>}
                       {item.statusText === 'Aguardando Fechamento' && <span className="text-gray-500">{item.statusText}</span>}
                     </td>
                     <td className="px-4 py-3 text-center align-middle">
