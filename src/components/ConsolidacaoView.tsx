@@ -627,7 +627,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                           <div key={d.disc.id} className="flex justify-between items-center text-sm bg-red-50 border border-red-100 rounded px-2 py-1">
                             <span className="text-red-800 truncate mr-2 font-medium">{d.disc.nome}</span>
                             <span className={`font-bold ${d.percent >= 1.0 ? 'text-red-700' : 'text-red-500'}`}>
-                              {d.faltasTot} / {d.limite} faltas
+                              {d.faltasTot} faltas
                             </span>
                           </div>
                         ))}
