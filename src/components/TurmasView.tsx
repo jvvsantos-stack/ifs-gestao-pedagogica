@@ -292,10 +292,6 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
   const alunos = useLiveQuery(() => db.alunos.where('turmaId').equals(turma.id!).toArray()) || [];
   const alunosSorted = [...alunos].sort((a, b) => a.nome.localeCompare(b.nome));
   
-  const disciplinas = useLiveQuery(() => db.disciplinas.where('turmaId').equals(turma.id!).toArray()) || [];
-  const curso = useLiveQuery(() => db.cursos.get(turma.cursoId));
-  const isSubsequente = curso?.modalidade === 'Técnico Subsequente';
-
   const [alunoModal, setAlunoModal] = useState<{ isOpen: boolean, mode: 'add' | 'edit', id: number | null, nome: string }>({ isOpen: false, mode: 'add', id: null, nome: '' });
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean, mode: 'single' | 'all', id: number | null, nome?: string }>({ isOpen: false, mode: 'single', id: null });
   const [ocorrenciasModal, setOcorrenciasModal] = useState<Aluno | null>(null);
