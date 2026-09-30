@@ -4,7 +4,6 @@ import type { Turma, Aluno, Disciplina, Nota, AvaliacaoFinal } from '../db/datab
 import { Users, FolderOpen, ArrowLeft, UserPlus, BookOpen, Edit2, Trash2, Upload, X, ClipboardList } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import * as XLSX from 'xlsx';
-import { injetarDadosDeTeste } from '../utils/mockData';
 import { ModalOcorrencias } from './ModalOcorrencias';
 
 interface Props {
@@ -299,7 +298,6 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
 
   const [alunoModal, setAlunoModal] = useState<{ isOpen: boolean, mode: 'add' | 'edit', id: number | null, nome: string }>({ isOpen: false, mode: 'add', id: null, nome: '' });
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean, mode: 'single' | 'all', id: number | null, nome?: string }>({ isOpen: false, mode: 'single', id: null });
-  const [isInjecting, setIsInjecting] = useState(false);
   const [ocorrenciasModal, setOcorrenciasModal] = useState<Aluno | null>(null);
 
   const normalize = (text: string) => String(text || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
@@ -339,27 +337,6 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
       await db.avaliacoes_finais.where('alunoId').equals(deleteModal.id).delete();
     }
     setDeleteModal({ ...deleteModal, isOpen: false });
-  };
-
-  const handleInjetarMock = async () => {
-    if (disciplinas.length === 0) {
-      alert('A turma precisa ter pelo menos 1 disciplina cadastrada para gerar os dados de teste.');
-      return;
-    }
-    
-    if (window.confirm('ATENÇÃO: Esta ação APAGARÁ todos os alunos e notas atuais desta turma e os substituirá por 10 perfis de teste que cobrem absolutamente todos os casos de regra de negócio do Conselho. Deseja continuar?')) {
-      setIsInjecting(true);
-      try {
-        await injetarDadosDeTeste(turma.id!, disciplinas, isSubsequente, db);
-        alert('✅ Dados de teste injetados com sucesso! Feche este modal e abra o diário ou o painel de consolidação para conferir os resultados.');
-        onClose();
-      } catch (error) {
-        console.error(error);
-        alert('Erro ao injetar dados de teste.');
-      } finally {
-        setIsInjecting(false);
-      }
-    }
   };
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -491,15 +468,6 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
           >
             <Trash2 className="w-4 h-4" />
             Excluir Todos
-          </button>
-          
-          <button
-            onClick={handleInjetarMock}
-            disabled={isInjecting}
-            className="flex-1 border border-dashed border-purple-400 bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-2 rounded-lg font-bold flex items-center justify-center gap-2 text-sm transition-colors shadow-sm disabled:opacity-50"
-            title="Popula a turma com 6 alunos cobrindo todos os casos do Conselho de Classe"
-          >
-            {isInjecting ? 'Injetando...' : '👾 Injetar Dados de Teste'}
           </button>
 
           <input 
