@@ -65,7 +65,7 @@ export const AnalisesView: React.FC = () => {
 
       const curso = turma ? cursosAll.find(c => c.id === turma.cursoId) : null;
       const isIntegrado = curso?.modalidade?.includes('Integrado');
-      const modalidade = isIntegrado ? 'Técnico Integrado' : (curso.modalidade?.includes('Subsequente') ? 'Técnico Subsequente' : curso.modalidade);
+      const modalidade = isIntegrado ? 'Técnico Integrado' : (curso?.modalidade?.includes('Subsequente') ? 'Técnico Subsequente' : (curso?.modalidade || 'Outros'));
       const numEtapas = isIntegrado ? 4 : 2;
       const limiteFaltas = Math.floor(disc.chRelogio * 0.25);
 
