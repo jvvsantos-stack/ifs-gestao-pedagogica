@@ -175,16 +175,16 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     e.preventDefault();
     if (!turmaNome.trim() || !turmaCodigo.trim() || !turmaCursoId || turmaCodigo === 'outro_manual_trigger') return;
 
-    if (!editingTurmaId) {
-      const duplicada = turmasAll.find(t => 
-        t.cursoId === Number(turmaCursoId) && 
-        t.codigo === turmaCodigo.trim() && 
-        t.anoLetivo === turmaAnoLetivo.trim()
-      );
-      if (duplicada) {
-        showAlert('Aviso', `A turma ${turmaCodigo} já existe para o período letivo ${turmaAnoLetivo}.`, 'warning');
-        return;
-      }
+    const duplicada = turmasAll.find(t => 
+      t.cursoId === Number(turmaCursoId) && 
+      t.codigo === turmaCodigo.trim() && 
+      t.anoLetivo === turmaAnoLetivo.trim() &&
+      t.id !== editingTurmaId
+    );
+
+    if (duplicada) {
+      showAlert('Aviso', `A turma ${turmaCodigo} já existe para o período letivo ${turmaAnoLetivo}.`, 'warning');
+      return;
     }
 
     if (editingTurmaId) {
