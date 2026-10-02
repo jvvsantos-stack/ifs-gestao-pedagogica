@@ -394,6 +394,10 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
       })) as any
     );
 
+    await db.turmas.update(turma.id!, {
+      anoLetivo: periodoLetivo
+    });
+
     setGerarDiscModalOpen(false);
     showAlert('Sucesso', `Foram geradas ${faltando.length} disciplina(s) na turma ${turma.nome} para o período ${periodoLetivo}.`, 'success');
   };
