@@ -34,7 +34,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           <img 
             src="/logo-ifs.png" 
             alt="Logo IFS" 
-            className="h-16 w-auto object-contain flex-shrink-0"
+            className="h-24 w-auto object-contain flex-shrink-0"
           />
           
           {/* Texto do Sistema (Gestão Pedagógica) em duas linhas */}
