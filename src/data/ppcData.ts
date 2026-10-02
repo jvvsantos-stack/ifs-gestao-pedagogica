@@ -4,6 +4,7 @@ export const cursosPPC = [
     modalidade: "Integrado",
     turmas: [
       {
+        nome: "1ª Série",
         codigo: "1IELN.M",
         disciplinas: [
           { nome: "Língua Portuguesa I", horasAula: 80 }, { nome: "Língua Inglesa I", horasAula: 80 },
@@ -17,6 +18,7 @@ export const cursosPPC = [
         ]
       },
       {
+        nome: "2ª Série",
         codigo: "2IELN.M",
         disciplinas: [
           { nome: "Língua Portuguesa II", horasAula: 120 }, { nome: "Língua Inglesa II", horasAula: 80 },
@@ -30,6 +32,7 @@ export const cursosPPC = [
         ]
       },
       {
+        nome: "3ª Série",
         codigo: "3IELN.M",
         disciplinas: [
           { nome: "Língua Portuguesa III", horasAula: 80 }, { nome: "Língua Inglesa III", horasAula: 80 },
@@ -50,6 +53,7 @@ export const cursosPPC = [
     modalidade: "Subsequente",
     turmas: [
       {
+        nome: "1º Período",
         codigo: "1ELN.N",
         disciplinas: [
           { nome: "Física Aplicada", horasAula: 72 },
@@ -61,6 +65,7 @@ export const cursosPPC = [
         ]
       },
       {
+        nome: "2º Período",
         codigo: "2ELN.N",
         disciplinas: [
           { nome: "Circuitos Elétricos II", horasAula: 108 },
@@ -71,6 +76,7 @@ export const cursosPPC = [
         ]
       },
       {
+        nome: "3º Período",
         codigo: "3ELN.N",
         disciplinas: [
           { nome: "Eletrônica Digital II", horasAula: 108 },
@@ -81,6 +87,7 @@ export const cursosPPC = [
         ]
       },
       {
+        nome: "4º Período",
         codigo: "4ELN.N",
         disciplinas: [
           { nome: "Sistemas Programáveis", horasAula: 108 },

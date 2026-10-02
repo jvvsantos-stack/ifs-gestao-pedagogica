@@ -104,7 +104,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
           const anoLetivoDefault = c.modalidade === 'Técnico Subsequente' ? `${anoCorrente}.1` : anoCorrente;
           const turmasParaCriar = c.turmas.map(t => ({
             cursoId: newCursoId as number,
-            nome: t.codigo.charAt(0) + "ª Série",
+            nome: (t as any).nome || t.codigo.charAt(0) + "ª Série",
             codigo: t.codigo,
             anoLetivo: anoLetivoDefault,
             arquivado: false,
@@ -178,7 +178,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
       if (!existe) {
         await db.turmas.add({
           cursoId: curso.id!,
-          nome: codigoLimpo.charAt(0) + "ª Série",
+          nome: (t as any).nome || codigoLimpo.charAt(0) + "ª Série",
           codigo: codigoLimpo,
           anoLetivo: anoLimpo,
           arquivado: false,
