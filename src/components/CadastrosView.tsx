@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
-import type { Turma } from '../db/database';
+import type { Turma, Disciplina } from '../db/database';
 import { Edit, Trash2, X, Archive, ArchiveRestore, BookOpen, CheckCircle2, Wand2 } from 'lucide-react';
 import { cursosPPC } from '../data/ppcData';
 import { ConfirmModal } from './ConfirmModal';
@@ -27,6 +27,9 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
   // --- Estados de edição ---
   const [editingTurmaId, setEditingTurmaId] = useState<number | null>(null);
+  const [editingDisciplina, setEditingDisciplina] = useState<Disciplina | null>(null);
+  const [editDiscNome, setEditDiscNome] = useState('');
+  const [editDiscChAula, setEditDiscChAula] = useState('');
 
   // --- Formulário de Novo Curso ---
   const [cursoNome, setCursoNome] = useState('');
@@ -200,6 +203,43 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         setConfirmModal(prev => ({ ...prev, isOpen: false }));
       },
     });
+  };
+
+  const handleArchiveDisciplina = async (id: number, arquivado: boolean) => {
+    await db.disciplinas.update(id, { arquivado });
+  };
+
+  const handleDeleteDisciplina = (id: number) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Excluir Disciplina',
+      message: 'Tem certeza que deseja excluir esta disciplina?',
+      confirmText: 'Excluir',
+      cancelText: 'Cancelar',
+      onConfirm: async () => {
+        await db.disciplinas.delete(id);
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      },
+    });
+  };
+
+  const handleEditDisciplinaClick = (d: Disciplina) => {
+    setEditingDisciplina(d);
+    setEditDiscNome(d.nome);
+    setEditDiscChAula(d.chAula.toString());
+  };
+
+  const handleSaveDisciplinaEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingDisciplina) return;
+    const ch = parseInt(editDiscChAula);
+    if (isNaN(ch) || ch <= 0) return;
+    await db.disciplinas.update(editingDisciplina.id!, {
+      nome: editDiscNome,
+      chAula: ch,
+      chRelogio: Math.round(ch * 0.83333)
+    });
+    setEditingDisciplina(null);
   };
 
   // ===================== AÇÕES DE DISCIPLINAS (GERAÇÃO PPC) =====================
@@ -570,6 +610,35 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                       </div>
                     )}
 
+                    {/* Lista de Disciplinas renderizadas */}
+                    {status !== null && status.cadastradas > 0 && (
+                      <div className="mt-1 mb-2 flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
+                        {disciplinasAll.filter(d => d.turmaId === t.id && (viewTurmas === 'ativas' ? !d.arquivado : d.arquivado)).map(d => {
+                          const turmaPPC = getCursoPPCParaTurma(t);
+                          const isPPC = turmaPPC?.disciplinas.some(dp => dp.nome === d.nome) || false;
+                          return (
+                            <div key={d.id} className="text-[10px] bg-gray-50 border border-gray-100 rounded p-1.5 flex justify-between items-center group/disc">
+                              <div className="flex-1 min-w-0 pr-2">
+                                <div className="font-semibold text-gray-700 truncate" title={d.nome}>{d.nome}</div>
+                                <div className="text-gray-400">{d.chAula} aulas / {d.chRelogio}h</div>
+                              </div>
+                              <div className="flex gap-1 opacity-0 group-hover/disc:opacity-100 transition-opacity">
+                                <button onClick={() => handleEditDisciplinaClick(d)} className="text-indigo-500 hover:text-indigo-700 p-0.5" title="Editar"><Edit className="w-3 h-3" /></button>
+                                {viewTurmas === 'ativas' ? (
+                                  <button onClick={() => handleArchiveDisciplina(d.id!, true)} className="text-orange-500 hover:text-orange-700 p-0.5" title="Arquivar"><Archive className="w-3 h-3" /></button>
+                                ) : (
+                                  <button onClick={() => handleArchiveDisciplina(d.id!, false)} className="text-green-500 hover:text-green-700 p-0.5" title="Restaurar"><ArchiveRestore className="w-3 h-3" /></button>
+                                )}
+                                {!isPPC && (
+                                  <button onClick={() => handleDeleteDisciplina(d.id!)} className="text-red-500 hover:text-red-700 p-0.5" title="Excluir"><Trash2 className="w-3 h-3" /></button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
                     {/* Ações */}
                     <div className="flex flex-col gap-2 mt-auto">
                       {/* Botão Gerar Disciplinas */}
@@ -647,6 +716,53 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         </section>
 
       </div>
+
+      {/* Modal Edit Disciplina */}
+      {editingDisciplina && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white rounded-lg p-5 w-full max-w-sm shadow-xl">
+            <h3 className="text-sm font-bold text-gray-800 mb-3">Editar Disciplina</h3>
+            <form onSubmit={handleSaveDisciplinaEdit} className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Nome</label>
+                <input
+                  type="text"
+                  required
+                  value={editDiscNome}
+                  onChange={e => setEditDiscNome(e.target.value)}
+                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">CH Aulas (horas-aula)</label>
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  value={editDiscChAula}
+                  onChange={e => setEditDiscChAula(e.target.value)}
+                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                />
+              </div>
+              <div className="flex gap-2 justify-end mt-4">
+                <button
+                  type="button"
+                  onClick={() => setEditingDisciplina(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded transition-colors"
+                >
+                  Salvar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <ConfirmModal
         isOpen={confirmModal.isOpen}
