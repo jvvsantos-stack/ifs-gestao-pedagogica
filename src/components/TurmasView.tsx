@@ -305,7 +305,6 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
   const alunosSorted = [...alunos].sort((a, b) => a.nome.localeCompare(b.nome));
   
   const [alunoModal, setAlunoModal] = useState<{ isOpen: boolean, mode: 'add' | 'edit', id: number | null, nome: string }>({ isOpen: false, mode: 'add', id: null, nome: '' });
-  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean, mode: 'single' | 'all', id: number | null, nome?: string }>({ isOpen: false, mode: 'single', id: null });
   const [ocorrenciasModal, setOcorrenciasModal] = useState<Aluno | null>(null);
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; type?: 'warning' | 'success' | 'info'; isAlert?: boolean; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
 
@@ -324,8 +323,33 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
 
   const handleAddManual = () => setAlunoModal({ isOpen: true, mode: 'add', id: null, nome: '' });
   const handleEdit = (aluno: Aluno) => setAlunoModal({ isOpen: true, mode: 'edit', id: aluno.id!, nome: aluno.nome });
-  const handleDelete = (aluno: Aluno) => setDeleteModal({ isOpen: true, mode: 'single', id: aluno.id!, nome: aluno.nome });
-  const handleDeleteAll = () => setDeleteModal({ isOpen: true, mode: 'all', id: null });
+  const handleDelete = (aluno: Aluno) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Excluir Aluno',
+      message: `Tem certeza que deseja excluir o aluno "${aluno.nome}"? Todas as notas e avaliações deste aluno também serão excluídas.`,
+      onConfirm: async () => {
+        await db.alunos.delete(aluno.id!);
+        await db.notas.where('alunoId').equals(aluno.id!).delete();
+        await db.avaliacoes_finais.where('alunoId').equals(aluno.id!).delete();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+  const handleDeleteAll = () => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Excluir Todos os Alunos',
+      message: 'Tem certeza que deseja excluir TODOS os alunos desta turma? Todas as notas e faltas associadas a eles serão apagadas permanentemente.',
+      onConfirm: async () => {
+        const ids = alunos.map(a => a.id!);
+        await db.notas.where('alunoId').anyOf(ids).delete();
+        await db.avaliacoes_finais.where('alunoId').anyOf(ids).delete();
+        await db.alunos.where({ turmaId: turma.id! }).delete();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
 
   const confirmSaveAluno = async () => {
     const nomeLimpo = alunoModal.nome.trim();
@@ -343,20 +367,6 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
       await db.alunos.update(alunoModal.id, { nome: nomeLimpo });
       setAlunoModal({ ...alunoModal, isOpen: false });
     }
-  };
-
-  const confirmDelete = async () => {
-    if (deleteModal.mode === 'all') {
-      const ids = alunos.map(a => a.id!);
-      await db.notas.where('alunoId').anyOf(ids).delete();
-      await db.avaliacoes_finais.where('alunoId').anyOf(ids).delete();
-      await db.alunos.where({ turmaId: turma.id! }).delete();
-    } else if (deleteModal.mode === 'single' && deleteModal.id) {
-      await db.alunos.delete(deleteModal.id);
-      await db.notas.where('alunoId').equals(deleteModal.id).delete();
-      await db.avaliacoes_finais.where('alunoId').equals(deleteModal.id).delete();
-    }
-    setDeleteModal({ ...deleteModal, isOpen: false });
   };
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -576,37 +586,6 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
                 className="px-4 py-2 bg-indigo-600 text-white font-medium hover:bg-indigo-700 rounded-lg transition-colors"
               >
                 Salvar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {deleteModal.isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <Trash2 className="w-6 h-6 text-red-600" />
-            </div>
-            <h3 className="text-lg font-bold text-gray-800 mb-2">Excluir {deleteModal.mode === 'all' ? 'Todos os Alunos' : 'Aluno'}</h3>
-            <p className="text-gray-500 mb-6">
-              {deleteModal.mode === 'all' 
-                ? 'Tem certeza que deseja excluir TODOS os alunos desta turma? Todas as notas e faltas associadas a eles serão apagadas permanentemente.'
-                : `Tem certeza que deseja excluir o aluno "${deleteModal.nome}"? Todas as notas e avaliações deste aluno também serão excluídas.`
-              }
-            </p>
-            <div className="flex justify-center gap-3">
-              <button 
-                onClick={() => setDeleteModal({ ...deleteModal, isOpen: false })}
-                className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Cancelar
-              </button>
-              <button 
-                onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white font-medium hover:bg-red-700 rounded-lg transition-colors"
-              >
-                Excluir
               </button>
             </div>
           </div>
