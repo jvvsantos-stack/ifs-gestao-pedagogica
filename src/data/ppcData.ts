@@ -44,5 +44,52 @@ export const cursosPPC = [
         ]
       }
     ]
+  },
+  {
+    nome: "Técnico em Eletrônica Subsequente",
+    modalidade: "Subsequente",
+    turmas: [
+      {
+        codigo: "1ELN.N",
+        disciplinas: [
+          { nome: "Física Aplicada", horasAula: 72 },
+          { nome: "Tecnologia dos Materiais", horasAula: 36 },
+          { nome: "Noções Práticas de Eletrônica", horasAula: 72 },
+          { nome: "Informática Aplicada", horasAula: 72 },
+          { nome: "Circuitos Elétricos I", horasAula: 72 },
+          { nome: "Inglês Técnico", horasAula: 36 }
+        ]
+      },
+      {
+        codigo: "2ELN.N",
+        disciplinas: [
+          { nome: "Circuitos Elétricos II", horasAula: 108 },
+          { nome: "Segurança, Meio Ambiente e Saúde", horasAula: 36 },
+          { nome: "Eletrônica Digital I", horasAula: 72 },
+          { nome: "Atuadores Elétricos", horasAula: 36 },
+          { nome: "Eletrônica Analógica", horasAula: 108 }
+        ]
+      },
+      {
+        codigo: "3ELN.N",
+        disciplinas: [
+          { nome: "Eletrônica Digital II", horasAula: 108 },
+          { nome: "Organizações, Normas e Qualidade", horasAula: 36 },
+          { nome: "Princípios de Telecomunicações", horasAula: 72 },
+          { nome: "Redes de Computadores", horasAula: 36 },
+          { nome: "Eletrônica Aplicada", horasAula: 108 }
+        ]
+      },
+      {
+        codigo: "4ELN.N",
+        disciplinas: [
+          { nome: "Sistemas Programáveis", horasAula: 108 },
+          { nome: "Eletrônica de Potência", horasAula: 36 },
+          { nome: "Sistemas de Telecomunicações", horasAula: 72 },
+          { nome: "Instalações Prediais", horasAula: 36 },
+          { nome: "Princípios de Automação e Instrumentação", horasAula: 108 }
+        ]
+      }
+    ]
   }
 ];
