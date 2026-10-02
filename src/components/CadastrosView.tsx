@@ -44,6 +44,12 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
   // --- Modal de Nova Oferta Letiva ---
   const [ofertaModalOpen, setOfertaModalOpen] = useState(false);
   const [ofertaAnoLetivo, setOfertaAnoLetivo] = useState(new Date().getFullYear().toString());
+
+  // --- Modal de Gerar Disciplinas ---
+  const [gerarDiscModalOpen, setGerarDiscModalOpen] = useState(false);
+  const [gerarDiscTurmaSelecionada, setGerarDiscTurmaSelecionada] = useState<Turma | null>(null);
+  const [gerarDiscAno, setGerarDiscAno] = useState(new Date().getFullYear().toString());
+  const [gerarDiscSemestre, setGerarDiscSemestre] = useState('1');
   // --- Tabs de visualização de turmas ---
   const [viewTurmas, setViewTurmas] = useState<'ativas' | 'arquivadas'>('ativas');
 
@@ -334,17 +340,37 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
   /** Gera apenas as disciplinas que ainda não existem na turma */
   const handleGerarDisciplinas = async (turma: Turma) => {
+    setGerarDiscTurmaSelecionada(turma);
+    setGerarDiscAno(new Date().getFullYear().toString());
+    setGerarDiscSemestre('1');
+    setGerarDiscModalOpen(true);
+  };
+
+  const confirmGerarDisciplinas = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!gerarDiscTurmaSelecionada) return;
+    const turma = gerarDiscTurmaSelecionada;
+
     const cursoDb = cursos.find(c => c.id === turma.cursoId);
     if (!cursoDb) return;
+
+    let periodoLetivo = '';
+    if (cursoDb.modalidade?.includes('Subsequente')) {
+      periodoLetivo = `${gerarDiscAno}/${gerarDiscSemestre}`;
+    } else {
+      periodoLetivo = `${gerarDiscAno}`;
+    }
 
     const cursoPPC = cursosPPC.find(c => c.nome === cursoDb.nome);
     if (!cursoPPC) {
       showAlert('Aviso', 'Este curso não possui correspondência no PPC automático.', 'warning');
+      setGerarDiscModalOpen(false);
       return;
     }
     const turmaPPC = cursoPPC.turmas.find(t => t.codigo === turma.codigo);
     if (!turmaPPC) {
       showAlert('Aviso', 'Esta turma não possui disciplinas no PPC automático (código não encontrado).', 'warning');
+      setGerarDiscModalOpen(false);
       return;
     }
 
@@ -352,7 +378,10 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     const nomesExistentes = new Set(existentes.map(d => d.nome));
     const faltando = turmaPPC.disciplinas.filter(d => !nomesExistentes.has(d.nome));
 
-    if (faltando.length === 0) return; // botão já estaria desativado, mas segurança extra
+    if (faltando.length === 0) {
+      setGerarDiscModalOpen(false);
+      return; // botão já estaria desativado, mas segurança extra
+    }
 
     await db.disciplinas.bulkAdd(
       faltando.map(d => ({
@@ -361,10 +390,12 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         chAula: d.horasAula,
         chRelogio: Math.round(d.horasAula * 0.83333),
         arquivado: false,
+        periodoLetivo
       })) as any
     );
 
-    showAlert('Sucesso', `Foram geradas ${faltando.length} disciplina(s) na turma ${turma.nome}.`, 'success');
+    setGerarDiscModalOpen(false);
+    showAlert('Sucesso', `Foram geradas ${faltando.length} disciplina(s) na turma ${turma.nome} para o período ${periodoLetivo}.`, 'success');
   };
 
   // ===================== HELPERS DE RENDER =====================
@@ -784,7 +815,10 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                           return (
                             <div key={d.id} className="text-[10px] bg-gray-50 border border-gray-100 rounded p-1.5 flex justify-between items-center group/disc">
                               <div className="flex-1 min-w-0 pr-2">
-                                <div className="font-semibold text-gray-700 truncate" title={d.nome}>{d.nome}</div>
+                                <div className="font-semibold text-gray-700 truncate" title={d.nome}>
+                                  {d.periodoLetivo && <span className="mr-1 text-indigo-600 bg-indigo-100 px-1 rounded">[ {d.periodoLetivo} ]</span>}
+                                  {d.nome}
+                                </div>
                                 <div className="text-gray-400">{d.chAula} aulas / {d.chRelogio}h</div>
                               </div>
                               <div className="flex gap-1 opacity-0 group-hover/disc:opacity-100 transition-opacity">
@@ -968,6 +1002,77 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
           </div>
         </div>
       )}
+
+      {/* Modal Gerar Disciplinas */}
+      {gerarDiscModalOpen && gerarDiscTurmaSelecionada && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white rounded-lg p-5 w-full max-w-sm shadow-xl">
+            <h3 className="text-sm font-bold text-gray-800 mb-2">Configurar Período Letivo</h3>
+            <p className="text-xs text-gray-500 mb-4">
+              Defina o período para as novas disciplinas desta turma.
+            </p>
+            <form onSubmit={confirmGerarDisciplinas} className="space-y-4">
+              {cursos.find(c => c.id === gerarDiscTurmaSelecionada.cursoId)?.modalidade?.includes('Subsequente') ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Ano (YYYY)</label>
+                    <input
+                      type="text"
+                      required
+                      autoFocus
+                      maxLength={4}
+                      value={gerarDiscAno}
+                      onChange={e => setGerarDiscAno(e.target.value)}
+                      className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Período</label>
+                    <select
+                      required
+                      value={gerarDiscSemestre}
+                      onChange={e => setGerarDiscSemestre(e.target.value)}
+                      className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    >
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                    </select>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Ano Letivo (YYYY)</label>
+                  <input
+                    type="text"
+                    required
+                    autoFocus
+                    maxLength={4}
+                    value={gerarDiscAno}
+                    onChange={e => setGerarDiscAno(e.target.value)}
+                    className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  />
+                </div>
+              )}
+              <div className="flex gap-2 justify-end mt-4">
+                <button
+                  type="button"
+                  onClick={() => setGerarDiscModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded transition-colors"
+                >
+                  Confirmar/Gerar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
 
       <ConfirmModal
         isOpen={confirmModal.isOpen}

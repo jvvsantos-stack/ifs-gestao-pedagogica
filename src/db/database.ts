@@ -24,6 +24,7 @@ export interface Disciplina {
   chAula: number;
   chRelogio: number;
   arquivado?: boolean;
+  periodoLetivo?: string;
 }
 
 export interface Aluno {
