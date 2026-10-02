@@ -34,7 +34,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
     // Lógica de Pendências do Conselho
     for (const turma of turmasAtivas) {
       const curso = cursos.find(c => c.id === turma.cursoId);
-      const isSubsequente = curso?.modalidade === 'Técnico Subsequente';
+      const isSubsequente = curso?.modalidade?.includes('Subsequente');
       const numEtapas = isSubsequente ? 2 : 4;
 
       const alunosTurma = alunosAtivos.filter(a => a.turmaId === turma.id);

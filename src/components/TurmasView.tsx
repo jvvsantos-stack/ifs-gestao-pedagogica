@@ -151,7 +151,7 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
   const alunos = useLiveQuery(() => db.alunos.where('turmaId').equals(turma.id!).toArray()) || [];
   const curso = useLiveQuery(() => db.cursos.get(turma.cursoId));
   const notasAll = useLiveQuery(() => db.notas.toArray()) || [];
-  const isSubsequente = curso?.modalidade === 'Técnico Subsequente';
+  const isSubsequente = curso?.modalidade?.includes('Subsequente');
   const etapasParaRenderizar = isSubsequente ? [1, 2] : [1, 2, 3, 4];
 
   if (selectedDisciplinaId) {
@@ -653,7 +653,7 @@ const DiarioDisciplina: React.FC<{
     });
   };
   const curso = useLiveQuery(() => db.cursos.get(turma.cursoId));
-  const isSubsequente = curso?.modalidade === 'Técnico Subsequente';
+  const isSubsequente = curso?.modalidade?.includes('Subsequente');
   const etapasParaRenderizar = isSubsequente ? [1, 2] : [1, 2, 3, 4];
   
   const notasRaw = useLiveQuery(() => db.notas.where('disciplinaId').equals(disciplina.id!).toArray(), [disciplina.id, activeTab]) || [];

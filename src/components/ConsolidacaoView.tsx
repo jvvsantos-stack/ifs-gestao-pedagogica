@@ -60,7 +60,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
   
   const curso = useLiveQuery(() => db.cursos.get(turma.cursoId));
-  const isSubsequente = curso?.modalidade === 'Técnico Subsequente';
+  const isSubsequente = curso?.modalidade?.includes('Subsequente');
   const numEtapas = isSubsequente ? 2 : 4;
 
   const alunos = useLiveQuery(() => db.alunos.where('turmaId').equals(turma.id!).toArray()) || [];

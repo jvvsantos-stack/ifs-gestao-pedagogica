@@ -104,7 +104,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                 const disciplinas = disciplinasAll.filter(d => d.turmaId === aluno.turmaId);
                 const ocorrenciasDoAluno = ocorrenciasAll.filter(o => o.alunoId === aluno.id);
                 const estagio = estagiosAll.find(e => e.alunoId === aluno.id);
-                const isSubsequente = curso?.modalidade === 'Técnico Subsequente';
+                const isSubsequente = curso?.modalidade?.includes('Subsequente');
                 const numEtapas = isSubsequente ? 2 : 4;
                 
                 let somaMediasGlobais = 0;

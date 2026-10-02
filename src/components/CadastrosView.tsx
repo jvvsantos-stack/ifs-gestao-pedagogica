@@ -119,7 +119,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         if (!existente) {
           const newCursoId = await db.cursos.add({ nome: c.nome, modalidade: c.modalidade });
           const anoCorrente = new Date().getFullYear().toString();
-          const anoLetivoDefault = c.modalidade === 'Técnico Subsequente' ? `${anoCorrente}.1` : anoCorrente;
+          const anoLetivoDefault = c.modalidade?.includes('Subsequente') ? `${anoCorrente}.1` : anoCorrente;
           const turmasParaCriar = c.turmas.map(t => ({
             cursoId: newCursoId as number,
             nome: (t as any).nome || t.codigo.charAt(0) + "ª Série",
@@ -588,7 +588,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                       const c = cursos.find(c => c.id === Number(e.target.value));
                       if (c) {
                         const anoCorrente = new Date().getFullYear().toString();
-                        setTurmaAnoLetivo(c.modalidade === 'Técnico Subsequente' ? `${anoCorrente}.1` : anoCorrente);
+                        setTurmaAnoLetivo(c.modalidade?.includes('Subsequente') ? `${anoCorrente}.1` : anoCorrente);
                       }
                     }}
                     className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
@@ -681,7 +681,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                     value={turmaAnoLetivo}
                     onChange={e => setTurmaAnoLetivo(e.target.value)}
                     className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                    placeholder={cursos.find(c => c.id === Number(turmaCursoId))?.modalidade === 'Técnico Subsequente' ? "Ex: 2026.1" : "Ex: 2026"}
+                    placeholder={cursos.find(c => c.id === Number(turmaCursoId))?.modalidade?.includes('Subsequente') ? "Ex: 2026.1" : "Ex: 2026"}
                   />
                 </div>
               </div>
