@@ -588,6 +588,9 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                             <button onClick={() => handleArchiveTurma(t.id!, true)} className="p-1 text-gray-400 hover:text-orange-600 transition-colors" title="Arquivar">
                               <Archive className="w-4 h-4" />
                             </button>
+                            <button onClick={() => handleDeleteTurma(t.id!)} className="p-1 text-gray-400 hover:text-red-600 transition-colors" title="Excluir Definitivamente">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </>
                         ) : (
                           <>
@@ -749,6 +752,9 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                           </button>
                           <button onClick={() => handleArchiveDisciplina(d.id!, true)} className="p-1 text-gray-400 hover:text-orange-600 transition-colors" title="Arquivar">
                             <Archive className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDeleteDisciplina(d.id!)} className="p-1 text-gray-400 hover:text-red-600 transition-colors" title="Excluir Definitivamente">
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </>
                       ) : (
