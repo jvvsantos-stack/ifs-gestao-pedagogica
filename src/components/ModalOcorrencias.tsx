@@ -16,7 +16,18 @@ export const ModalOcorrencias: React.FC<Props> = ({ aluno, onClose }) => {
   const [descricao, setDescricao] = useState('');
   const [anexoNome, setAnexoNome] = useState<string | undefined>(undefined);
   const [anexoDados, setAnexoDados] = useState<string | ArrayBuffer | undefined>(undefined);
-  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; type?: 'warning' | 'success' | 'info'; isAlert?: boolean; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+
+  const showAlert = (title: string, message: string, type: 'warning' | 'success' | 'info' = 'info') => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      type,
+      isAlert: true,
+      onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+    });
+  };
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -40,7 +51,7 @@ export const ModalOcorrencias: React.FC<Props> = ({ aluno, onClose }) => {
 
   const handleSave = async () => {
     if (!descricao.trim()) {
-      alert('A descrição é obrigatória.');
+      showAlert('Aviso', 'A descrição é obrigatória.', 'warning');
       return;
     }
 
@@ -65,7 +76,7 @@ export const ModalOcorrencias: React.FC<Props> = ({ aluno, onClose }) => {
       }
     } catch (err) {
       console.error(err);
-      alert('Erro ao salvar ocorrência.');
+      showAlert('Erro', 'Erro ao salvar ocorrência.', 'warning');
     }
   };
 
@@ -246,7 +257,8 @@ export const ModalOcorrencias: React.FC<Props> = ({ aluno, onClose }) => {
         title={confirmModal.title}
         message={confirmModal.message}
         onConfirm={confirmModal.onConfirm}
-        onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+        type={confirmModal.type}
+        onCancel={confirmModal.isAlert ? undefined : () => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
       />
     </div>
   );

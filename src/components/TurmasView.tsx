@@ -5,6 +5,7 @@ import { Users, FolderOpen, ArrowLeft, UserPlus, BookOpen, Edit2, Trash2, Upload
 import { useLiveQuery } from 'dexie-react-hooks';
 import * as XLSX from 'xlsx';
 import { ModalOcorrencias } from './ModalOcorrencias';
+import { ConfirmModal } from './ConfirmModal';
 
 interface Props {
   initialOpenTurmaAlunosId?: number | null;
@@ -306,6 +307,18 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
   const [alunoModal, setAlunoModal] = useState<{ isOpen: boolean, mode: 'add' | 'edit', id: number | null, nome: string }>({ isOpen: false, mode: 'add', id: null, nome: '' });
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean, mode: 'single' | 'all', id: number | null, nome?: string }>({ isOpen: false, mode: 'single', id: null });
   const [ocorrenciasModal, setOcorrenciasModal] = useState<Aluno | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; type?: 'warning' | 'success' | 'info'; isAlert?: boolean; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+
+  const showAlert = (title: string, message: string, type: 'warning' | 'success' | 'info' = 'info') => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      type,
+      isAlert: true,
+      onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+    });
+  };
 
   const normalize = (text: string) => String(text || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
 
@@ -324,7 +337,7 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
         await db.alunos.add({ turmaId: turma.id!, nome: nomeLimpo });
         setAlunoModal({ ...alunoModal, isOpen: false });
       } else {
-        alert('Este aluno já está cadastrado na turma.');
+        showAlert('Aviso', 'Este aluno já está cadastrado na turma.', 'warning');
       }
     } else if (alunoModal.mode === 'edit' && alunoModal.id) {
       await db.alunos.update(alunoModal.id, { nome: nomeLimpo });
@@ -424,14 +437,14 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
 
       if (toAdd.length > 0) {
         await db.alunos.bulkAdd(toAdd);
-        alert(`${toAdd.length} alunos importados com sucesso!`);
+        showAlert('Sucesso', `${toAdd.length} alunos importados com sucesso!`, 'success');
       } else {
-        alert('Nenhum aluno novo encontrado para importação (talvez já estejam cadastrados ou o arquivo seja inválido).');
+        showAlert('Aviso', 'Nenhum aluno novo encontrado para importação (talvez já estejam cadastrados ou o arquivo seja inválido).', 'warning');
       }
       
     } catch (error) {
       console.error(error);
-      alert('Erro ao processar o arquivo. Verifique o formato.');
+      showAlert('Erro', 'Erro ao processar o arquivo. Verifique o formato.', 'warning');
     } finally {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -600,6 +613,14 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
         </div>
       )}
 
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        type={confirmModal.type}
+        onCancel={confirmModal.isAlert ? undefined : () => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+      />
       {ocorrenciasModal && (
         <ModalOcorrencias 
           aluno={ocorrenciasModal} 
@@ -660,7 +681,7 @@ const DiarioDisciplina: React.FC<{
       
       const somaProvisoria = faltasOutrasEtapas + numValue;
       if (somaProvisoria > disciplina.chAula) {
-        alert(`Erro: O limite de faltas excede a carga horária total da disciplina (${disciplina.chAula} horas).`);
+        showAlert('Erro', `O limite de faltas excede a carga horária total da disciplina (${disciplina.chAula} horas).`, 'warning');
         if (e && e.target) {
            const existingVal = notasMap[alunoId]?.[etapa]?.faltas;
            e.target.value = existingVal !== undefined && existingVal !== null ? String(existingVal) : '';
