@@ -729,13 +729,13 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                 </select>
               </div>
             </div>
-            <ul className="space-y-2">
+            <ul className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {disciplinasListadas.map(d => (
                 <li key={d.id} className="bg-white p-3 border border-gray-200 rounded shadow-sm group">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="font-semibold text-gray-800 text-sm">{d.nome}</div>
-                      <div className="text-[10px] text-gray-500 flex gap-3 mt-1">
+                  <div className="flex justify-between items-start h-full">
+                    <div className="flex-1 min-w-0 pr-2">
+                      <div className="font-semibold text-gray-800 text-sm truncate" title={d.nome}>{d.nome}</div>
+                      <div className="text-[10px] text-gray-500 flex flex-wrap gap-x-3 gap-y-1 mt-1">
                         <span>Turma: {turmasAll.find(t => t.id === d.turmaId)?.nome || 'Desconhecida'}</span>
                         <span className="font-medium">CH Aula: {d.chAula}</span>
                         <span className="font-medium">CH Rel: {d.chRelogio}</span>
