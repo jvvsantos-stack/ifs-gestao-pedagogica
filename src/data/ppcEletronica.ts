@@ -1,0 +1,11 @@
+export const ppcEletronica: Record<string, { nome: string; chAula: number }[]> = {
+  "1IELN.M": [
+    { nome: 'Língua Portuguesa I', chAula: 80 }, { nome: 'Língua Inglesa I', chAula: 80 }, { nome: 'Redação', chAula: 80 }, { nome: 'Educação Física I', chAula: 40 }, { nome: 'Artes', chAula: 40 }, { nome: 'Matemática I', chAula: 160 }, { nome: 'Física I', chAula: 120 }, { nome: 'Química I', chAula: 120 }, { nome: 'Sociologia I', chAula: 80 }, { nome: 'Filosofia I', chAula: 80 }, { nome: 'História I', chAula: 80 }, { nome: 'Geografia I', chAula: 120 }, { nome: 'Biologia I', chAula: 120 }, { nome: 'Informática Básica e Aplicada', chAula: 80 }, { nome: 'Circuitos Elétricos', chAula: 200 }, { nome: 'Eletricidade', chAula: 120 }
+  ],
+  "2IELN.M": [
+    { nome: 'Língua Portuguesa II', chAula: 120 }, { nome: 'Língua Inglesa II', chAula: 80 }, { nome: 'Educação Física II', chAula: 40 }, { nome: 'Matemática II', chAula: 120 }, { nome: 'Física II', chAula: 160 }, { nome: 'Química II', chAula: 120 }, { nome: 'Sociologia II', chAula: 80 }, { nome: 'Filosofia II', chAula: 80 }, { nome: 'História II', chAula: 120 }, { nome: 'Geografia II', chAula: 80 }, { nome: 'Biologia II', chAula: 120 }, { nome: 'Dispositivos Eletrônicos', chAula: 160 }, { nome: 'Laboratório de Dispositivos Eletrônicos', chAula: 80 }, { nome: 'Técnicas Digitais', chAula: 120 }, { nome: 'Laboratório de Técnicas Digitais', chAula: 80 }
+  ],
+  "3IELN.M": [
+    { nome: 'Língua Portuguesa III', chAula: 80 }, { nome: 'Língua Inglesa III', chAula: 80 }, { nome: 'Educação Física III', chAula: 40 }, { nome: 'Matemática III', chAula: 120 }, { nome: 'Sociologia III', chAula: 40 }, { nome: 'Filosofia III', chAula: 40 }, { nome: 'Saúde, Meio Ambiente e Segurança no Trabalho', chAula: 80 }, { nome: 'Redes de Computadores', chAula: 80 }, { nome: 'Infraestrutura de Hardware e Software', chAula: 80 }, { nome: 'Linguagem de Programação', chAula: 120 }, { nome: 'Sistemas Programáveis', chAula: 120 }, { nome: 'Sistemas Digitais', chAula: 120 }, { nome: 'Sistemas de Automação', chAula: 160 }, { nome: 'Telecomunicações', chAula: 120 }, { nome: 'Artes (3º Ano)', chAula: 80 }, { nome: 'Língua Espanhola', chAula: 80 }, { nome: 'Eletrônica de Potência', chAula: 80 }
+  ]
+};

@@ -17,6 +17,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userInfo, setUserInfo] = useState<GoogleUserInfo | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
+  const [turmaIdToOpenAlunos, setTurmaIdToOpenAlunos] = useState<number | null>(null);
 
   useEffect(() => {
     // Check if we have a saved session
@@ -99,9 +100,18 @@ function App() {
       {activeTab === 'dashboard' ? (
         <DashboardView setActiveTab={setActiveTab} />
       ) : activeTab === 'turmas' ? (
-        <TurmasView onLogout={handleLogout} />
+        <TurmasView 
+          onLogout={handleLogout} 
+          initialOpenTurmaAlunosId={turmaIdToOpenAlunos} 
+          clearInitialOpen={() => setTurmaIdToOpenAlunos(null)} 
+        />
       ) : activeTab === 'cadastros' ? (
-        <CadastrosView />
+        <CadastrosView 
+          onTurmaCriada={(id) => {
+            setTurmaIdToOpenAlunos(id);
+            setActiveTab('turmas');
+          }}
+        />
       ) : activeTab === 'consolidacao' ? (
         <ConsolidacaoView />
       ) : activeTab === 'estagios' ? (

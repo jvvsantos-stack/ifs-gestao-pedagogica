@@ -8,9 +8,11 @@ import { ModalOcorrencias } from './ModalOcorrencias';
 
 interface Props {
   onLogout?: () => void;
+  initialOpenTurmaAlunosId?: number | null;
+  clearInitialOpen?: () => void;
 }
 
-export const TurmasView: React.FC<Props> = () => {
+export const TurmasView: React.FC<Props> = ({ onLogout, initialOpenTurmaAlunosId, clearInitialOpen }) => {
   const [selectedCursoId, setSelectedCursoId] = useState<string>('');
   const [selectedTurma, setSelectedTurma] = useState<Turma | null>(null);
   const [alunosModalTurma, setAlunosModalTurma] = useState<Turma | null>(null);
@@ -24,6 +26,16 @@ export const TurmasView: React.FC<Props> = () => {
   const turmasAll = useLiveQuery(() => db.turmas.toArray()) || [];
   const todosAlunos = useLiveQuery(() => db.alunos.toArray()) || [];
   const todasDisciplinas = useLiveQuery(() => db.disciplinas.toArray()) || [];
+
+  React.useEffect(() => {
+    if (initialOpenTurmaAlunosId && turmasAll.length > 0) {
+      const turma = turmasAll.find(t => t.id === initialOpenTurmaAlunosId);
+      if (turma) {
+        setAlunosModalTurma(turma);
+      }
+      if (clearInitialOpen) clearInitialOpen();
+    }
+  }, [initialOpenTurmaAlunosId, turmasAll, clearInitialOpen]);
 
   const turmasAtivas = turmasAll.filter(t => !t.arquivado);
   const turmasListadas = selectedCursoId 
