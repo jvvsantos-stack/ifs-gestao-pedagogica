@@ -859,9 +859,9 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         cancelText={confirmModal.cancelText}
         onConfirm={confirmModal.onConfirm}
         type={confirmModal.type}
-        onCancel={confirmModal.isAlert ? undefined : () => {
-          handleCancelPPC();
-        }}
+        {...(!confirmModal.isAlert && {
+          onCancel: () => handleCancelPPC()
+        })}
       />
     </div>
   );

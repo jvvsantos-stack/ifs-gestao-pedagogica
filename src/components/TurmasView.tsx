@@ -639,6 +639,19 @@ const DiarioDisciplina: React.FC<{
   onBack: () => void;
 }> = ({ turma, disciplina, alunos, initialTab, onBack }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
+
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; type?: 'warning' | 'success' | 'info'; isAlert?: boolean; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+
+  const showAlert = (title: string, message: string, type: 'warning' | 'success' | 'info' = 'info') => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      type,
+      isAlert: true,
+      onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+    });
+  };
   const curso = useLiveQuery(() => db.cursos.get(turma.cursoId));
   const isSubsequente = curso?.modalidade === 'Técnico Subsequente';
   const etapasParaRenderizar = isSubsequente ? [1, 2] : [1, 2, 3, 4];
@@ -1012,6 +1025,16 @@ const DiarioDisciplina: React.FC<{
           </table>
         </div>
       </main>
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        type={confirmModal.type}
+        {...(!confirmModal.isAlert && {
+          onCancel: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+        })}
+      />
     </div>
   );
 };
