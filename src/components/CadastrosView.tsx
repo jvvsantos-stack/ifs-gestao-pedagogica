@@ -41,6 +41,9 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
   const [turmaCursoId, setTurmaCursoId] = useState('');
   const [turmaAnoLetivo, setTurmaAnoLetivo] = useState(new Date().getFullYear().toString());
 
+  // --- Modal de Nova Oferta Letiva ---
+  const [ofertaModalOpen, setOfertaModalOpen] = useState(false);
+  const [ofertaAnoLetivo, setOfertaAnoLetivo] = useState(new Date().getFullYear().toString());
   // --- Tabs de visualização de turmas ---
   const [viewTurmas, setViewTurmas] = useState<'ativas' | 'arquivadas'>('ativas');
 
@@ -151,6 +154,47 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         setConfirmModal(prev => ({ ...prev, isOpen: false }));
       },
     });
+  };
+
+  const handleGerarTurmasPPC = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cursoSelecionadoId || !ofertaAnoLetivo.trim()) return;
+    
+    const curso = cursos.find(c => c.id === cursoSelecionadoId);
+    if (!curso) return;
+
+    const cursoPpc = cursosPPC.find(c => c.nome === curso.nome);
+    if (!cursoPpc) {
+      showAlert('Aviso', 'O curso selecionado não possui matriz cadastrada no sistema (PPC).', 'warning');
+      return;
+    }
+
+    let criadas = 0;
+    for (const t of cursoPpc.turmas) {
+      const codigoLimpo = t.codigo.trim();
+      const anoLimpo = ofertaAnoLetivo.trim();
+      // Verifica se a turma específica (codigo + ano) já existe para evitar duplicidade
+      const existe = turmasAll.some(x => x.cursoId === curso.id && x.codigo === codigoLimpo && x.anoLetivo === anoLimpo);
+      if (!existe) {
+        await db.turmas.add({
+          cursoId: curso.id!,
+          nome: codigoLimpo.charAt(0) + "ª Série",
+          codigo: codigoLimpo,
+          anoLetivo: anoLimpo,
+          arquivado: false,
+          lastAccessed: Date.now()
+        });
+        criadas++;
+      }
+    }
+
+    setOfertaModalOpen(false);
+    setViewTurmas('ativas');
+    if (criadas > 0) {
+      showAlert('Sucesso', `Foram geradas ${criadas} turma(s) para o período letivo ${ofertaAnoLetivo}.`, 'success');
+    } else {
+      showAlert('Aviso', `Todas as turmas base do PPC já existem para o período letivo ${ofertaAnoLetivo}.`, 'info');
+    }
   };
 
   // ===================== AÇÕES DE TURMA =====================
@@ -636,19 +680,35 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
           {/* Lista de Turmas */}
           <div className="p-4 flex-1 bg-gray-50/50">
-            <div className="flex gap-2 mb-4 border-b border-gray-200 pb-2">
-              <button
-                onClick={() => setViewTurmas('ativas')}
-                className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'ativas' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100'}`}
-              >
-                Ativas
-              </button>
-              <button
-                onClick={() => setViewTurmas('arquivadas')}
-                className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'arquivadas' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100'}`}
-              >
-                Arquivadas
-              </button>
+            <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setViewTurmas('ativas')}
+                  className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'ativas' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100'}`}
+                >
+                  Ativas
+                </button>
+                <button
+                  onClick={() => setViewTurmas('arquivadas')}
+                  className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'arquivadas' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100'}`}
+                >
+                  Arquivadas
+                </button>
+              </div>
+
+              {/* Botão Nova Oferta Letiva (PPC) */}
+              {cursoSelecionadoId && cursosPPC.some(cp => cp.nome === cursos.find(c => c.id === cursoSelecionadoId)?.nome) && (
+                <button
+                  onClick={() => {
+                    setOfertaAnoLetivo(new Date().getFullYear().toString());
+                    setOfertaModalOpen(true);
+                  }}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1 transition-colors"
+                >
+                  <Wand2 className="w-3.5 h-3.5" />
+                  Gerar Turmas do PPC
+                </button>
+              )}
             </div>
 
             {!cursoSelecionadoId && (
@@ -844,6 +904,46 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded transition-colors"
                 >
                   Salvar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Nova Oferta Letiva */}
+      {ofertaModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white rounded-lg p-5 w-full max-w-sm shadow-xl">
+            <h3 className="text-sm font-bold text-gray-800 mb-2">Gerar Turmas do PPC</h3>
+            <p className="text-xs text-gray-500 mb-4">
+              Para qual Período Letivo deseja gerar as turmas?
+            </p>
+            <form onSubmit={handleGerarTurmasPPC} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Período Letivo (ex: 2026, 2026.1)</label>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={ofertaAnoLetivo}
+                  onChange={e => setOfertaAnoLetivo(e.target.value)}
+                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                />
+              </div>
+              <div className="flex gap-2 justify-end mt-4">
+                <button
+                  type="button"
+                  onClick={() => setOfertaModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded transition-colors"
+                >
+                  Gerar Turmas
                 </button>
               </div>
             </form>
