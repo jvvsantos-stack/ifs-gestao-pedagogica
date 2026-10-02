@@ -11,19 +11,19 @@ interface Props {
 }
 
 export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
-  // --- Estados de EdiÃ§Ã£o ---
+  // --- Estados de Edição ---
   const [editingCursoId, setEditingCursoId] = useState<number | null>(null);
   const [editingTurmaId, setEditingTurmaId] = useState<number | null>(null);
 
-  // --- Estados para o fluxo PPC DinÃ¢mico ---
+  // --- Estados para o fluxo PPC Dinâmico ---
   const [ppcCursoIndex, setPpcCursoIndex] = useState<string>(''); // "" | "0" | "1" ... | "outro"
   const [ppcTurmaIndex, setPpcTurmaIndex] = useState<string>(''); // "" | "0" | "1" ... | "outro"
 
-  // --- Estados do FormulÃ¡rio de Curso (Manual) ---
+  // --- Estados do Formulário de Curso (Manual) ---
   const [cursoNome, setCursoNome] = useState('');
-  const [cursoModalidade, setCursoModalidade] = useState('TÃ©cnico Integrado');
+  const [cursoModalidade, setCursoModalidade] = useState('Técnico Integrado');
 
-  // --- Estados do FormulÃ¡rio de Turma (Manual/EdiÃ§Ã£o) ---
+  // --- Estados do Formulário de Turma (Manual/Edição) ---
   const [turmaCursoId, setTurmaCursoId] = useState('');
   const [turmaNome, setTurmaNome] = useState('');
   const [turmaCodigo, setTurmaCodigo] = useState('');
@@ -47,18 +47,18 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
   // Disciplinas filtradas pela turma selecionada na listagem de disciplinas
 
-  // ===================== AÃ‡Ã•ES DE CURSO =====================
+  // ===================== AÇÁ•ES DE CURSO =====================
   const handleEditCurso = (c: Curso) => {
     setEditingCursoId(c.id!);
     setCursoNome(c.nome);
     setCursoModalidade(c.modalidade);
-    setPpcCursoIndex('outro'); // ForÃ§a a exibiÃ§Ã£o do formulÃ¡rio manual para ediÃ§Ã£o
+    setPpcCursoIndex('outro'); // Força a exibição do formulário manual para edição
   };
 
   const cancelEditCurso = () => {
     setEditingCursoId(null);
     setCursoNome('');
-    setCursoModalidade('TÃ©cnico Integrado');
+    setCursoModalidade('Técnico Integrado');
     setPpcCursoIndex('');
   };
 
@@ -66,7 +66,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     setConfirmModal({
       isOpen: true,
       title: 'Excluir Curso',
-      message: 'Tem certeza que deseja excluir este curso? Todas as turmas e disciplinas vinculadas tambÃ©m serÃ£o excluÃ­das.',
+      message: 'Tem certeza que deseja excluir este curso? Todas as turmas e disciplinas vinculadas também serão excluídas.',
       onConfirm: async () => {
         const turmasDoCurso = await db.turmas.where('cursoId').equals(id).toArray();
         const turmasIds = turmasDoCurso.map(t => t.id!);
@@ -102,7 +102,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     cancelEditCurso();
   };
 
-  // ===================== AÃ‡Ã•ES DE TURMA =====================
+  // ===================== AÇÁ•ES DE TURMA =====================
   const ensureCursoExists = async (nome: string, modalidade: string): Promise<number> => {
     const existing = await db.cursos.where('nome').equals(nome).first();
     if (existing) return existing.id!;
@@ -119,7 +119,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
     const novaTurmaId = await db.turmas.add({
       cursoId,
-      nome: turmaNome || `${turmaPPC.codigo.charAt(0)}Âª SÃ©rie`,
+      nome: turmaNome || `${turmaPPC.codigo.charAt(0)}ª Série`,
       codigo: turmaPPC.codigo,
       anoLetivo: turmaAnoLetivo || new Date().getFullYear().toString(),
       lastAccessed: Date.now(),
@@ -152,7 +152,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     setTurmaNome(t.nome);
     setTurmaCodigo(t.codigo);
     setTurmaAnoLetivo(t.anoLetivo || '');
-    // ForÃ§a ir para "Outro" no Curso para editar a turma manual
+    // Força ir para "Outro" no Curso para editar a turma manual
     setPpcCursoIndex('outro');
     setPpcTurmaIndex('outro');
   };
@@ -175,7 +175,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     setConfirmModal({
       isOpen: true,
       title: 'Excluir Turma',
-      message: 'Tem certeza que deseja excluir esta turma? Todas as disciplinas vinculadas tambÃ©m serÃ£o excluÃ­das.',
+      message: 'Tem certeza que deseja excluir esta turma? Todas as disciplinas vinculadas também serão excluídas.',
       onConfirm: async () => {
         const disciplinasDaTurma = await db.disciplinas.where('turmaId').equals(id).toArray();
         const disciplinasIds = disciplinasDaTurma.map(d => d.id!);
@@ -214,7 +214,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     cancelEditTurma();
   };
 
-  // ===================== AÃ‡Ã•ES DE DISCIPLINA =====================
+  // ===================== AÇÁ•ES DE DISCIPLINA =====================
 
 
 
@@ -232,7 +232,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
               value={cursoNome}
               onChange={e => setCursoNome(e.target.value)}
               className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-              placeholder="Ex: TÃ©cnico em EletrÃ´nica"
+              placeholder="Ex: Técnico em Eletrônica"
             />
           </div>
           <div>
@@ -242,8 +242,8 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
               onChange={e => setCursoModalidade(e.target.value)}
               className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
             >
-              <option value="TÃ©cnico Integrado">TÃ©cnico Integrado</option>
-              <option value="TÃ©cnico Subsequente">TÃ©cnico Subsequente</option>
+              <option value="Técnico Integrado">Técnico Integrado</option>
+              <option value="Técnico Subsequente">Técnico Subsequente</option>
             </select>
           </div>
           <button type="submit" className={`w-full text-white text-sm font-medium py-2 rounded transition-colors ${editingCursoId ? 'bg-amber-500 hover:bg-amber-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
@@ -283,11 +283,11 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
               value={turmaNome}
               onChange={e => setTurmaNome(e.target.value)}
               className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-              placeholder="Ex: EletrÃ´nica 1A"
+              placeholder="Ex: Eletrônica 1A"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">CÃ³digo</label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Código</label>
             <input
               type="text"
               required
@@ -299,7 +299,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">
-              {isSubsequente ? 'Ano/PerÃ­odo Letivo' : 'Ano Letivo'}
+              {isSubsequente ? 'Ano/Período Letivo' : 'Ano Letivo'}
             </label>
             <input
               type="text"
@@ -322,13 +322,13 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         <div className="space-y-3 mt-3 animate-fade-in">
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Nome de ExibiÃ§Ã£o (Opcional)</label>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Nome de Exibição (Opcional)</label>
               <input
                 type="text"
                 value={turmaNome}
                 onChange={e => setTurmaNome(e.target.value)}
                 className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                placeholder="Ex: 1Âª SÃ©rie"
+                placeholder="Ex: 1ª Série"
               />
             </div>
             <div className="flex-1">
@@ -360,7 +360,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     <div className="p-6 bg-gray-50 min-h-full space-y-8">
       <header className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Cadastros Base</h1>
-        <p className="text-gray-500 text-sm">Gerencie os cursos, turmas e disciplinas da instituiÃ§Ã£o</p>
+        <p className="text-gray-500 text-sm">Gerencie os cursos, turmas e disciplinas da instituição</p>
       </header>
 
       <div className="flex flex-col gap-8 w-full">
@@ -368,10 +368,10 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         {/* CARD: CURSOS */}
         <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col w-full">
           <div className="p-4 border-b border-gray-100 bg-indigo-50/30 flex justify-between items-center">
-            <h2 className="text-lg font-bold text-gray-800">1. SessÃ£o Cursos</h2>
+            <h2 className="text-lg font-bold text-gray-800">1. Seção Cursos</h2>
             {editingCursoId && (
               <button onClick={cancelEditCurso} className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1">
-                <X className="w-3 h-3" /> Cancelar EdiÃ§Ã£o
+                <X className="w-3 h-3" /> Cancelar Edição
               </button>
             )}
           </div>
@@ -386,7 +386,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   setPpcTurmaIndex(''); // reset
                   if (e.target.value === 'outro') {
                     setCursoNome('');
-                    setCursoModalidade('TÃ©cnico Integrado');
+                    setCursoModalidade('Técnico Integrado');
                   }
                 }}
                 className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
@@ -429,10 +429,10 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         {(ppcCursoIndex !== '' || editingTurmaId) && (
           <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col w-full animate-fade-in">
             <div className="p-4 border-b border-gray-100 bg-indigo-50/30 flex justify-between items-center">
-              <h2 className="text-lg font-bold text-gray-800">2. SessÃ£o Turmas</h2>
+              <h2 className="text-lg font-bold text-gray-800">2. Seção Turmas</h2>
               {editingTurmaId && (
                 <button onClick={cancelEditTurma} className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1">
-                  <X className="w-3 h-3" /> Cancelar EdiÃ§Ã£o
+                  <X className="w-3 h-3" /> Cancelar Edição
                 </button>
               )}
             </div>
@@ -452,7 +452,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                     }}
                     className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                   >
-                    <option value="" disabled>Selecione uma turma do catÃ¡logo...</option>
+                    <option value="" disabled>Selecione uma turma do catálogo...</option>
                     {ppcCursoIndex !== '' && cursosPPC[Number(ppcCursoIndex)].turmas.map((t, i) => (
                       <option key={i} value={i}>{t.codigo}</option>
                     ))}
