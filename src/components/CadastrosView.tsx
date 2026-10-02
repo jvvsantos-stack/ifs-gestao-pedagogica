@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
 import type { Curso, Turma, Disciplina } from '../db/database';
-import { Edit, Trash2, X, Archive, ArchiveRestore, Settings } from 'lucide-react';
-import { catalogoPPC } from '../utils/catalogoPPC';
-import { ppcEletronica } from '../data/ppcEletronica';
+import { Edit, Trash2, X, Archive, ArchiveRestore } from 'lucide-react';
+import { cursosPPC } from '../data/ppcData';
 import { ConfirmModal } from './ConfirmModal';
 
 interface Props {
@@ -17,11 +16,15 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
   const [editingTurmaId, setEditingTurmaId] = useState<number | null>(null);
   const [editingDisciplinaId, setEditingDisciplinaId] = useState<number | null>(null);
 
-  // --- Estados do Formulário de Curso ---
+  // --- Estados para o fluxo PPC Dinâmico ---
+  const [ppcCursoIndex, setPpcCursoIndex] = useState<string>(''); // "" | "0" | "1" ... | "outro"
+  const [ppcTurmaIndex, setPpcTurmaIndex] = useState<string>(''); // "" | "0" | "1" ... | "outro"
+
+  // --- Estados do Formulário de Curso (Manual) ---
   const [cursoNome, setCursoNome] = useState('');
   const [cursoModalidade, setCursoModalidade] = useState('Técnico Integrado');
 
-  // --- Estados do Formulário de Turma ---
+  // --- Estados do Formulário de Turma (Manual/Edição) ---
   const [turmaCursoId, setTurmaCursoId] = useState('');
   const [turmaNome, setTurmaNome] = useState('');
   const [turmaCodigo, setTurmaCodigo] = useState('');
@@ -38,7 +41,6 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
   const [viewTurmas, setViewTurmas] = useState<'ativas' | 'arquivadas'>('ativas');
   const [viewDisciplinas, setViewDisciplinas] = useState<'ativas' | 'arquivadas'>('ativas');
-  const [showManualForms, setShowManualForms] = useState(false);
   
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
 
@@ -70,12 +72,14 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     setEditingCursoId(c.id!);
     setCursoNome(c.nome);
     setCursoModalidade(c.modalidade);
+    setPpcCursoIndex('outro'); // Força a exibição do formulário manual para edição
   };
 
   const cancelEditCurso = () => {
     setEditingCursoId(null);
     setCursoNome('');
     setCursoModalidade('Técnico Integrado');
+    setPpcCursoIndex('');
   };
 
   const handleDeleteCurso = async (id: number) => {
@@ -119,12 +123,58 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
   };
 
   // ===================== AÇÕES DE TURMA =====================
+  const ensureCursoExists = async (nome: string, modalidade: string): Promise<number> => {
+    const existing = await db.cursos.where('nome').equals(nome).first();
+    if (existing) return existing.id!;
+    return await db.cursos.add({ nome, modalidade });
+  };
+
+  const handleSaveTurmaPPC = async () => {
+    if (ppcCursoIndex === '' || ppcCursoIndex === 'outro' || ppcTurmaIndex === '' || ppcTurmaIndex === 'outro') return;
+
+    const cursoPPC = cursosPPC[Number(ppcCursoIndex)];
+    const turmaPPC = cursoPPC.turmas[Number(ppcTurmaIndex)];
+    
+    const cursoId = await ensureCursoExists(cursoPPC.nome, cursoPPC.modalidade);
+
+    const novaTurmaId = await db.turmas.add({
+      cursoId,
+      nome: turmaNome || `${turmaPPC.codigo.charAt(0)}ª Série`,
+      codigo: turmaPPC.codigo,
+      anoLetivo: turmaAnoLetivo || new Date().getFullYear().toString(),
+      lastAccessed: Date.now(),
+      arquivado: false
+    });
+
+    const disciplinasParaCriar = turmaPPC.disciplinas.map(d => ({
+      turmaId: novaTurmaId,
+      nome: d.nome,
+      chAula: d.horasAula,
+      chRelogio: Math.round(d.horasAula * 0.83333),
+      arquivado: false
+    }));
+    
+    await db.disciplinas.bulkAdd(disciplinasParaCriar as any);
+    
+    // Reset state
+    setPpcTurmaIndex('');
+    setTurmaNome('');
+    setTurmaAnoLetivo('');
+    
+    if (onTurmaCriada) {
+      onTurmaCriada(novaTurmaId as number);
+    }
+  };
+
   const handleEditTurma = (t: Turma) => {
     setEditingTurmaId(t.id!);
     setTurmaCursoId(String(t.cursoId));
     setTurmaNome(t.nome);
     setTurmaCodigo(t.codigo);
     setTurmaAnoLetivo(t.anoLetivo || '');
+    // Força ir para "Outro" no Curso para editar a turma manual
+    setPpcCursoIndex('outro');
+    setPpcTurmaIndex('outro');
   };
 
   const cancelEditTurma = () => {
@@ -133,6 +183,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     setTurmaCodigo('');
     setTurmaCursoId('');
     setTurmaAnoLetivo('');
+    setPpcTurmaIndex('');
   };
 
   const handleArchiveTurma = async (id: number, arquivar: boolean) => {
@@ -158,7 +209,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     });
   };
 
-  const handleSaveTurma = async (e: React.FormEvent) => {
+  const handleSaveTurmaManual = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!turmaNome.trim() || !turmaCodigo.trim() || !turmaCursoId) return;
 
@@ -171,7 +222,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         lastAccessed: Date.now(),
       });
     } else {
-      const novaTurmaId = await db.turmas.add({
+      await db.turmas.add({
         cursoId: Number(turmaCursoId),
         nome: turmaNome,
         codigo: turmaCodigo,
@@ -179,22 +230,6 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         lastAccessed: Date.now(),
         arquivado: false
       });
-
-      // Se for uma turma mapeada no PPC Eletronica
-      if (!showManualForms && ppcEletronica[turmaCodigo]) {
-        const disciplinasParaCriar = ppcEletronica[turmaCodigo].map(d => ({
-          turmaId: novaTurmaId,
-          nome: d.nome,
-          chAula: d.chAula,
-          chRelogio: Math.round(d.chAula * 0.83333),
-          arquivado: false
-        }));
-        await db.disciplinas.bulkAdd(disciplinasParaCriar as any);
-        
-        if (onTurmaCriada) {
-          onTurmaCriada(novaTurmaId as number);
-        }
-      }
     }
     cancelEditTurma();
   };
@@ -251,36 +286,153 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         nome: disciplinaNome,
         chAula: Number(disciplinaChAula),
         chRelogio: Number(disciplinaChRelogio),
+        arquivado: false
       });
-      setEditingDisciplinaId(null);
-      setDisciplinaNome('');
-      setDisciplinaChAula('');
-      setDisciplinaChRelogio('');
-      return;
     }
     cancelEditDisciplina();
   };
 
-  const turmaSelecionadaForm = turmasAll.find(t => t.id === Number(disciplinaTurmaId));
-  const cursoSelecionadoForm = turmaSelecionadaForm ? cursos.find(c => c.id === turmaSelecionadaForm.cursoId) : null;
-  const isEletronica = cursoSelecionadoForm ? (cursoSelecionadoForm.nome.toLowerCase().includes('eletrônica') || cursoSelecionadoForm.nome.toLowerCase().includes('eletronica')) : false;
-  const isPreenchimentoRapidoDisabled = !cursoSelecionadoForm || !isEletronica;
-  const catType = cursoSelecionadoForm ? (cursoSelecionadoForm.modalidade.includes('Integrado') ? 'Integrado' : 'Subsequente') : 'Integrado';
+  const renderCursosForm = () => {
+    if (ppcCursoIndex === 'outro') {
+      return (
+        <form onSubmit={handleSaveCurso} className="space-y-3 mt-3 animate-fade-in">
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Nome do Curso (Manual)</label>
+            <input
+              type="text"
+              required
+              value={cursoNome}
+              onChange={e => setCursoNome(e.target.value)}
+              className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+              placeholder="Ex: Técnico em Eletrônica"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Modalidade</label>
+            <select
+              value={cursoModalidade}
+              onChange={e => setCursoModalidade(e.target.value)}
+              className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+            >
+              <option value="Técnico Integrado">Técnico Integrado</option>
+              <option value="Técnico Subsequente">Técnico Subsequente</option>
+            </select>
+          </div>
+          <button type="submit" className={`w-full text-white text-sm font-medium py-2 rounded transition-colors ${editingCursoId ? 'bg-amber-500 hover:bg-amber-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
+            {editingCursoId ? 'Atualizar Curso' : 'Salvar Curso Manualmente'}
+          </button>
+        </form>
+      );
+    }
+    return null;
+  };
+
+  const renderTurmasForm = () => {
+    if (ppcTurmaIndex === 'outro' || ppcCursoIndex === 'outro') {
+      const cursoSelecionado = cursos.find(c => c.id === Number(turmaCursoId));
+      const isSubsequente = cursoSelecionado?.modalidade.includes('Subsequente');
+      return (
+        <form onSubmit={handleSaveTurmaManual} className="space-y-3 mt-3 animate-fade-in">
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Curso Pai</label>
+            <select
+              required
+              value={turmaCursoId}
+              onChange={e => setTurmaCursoId(e.target.value)}
+              className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+            >
+              <option value="" disabled>Selecione um curso cadastrado...</option>
+              {cursos.map(c => (
+                <option key={c.id} value={c.id}>{c.nome}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Nome da Turma</label>
+            <input
+              type="text"
+              required
+              value={turmaNome}
+              onChange={e => setTurmaNome(e.target.value)}
+              className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+              placeholder="Ex: Eletrônica 1A"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Código</label>
+            <input
+              type="text"
+              required
+              value={turmaCodigo}
+              onChange={e => setTurmaCodigo(e.target.value)}
+              className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+              placeholder="Ex: ELT1A"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              {isSubsequente ? 'Ano/Período Letivo' : 'Ano Letivo'}
+            </label>
+            <input
+              type="text"
+              required
+              value={turmaAnoLetivo}
+              onChange={e => setTurmaAnoLetivo(e.target.value)}
+              className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+              placeholder={isSubsequente ? 'Ex: 2026/2' : 'Ex: 2026'}
+            />
+          </div>
+          <button type="submit" className={`w-full text-white text-sm font-medium py-2 rounded transition-colors ${editingTurmaId ? 'bg-amber-500 hover:bg-amber-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
+            {editingTurmaId ? 'Atualizar Turma' : 'Salvar Turma Manualmente'}
+          </button>
+        </form>
+      );
+    }
+    
+    if (ppcTurmaIndex !== '' && ppcCursoIndex !== '') {
+      return (
+        <div className="space-y-3 mt-3 animate-fade-in">
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">Nome de Exibição (Opcional)</label>
+              <input
+                type="text"
+                value={turmaNome}
+                onChange={e => setTurmaNome(e.target.value)}
+                className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                placeholder="Ex: 1ª Série"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">Ano Letivo (Opcional)</label>
+              <input
+                type="text"
+                value={turmaAnoLetivo}
+                onChange={e => setTurmaAnoLetivo(e.target.value)}
+                className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                placeholder="Ex: 2026"
+              />
+            </div>
+          </div>
+          <button 
+            type="button" 
+            onClick={handleSaveTurmaPPC}
+            className="w-full text-white text-sm font-medium py-2 rounded transition-colors bg-indigo-600 hover:bg-indigo-700"
+          >
+            Adicionar Turma (PPC)
+          </button>
+        </div>
+      );
+    }
+    
+    return null;
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-full space-y-8">
-      <header className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Cadastros Base</h1>
-          <p className="text-gray-500 text-sm">Gerencie os cursos, turmas e disciplinas da instituição</p>
-        </div>
-        <button 
-          onClick={() => setShowManualForms(!showManualForms)}
-          className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${showManualForms ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}
-        >
-          <Settings className="w-4 h-4" />
-          Adição Manual Extraordinária
-        </button>
+      <header className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Cadastros Base</h1>
+        <p className="text-gray-500 text-sm">Gerencie os cursos, turmas e disciplinas da instituição</p>
       </header>
 
       <div className="flex flex-col gap-8 w-full">
@@ -288,7 +440,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         {/* CARD: CURSOS */}
         <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col w-full">
           <div className="p-4 border-b border-gray-100 bg-indigo-50/30 flex justify-between items-center">
-            <h2 className="text-lg font-bold text-gray-800">1. Cursos</h2>
+            <h2 className="text-lg font-bold text-gray-800">1. Sessão Cursos</h2>
             {editingCursoId && (
               <button onClick={cancelEditCurso} className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1">
                 <X className="w-3 h-3" /> Cancelar Edição
@@ -297,33 +449,28 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
           </div>
           
           <div className="p-4 border-b border-gray-100 shrink-0">
-            <form onSubmit={handleSaveCurso} className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Nome do Curso</label>
-                <input
-                  type="text"
-                  required
-                  value={cursoNome}
-                  onChange={e => setCursoNome(e.target.value)}
-                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                  placeholder="Ex: Técnico em Eletrônica"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Modalidade</label>
-                <select
-                  value={cursoModalidade}
-                  onChange={e => setCursoModalidade(e.target.value)}
-                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                >
-                  <option value="Técnico Integrado">Técnico Integrado</option>
-                  <option value="Técnico Subsequente">Técnico Subsequente</option>
-                </select>
-              </div>
-              <button type="submit" className={`w-full text-white text-sm font-medium py-2 rounded transition-colors ${editingCursoId ? 'bg-amber-500 hover:bg-amber-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
-                {editingCursoId ? 'Atualizar Curso' : 'Adicionar Curso'}
-              </button>
-            </form>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Selecione um Curso Base (PPC)</label>
+              <select
+                value={ppcCursoIndex}
+                onChange={e => {
+                  setPpcCursoIndex(e.target.value);
+                  setPpcTurmaIndex(''); // reset
+                  if (e.target.value === 'outro') {
+                    setCursoNome('');
+                    setCursoModalidade('Técnico Integrado');
+                  }
+                }}
+                className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+              >
+                <option value="" disabled>Selecione um curso...</option>
+                {cursosPPC.map((c, i) => (
+                  <option key={i} value={i}>{c.nome}</option>
+                ))}
+                <option value="outro">Outro (Cadastro Manual)</option>
+              </select>
+            </div>
+            {renderCursosForm()}
           </div>
 
           <div className="p-4 flex-1 bg-gray-50/50">
@@ -351,314 +498,196 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         </section>
 
         {/* CARD: TURMAS */}
-        <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col w-full">
-          <div className="p-4 border-b border-gray-100 bg-indigo-50/30 flex justify-between items-center">
-            <h2 className="text-lg font-bold text-gray-800">2. Turmas</h2>
-            {editingTurmaId && (
-              <button onClick={cancelEditTurma} className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1">
-                <X className="w-3 h-3" /> Cancelar Edição
-              </button>
-            )}
-          </div>
-          
-          <div className="p-4 border-b border-gray-100 shrink-0">
-            <form onSubmit={handleSaveTurma} className="space-y-3">
-              {(() => {
-                const cursoSelecionado = cursos.find(c => c.id === Number(turmaCursoId));
-                const isSubsequente = cursoSelecionado?.modalidade.includes('Subsequente');
-                return (
-                  <>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Curso Pai</label>
-                <select
-                  required
-                  value={turmaCursoId}
-                  onChange={e => setTurmaCursoId(e.target.value)}
-                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+        {(ppcCursoIndex !== '' || editingTurmaId) && (
+          <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col w-full animate-fade-in">
+            <div className="p-4 border-b border-gray-100 bg-indigo-50/30 flex justify-between items-center">
+              <h2 className="text-lg font-bold text-gray-800">2. Sessão Turmas</h2>
+              {editingTurmaId && (
+                <button onClick={cancelEditTurma} className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1">
+                  <X className="w-3 h-3" /> Cancelar Edição
+                </button>
+              )}
+            </div>
+            
+            <div className="p-4 border-b border-gray-100 shrink-0">
+              {ppcCursoIndex !== 'outro' && !editingTurmaId && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Selecione uma Turma (PPC)</label>
+                  <select
+                    value={ppcTurmaIndex}
+                    onChange={e => {
+                      setPpcTurmaIndex(e.target.value);
+                      if (e.target.value !== 'outro' && e.target.value !== '') {
+                         const tp = cursosPPC[Number(ppcCursoIndex)].turmas[Number(e.target.value)];
+                         if (tp.codigo.startsWith('1')) setTurmaNome('1ª Série');
+                         else if (tp.codigo.startsWith('2')) setTurmaNome('2ª Série');
+                         else if (tp.codigo.startsWith('3')) setTurmaNome('3ª Série');
+                      }
+                    }}
+                    className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  >
+                    <option value="" disabled>Selecione uma turma do catálogo...</option>
+                    {ppcCursoIndex !== '' && cursosPPC[Number(ppcCursoIndex)].turmas.map((t, i) => (
+                      <option key={i} value={i}>{t.codigo}</option>
+                    ))}
+                    <option value="outro">Outro (Cadastro Manual)</option>
+                  </select>
+                </div>
+              )}
+              {renderTurmasForm()}
+            </div>
+
+            <div className="p-4 flex-1 bg-gray-50/50 flex flex-col">
+              <div className="flex gap-2 mb-4 border-b border-gray-200 pb-2">
+                <button 
+                  onClick={() => setViewTurmas('ativas')} 
+                  className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'ativas' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100'}`}
                 >
-                  <option value="" disabled>Selecione um curso...</option>
+                  Ativas
+                </button>
+                <button 
+                  onClick={() => setViewTurmas('arquivadas')} 
+                  className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'arquivadas' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100'}`}
+                >
+                  Arquivadas
+                </button>
+              </div>
+              <div className="mb-3">
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Filtrar por Curso</label>
+                <select
+                  value={turmaListCursoId}
+                  onChange={e => setTurmaListCursoId(e.target.value)}
+                  className="w-full text-xs border border-gray-300 rounded p-1.5 focus:ring-1 focus:ring-indigo-500 outline-none"
+                >
+                  <option value="">Todas as turmas</option>
                   {cursos.map(c => (
                     <option key={c.id} value={c.id}>{c.nome}</option>
                   ))}
                 </select>
               </div>
-              
-              {!showManualForms ? (
-                // FORMULÁRIO RÁPIDO (PPC)
-                <>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Código da Turma PPC (Ex: 1IELN.M)</label>
-                    <input
-                      type="text"
-                      required
-                      value={turmaCodigo}
-                      onChange={e => {
-                        const val = e.target.value.toUpperCase();
-                        setTurmaCodigo(val);
-                        // Autopreencher nome
-                        if (val.startsWith('1')) setTurmaNome('1ª Série');
-                        else if (val.startsWith('2')) setTurmaNome('2ª Série');
-                        else if (val.startsWith('3')) setTurmaNome('3ª Série');
-                      }}
-                      className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                      placeholder="Ex: 1IELN.M"
-                    />
-                    <p className="text-[10px] text-gray-500 mt-1">
-                      As disciplinas e suas cargas horárias serão criadas automaticamente conforme o PPC.
-                    </p>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="flex-1">
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Nome de Exibição (Opcional)</label>
-                      <input
-                        type="text"
-                        value={turmaNome}
-                        onChange={e => setTurmaNome(e.target.value)}
-                        className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                        placeholder="Ex: 1ª Série"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Ano Letivo</label>
-                      <input
-                        type="text"
-                        required
-                        value={turmaAnoLetivo}
-                        onChange={e => setTurmaAnoLetivo(e.target.value)}
-                        className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                        placeholder="Ex: 2026"
-                      />
-                    </div>
-                  </div>
-                </>
-              ) : (
-                // FORMULÁRIO ANTIGO (MANUAL)
-                <>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Nome da Turma</label>
-                    <input
-                      type="text"
-                      required
-                      value={turmaNome}
-                      onChange={e => setTurmaNome(e.target.value)}
-                      className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                      placeholder="Ex: Eletrônica 1A"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Código</label>
-                    <input
-                      type="text"
-                      required
-                      value={turmaCodigo}
-                      onChange={e => setTurmaCodigo(e.target.value)}
-                      className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                      placeholder="Ex: ELT1A"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      {isSubsequente ? 'Ano/Período Letivo' : 'Ano Letivo'}
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={turmaAnoLetivo}
-                      onChange={e => setTurmaAnoLetivo(e.target.value)}
-                      className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                      placeholder={isSubsequente ? 'Ex: 2026/2' : 'Ex: 2026'}
-                    />
-                  </div>
-                </>
-              )}
-              </>
-              );
-            })()}
-              <button type="submit" className={`w-full text-white text-sm font-medium py-2 rounded transition-colors ${editingTurmaId ? 'bg-amber-500 hover:bg-amber-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
-                {editingTurmaId ? 'Atualizar Turma' : (showManualForms ? 'Adicionar Turma (Manual)' : 'Adicionar Turma (PPC)')}
-              </button>
-            </form>
-          </div>
-
-          <div className="p-4 flex-1 bg-gray-50/50 flex flex-col">
-            <div className="flex gap-2 mb-4 border-b border-gray-200 pb-2">
-              <button 
-                onClick={() => setViewTurmas('ativas')} 
-                className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'ativas' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100'}`}
-              >
-                Ativas
-              </button>
-              <button 
-                onClick={() => setViewTurmas('arquivadas')} 
-                className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'arquivadas' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100'}`}
-              >
-                Arquivadas
-              </button>
-            </div>
-            <div className="mb-3">
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Filtrar por Curso</label>
-              <select
-                value={turmaListCursoId}
-                onChange={e => setTurmaListCursoId(e.target.value)}
-                className="w-full text-xs border border-gray-300 rounded p-1.5 focus:ring-1 focus:ring-indigo-500 outline-none"
-              >
-                <option value="">Todas as turmas</option>
-                {cursos.map(c => (
-                  <option key={c.id} value={c.id}>{c.nome}</option>
-                ))}
-              </select>
-            </div>
-            <ul className="space-y-2">
-              {turmasListadas.map(t => (
-                <li key={t.id} className="bg-white p-3 border border-gray-200 rounded shadow-sm group">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                        {t.nome}
-                        <span className="text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">{t.codigo}</span>
-                        {t.anoLetivo && (
-                          <span className="text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">{t.anoLetivo}</span>
+              <ul className="space-y-2">
+                {turmasListadas.map(t => (
+                  <li key={t.id} className="bg-white p-3 border border-gray-200 rounded shadow-sm group">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="font-semibold text-gray-800 text-sm flex items-center gap-2">
+                          {t.nome}
+                          <span className="text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">{t.codigo}</span>
+                          {t.anoLetivo && (
+                            <span className="text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">{t.anoLetivo}</span>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {cursos.find(c => c.id === t.cursoId)?.nome || 'Curso Desconhecido'}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {viewTurmas === 'ativas' ? (
+                          <>
+                            <button onClick={() => handleEditTurma(t)} className="p-1 text-gray-400 hover:text-indigo-600 transition-colors" title="Editar">
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleArchiveTurma(t.id!, true)} className="p-1 text-gray-400 hover:text-orange-600 transition-colors" title="Arquivar">
+                              <Archive className="w-4 h-4" />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button onClick={() => handleArchiveTurma(t.id!, false)} className="p-1 text-gray-400 hover:text-green-600 transition-colors" title="Restaurar">
+                              <ArchiveRestore className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleDeleteTurma(t.id!)} className="p-1 text-gray-400 hover:text-red-600 transition-colors" title="Excluir Definitivamente">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
                         )}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {cursos.find(c => c.id === t.cursoId)?.nome || 'Curso Desconhecido'}
-                      </div>
                     </div>
-                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {viewTurmas === 'ativas' ? (
-                        <>
-                          <button onClick={() => handleEditTurma(t)} className="p-1 text-gray-400 hover:text-indigo-600 transition-colors" title="Editar">
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => handleArchiveTurma(t.id!, true)} className="p-1 text-gray-400 hover:text-orange-600 transition-colors" title="Arquivar">
-                            <Archive className="w-4 h-4" />
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button onClick={() => handleArchiveTurma(t.id!, false)} className="p-1 text-gray-400 hover:text-green-600 transition-colors" title="Restaurar">
-                            <ArchiveRestore className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => handleDeleteTurma(t.id!)} className="p-1 text-gray-400 hover:text-red-600 transition-colors" title="Excluir Definitivamente">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              ))}
-              {turmasListadas.length === 0 && <p className="text-xs text-gray-400 text-center py-4">Nenhuma turma encontrada.</p>}
-            </ul>
-          </div>
-        </section>
+                  </li>
+                ))}
+                {turmasListadas.length === 0 && <p className="text-xs text-gray-400 text-center py-4">Nenhuma turma encontrada.</p>}
+              </ul>
+            </div>
+          </section>
+        )}
 
         {/* CARD: DISCIPLINAS */}
         <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col w-full">
           <div className="p-4 border-b border-gray-100 bg-indigo-50/30 flex justify-between items-center">
-            <h2 className="text-lg font-bold text-gray-800">3. Disciplinas</h2>
+            <h2 className="text-lg font-bold text-gray-800">3. Sessão Disciplinas (Avulsas)</h2>
             {editingDisciplinaId && (
               <button onClick={cancelEditDisciplina} className="text-xs text-red-600 hover:text-red-800 flex items-center gap-1">
                 <X className="w-3 h-3" /> Cancelar Edição
               </button>
             )}
           </div>
-          {showManualForms && (
-            <div className="p-4 border-b border-gray-100 shrink-0">
-              <form onSubmit={handleSaveDisciplina} className="space-y-3">
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Turma Pai</label>
-                  <select
-                    required
-                    value={disciplinaTurmaId}
-                    onChange={e => setDisciplinaTurmaId(e.target.value)}
-                    className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                  >
-                    <option value="" disabled>Selecione uma turma...</option>
-                    {turmasAll.map(t => (
-                      <option key={t.id} value={t.id}>{t.nome}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Preenchimento Rápido (Catálogo)</label>
-                  <select
-                    disabled={isPreenchimentoRapidoDisabled}
-                    onChange={e => {
-                      if (!e.target.value) return;
-                      const parts = e.target.value.split('|');
-                      const nome = parts[0];
-                      const chAulaVal = Number(parts[1]);
-                      setDisciplinaNome(nome);
-                      setDisciplinaChAula(chAulaVal);
-                      setDisciplinaChRelogio(Math.round(chAulaVal * 0.83333));
-                      e.target.value = ''; // reseta após o uso
-                    }}
-                    className={`w-full text-sm border rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none mb-3 ${isPreenchimentoRapidoDisabled ? 'bg-gray-100 text-gray-500 border-gray-200' : 'bg-indigo-50/50 border-gray-300'}`}
-                    defaultValue=""
-                  >
-                    {isPreenchimentoRapidoDisabled ? (
-                      <option value="" disabled>Indisponível para este curso</option>
-                    ) : (
-                      <>
-                        <option value="" disabled>Escolha uma disciplina...</option>
-                        {catalogoPPC.filter(d => d.curso === catType).map((d, i) => (
-                          <option key={`cat-${i}`} value={`${d.nome}|${d.chAula}`}>{d.nome} ({d.chAula}h)</option>
-                        ))}
-                      </>
-                    )}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Nome da Disciplina</label>
+          
+          <div className="p-4 border-b border-gray-100 shrink-0">
+            <form onSubmit={handleSaveDisciplina} className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Turma Pai</label>
+                <select
+                  required
+                  value={disciplinaTurmaId}
+                  onChange={e => setDisciplinaTurmaId(e.target.value)}
+                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                >
+                  <option value="" disabled>Selecione uma turma...</option>
+                  {turmasAll.map(t => (
+                    <option key={t.id} value={t.id}>{t.nome}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Nome da Disciplina (Outro)</label>
+                <input
+                  type="text"
+                  required
+                  value={disciplinaNome}
+                  onChange={e => setDisciplinaNome(e.target.value)}
+                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  placeholder="Ex: Matemática"
+                />
+              </div>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">CH Aula</label>
                   <input
-                    type="text"
+                    type="number"
                     required
-                    value={disciplinaNome}
-                    onChange={e => setDisciplinaNome(e.target.value)}
+                    value={disciplinaChAula}
+                    onChange={e => {
+                      const chAulaVal = e.target.value ? Number(e.target.value) : '';
+                      setDisciplinaChAula(chAulaVal);
+                      if (chAulaVal !== '') {
+                        setDisciplinaChRelogio(Math.round(chAulaVal * 0.83333));
+                      } else {
+                        setDisciplinaChRelogio('');
+                      }
+                    }}
                     className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                    placeholder="Ex: Matemática"
+                    placeholder="Ex: 80"
                   />
                 </div>
-                <div className="flex gap-3">
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">CH Aula</label>
-                    <input
-                      type="number"
-                      required
-                      value={disciplinaChAula}
-                      onChange={e => {
-                        const chAulaVal = e.target.value ? Number(e.target.value) : '';
-                        setDisciplinaChAula(chAulaVal);
-                        if (chAulaVal !== '') {
-                          setDisciplinaChRelogio(Math.round(chAulaVal * 0.83333));
-                        } else {
-                          setDisciplinaChRelogio('');
-                        }
-                      }}
-                      className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                      placeholder="Ex: 80"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">CH Relógio</label>
-                    <input
-                      type="number"
-                      required
-                      readOnly
-                      disabled
-                      value={disciplinaChRelogio}
-                      className="w-full text-sm border border-gray-300 rounded p-2 bg-gray-100 text-gray-500 cursor-not-allowed outline-none"
-                      placeholder="Auto."
-                    />
-                  </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">CH Relógio</label>
+                  <input
+                    type="number"
+                    required
+                    readOnly
+                    disabled
+                    value={disciplinaChRelogio}
+                    className="w-full text-sm border border-gray-300 rounded p-2 bg-gray-100 text-gray-500 cursor-not-allowed outline-none"
+                    placeholder="Auto."
+                  />
                 </div>
-                <button type="submit" className={`w-full text-white text-sm font-medium py-2 rounded transition-colors ${editingDisciplinaId ? 'bg-amber-500 hover:bg-amber-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
-                  {editingDisciplinaId ? 'Atualizar Disciplina' : 'Adicionar Disciplina'}
-                </button>
-              </form>
-            </div>
-          )}
+              </div>
+              <button type="submit" className={`w-full text-white text-sm font-medium py-2 rounded transition-colors ${editingDisciplinaId ? 'bg-amber-500 hover:bg-amber-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
+                {editingDisciplinaId ? 'Atualizar Disciplina' : 'Adicionar Disciplina (Outro)'}
+              </button>
+            </form>
+          </div>
 
           <div className="p-4 flex-1 bg-gray-50/50 flex flex-col">
             <div className="flex gap-2 mb-4 border-b border-gray-200 pb-2">
