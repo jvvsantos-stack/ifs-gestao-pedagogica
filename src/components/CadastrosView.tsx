@@ -70,6 +70,24 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     });
   };
 
+  React.useEffect(() => {
+    // Auto-migração: Turmas de cursos Subsequentes que ficaram com "Série" no nome
+    const migrateNomes = async () => {
+      const cursosSubsequentes = await db.cursos.filter(c => c.nome.includes('Subsequente') || c.modalidade === 'Subsequente').toArray();
+      for (const curso of cursosSubsequentes) {
+        const turmas = await db.turmas.where('cursoId').equals(curso.id!).toArray();
+        for (const t of turmas) {
+          if (t.nome && t.nome.includes('Série')) {
+            await db.turmas.update(t.id!, {
+              nome: t.nome.replace('Série', 'Período').replace('ª', 'º')
+            });
+          }
+        }
+      }
+    };
+    migrateNomes();
+  }, []);
+
   // --- Consultas em Tempo Real ---
   const cursos = useLiveQuery(() => db.cursos.toArray()) || [];
   const cursosAtivos = cursos.filter(c => !c.arquivado);
@@ -601,7 +619,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                                 setTurmaCodigo(e.target.value);
                                 const tPPC = cPPC.turmas.find(t => t.codigo === e.target.value);
                                 if (tPPC) {
-                                  setTurmaNome(tPPC.codigo.charAt(0) + "ª Série");
+                                  setTurmaNome((tPPC as any).nome || tPPC.codigo.charAt(0) + "ª Série");
                                 }
                               }
                             }}
