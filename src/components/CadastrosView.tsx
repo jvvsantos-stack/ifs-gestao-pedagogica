@@ -51,8 +51,21 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     message: string;
     confirmText?: string;
     cancelText?: string;
+    type?: 'warning' | 'success' | 'info';
+    isAlert?: boolean;
     onConfirm: () => void;
   }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+
+  const showAlert = (title: string, message: string, type: 'warning' | 'success' | 'info' = 'info') => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      type,
+      isAlert: true,
+      onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+    });
+  };
 
   // --- Consultas em Tempo Real ---
   const cursos = useLiveQuery(() => db.cursos.toArray()) || [];
@@ -85,11 +98,12 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         if (!existente) {
           const newCursoId = await db.cursos.add({ nome: c.nome, modalidade: c.modalidade });
           const anoCorrente = new Date().getFullYear().toString();
+          const anoLetivoDefault = c.modalidade === 'Técnico Subsequente' ? `${anoCorrente}.1` : anoCorrente;
           const turmasParaCriar = c.turmas.map(t => ({
             cursoId: newCursoId as number,
             nome: t.codigo.charAt(0) + "ª Série",
             codigo: t.codigo,
-            anoLetivo: anoCorrente,
+            anoLetivo: anoLetivoDefault,
             arquivado: false,
             lastAccessed: Date.now()
           }));
@@ -159,7 +173,19 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
   const handleSaveTurmaManual = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!turmaNome.trim() || !turmaCodigo.trim() || !turmaCursoId) return;
+    if (!turmaNome.trim() || !turmaCodigo.trim() || !turmaCursoId || turmaCodigo === 'outro_manual_trigger') return;
+
+    if (!editingTurmaId) {
+      const duplicada = turmasAll.find(t => 
+        t.cursoId === Number(turmaCursoId) && 
+        t.codigo === turmaCodigo.trim() && 
+        t.anoLetivo === turmaAnoLetivo.trim()
+      );
+      if (duplicada) {
+        showAlert('Aviso', `A turma ${turmaCodigo} já existe para o período letivo ${turmaAnoLetivo}.`, 'warning');
+        return;
+      }
+    }
 
     if (editingTurmaId) {
       await db.turmas.update(editingTurmaId, {
@@ -251,12 +277,12 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
     const cursoPPC = cursosPPC.find(c => c.nome === cursoDb.nome);
     if (!cursoPPC) {
-      alert('Este curso não possui correspondência no PPC automático.');
+      showAlert('Aviso', 'Este curso não possui correspondência no PPC automático.', 'warning');
       return;
     }
     const turmaPPC = cursoPPC.turmas.find(t => t.codigo === turma.codigo);
     if (!turmaPPC) {
-      alert('Esta turma não possui disciplinas no PPC automático (código não encontrado).');
+      showAlert('Aviso', 'Esta turma não possui disciplinas no PPC automático (código não encontrado).', 'warning');
       return;
     }
 
@@ -276,7 +302,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
       })) as any
     );
 
-    alert(`Foram geradas ${faltando.length} disciplina(s) na turma ${turma.nome}.`);
+    showAlert('Sucesso', `Foram geradas ${faltando.length} disciplina(s) na turma ${turma.nome}.`, 'success');
   };
 
   // ===================== HELPERS DE RENDER =====================
@@ -493,7 +519,16 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   <select
                     required
                     value={turmaCursoId}
-                    onChange={e => setTurmaCursoId(e.target.value)}
+                    onChange={e => {
+                      setTurmaCursoId(e.target.value);
+                      setTurmaCodigo('');
+                      setTurmaNome('');
+                      const c = cursos.find(c => c.id === Number(e.target.value));
+                      if (c) {
+                        const anoCorrente = new Date().getFullYear().toString();
+                        setTurmaAnoLetivo(c.modalidade === 'Técnico Subsequente' ? `${anoCorrente}.1` : anoCorrente);
+                      }
+                    }}
                     className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                   >
                     <option value="" disabled>Selecione...</option>
@@ -503,15 +538,67 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Código</label>
-                  <input
-                    type="text"
-                    required
-                    value={turmaCodigo}
-                    onChange={e => setTurmaCodigo(e.target.value)}
-                    className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                    placeholder="Ex: 1IELN.M"
-                  />
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Código da Turma</label>
+                  {(() => {
+                    const cDb = cursos.find(c => c.id === Number(turmaCursoId));
+                    const cPPC = cDb ? cursosPPC.find(cp => cp.nome === cDb.nome) : null;
+                    
+                    if (cPPC && turmaCodigo !== 'outro_manual_trigger') {
+                      const isManual = turmaCodigo !== '' && !cPPC.turmas.some(t => t.codigo === turmaCodigo);
+                      if (!isManual) {
+                        return (
+                          <select
+                            required
+                            value={turmaCodigo}
+                            onChange={e => {
+                              if (e.target.value === 'outro_manual_trigger') {
+                                setTurmaCodigo('outro_manual_trigger'); 
+                              } else {
+                                setTurmaCodigo(e.target.value);
+                                const tPPC = cPPC.turmas.find(t => t.codigo === e.target.value);
+                                if (tPPC) {
+                                  setTurmaNome(tPPC.codigo.charAt(0) + "ª Série");
+                                }
+                              }
+                            }}
+                            className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                          >
+                            <option value="" disabled>Selecione a turma...</option>
+                            {cPPC.turmas.map(t => (
+                              <option key={t.codigo} value={t.codigo}>{t.codigo}</option>
+                            ))}
+                            <option value="outro_manual_trigger">Outro (Manual)</option>
+                          </select>
+                        );
+                      }
+                    }
+
+                    return (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          required
+                          value={turmaCodigo === 'outro_manual_trigger' ? '' : turmaCodigo}
+                          onChange={e => setTurmaCodigo(e.target.value)}
+                          className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                          placeholder="Ex: 1IELN.M"
+                          autoFocus={turmaCodigo === 'outro_manual_trigger'}
+                        />
+                        {cPPC && (
+                          <button 
+                            type="button"
+                            onClick={() => {
+                               setTurmaCodigo('');
+                               setTurmaNome('');
+                            }} 
+                            className="text-xs text-indigo-600 font-medium hover:underline whitespace-nowrap px-2"
+                          >
+                            Lista PPC
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">Nome de Exibição</label>
@@ -525,14 +612,14 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Ano Letivo</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Período Letivo</label>
                   <input
                     type="text"
                     required
                     value={turmaAnoLetivo}
                     onChange={e => setTurmaAnoLetivo(e.target.value)}
                     className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                    placeholder="Ex: 2026"
+                    placeholder={cursos.find(c => c.id === Number(turmaCursoId))?.modalidade === 'Técnico Subsequente' ? "Ex: 2026.1" : "Ex: 2026"}
                   />
                 </div>
               </div>
@@ -771,7 +858,8 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         confirmText={confirmModal.confirmText}
         cancelText={confirmModal.cancelText}
         onConfirm={confirmModal.onConfirm}
-        onCancel={() => {
+        type={confirmModal.type}
+        onCancel={confirmModal.isAlert ? undefined : () => {
           handleCancelPPC();
         }}
       />
