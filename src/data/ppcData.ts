@@ -53,7 +53,7 @@ export const cursosPPC = [
     modalidade: "Subsequente",
     turmas: [
       {
-        nome: "1º Período",
+        nomeExibicao: "1º Período",
         codigo: "1ELN.N",
         disciplinas: [
           { nome: "Física Aplicada", horasAula: 72 },
@@ -65,7 +65,7 @@ export const cursosPPC = [
         ]
       },
       {
-        nome: "2º Período",
+        nomeExibicao: "2º Período",
         codigo: "2ELN.N",
         disciplinas: [
           { nome: "Circuitos Elétricos II", horasAula: 108 },
@@ -76,7 +76,7 @@ export const cursosPPC = [
         ]
       },
       {
-        nome: "3º Período",
+        nomeExibicao: "3º Período",
         codigo: "3ELN.N",
         disciplinas: [
           { nome: "Eletrônica Digital II", horasAula: 108 },
@@ -87,7 +87,7 @@ export const cursosPPC = [
         ]
       },
       {
-        nome: "4º Período",
+        nomeExibicao: "4º Período",
         codigo: "4ELN.N",
         disciplinas: [
           { nome: "Sistemas Programáveis", horasAula: 108 },
