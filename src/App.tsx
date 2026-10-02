@@ -101,7 +101,6 @@ function App() {
         <DashboardView setActiveTab={setActiveTab} />
       ) : activeTab === 'turmas' ? (
         <TurmasView 
-          onLogout={handleLogout} 
           initialOpenTurmaAlunosId={turmaIdToOpenAlunos} 
           clearInitialOpen={() => setTurmaIdToOpenAlunos(null)} 
         />

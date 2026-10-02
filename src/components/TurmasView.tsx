@@ -7,12 +7,11 @@ import * as XLSX from 'xlsx';
 import { ModalOcorrencias } from './ModalOcorrencias';
 
 interface Props {
-  onLogout?: () => void;
   initialOpenTurmaAlunosId?: number | null;
   clearInitialOpen?: () => void;
 }
 
-export const TurmasView: React.FC<Props> = ({ onLogout, initialOpenTurmaAlunosId, clearInitialOpen }) => {
+export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearInitialOpen }) => {
   const [selectedCursoId, setSelectedCursoId] = useState<string>('');
   const [selectedTurma, setSelectedTurma] = useState<Turma | null>(null);
   const [alunosModalTurma, setAlunosModalTurma] = useState<Turma | null>(null);
