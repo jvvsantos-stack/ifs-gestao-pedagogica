@@ -4,6 +4,7 @@ export interface Curso {
   id?: number;
   nome: string;
   modalidade: string;
+  arquivado?: boolean;
 }
 
 export interface Turma {

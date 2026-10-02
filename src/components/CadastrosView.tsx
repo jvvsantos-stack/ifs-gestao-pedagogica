@@ -53,6 +53,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
   // --- Consultas em Tempo Real ---
   const cursos = useLiveQuery(() => db.cursos.toArray()) || [];
+  const cursosAtivos = cursos.filter(c => !c.arquivado);
   const turmasAll = useLiveQuery(() => db.turmas.toArray()) || [];
   const disciplinasAll = useLiveQuery(() => db.disciplinas.toArray()) || [];
 
@@ -79,7 +80,17 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         // Verifica se já existe
         const existente = cursos.find(x => x.nome === c.nome);
         if (!existente) {
-          await db.cursos.add({ nome: c.nome, modalidade: c.modalidade });
+          const newCursoId = await db.cursos.add({ nome: c.nome, modalidade: c.modalidade });
+          const anoCorrente = new Date().getFullYear().toString();
+          const turmasParaCriar = c.turmas.map(t => ({
+            cursoId: newCursoId as number,
+            nome: t.codigo.charAt(0) + "ª Série",
+            codigo: t.codigo,
+            anoLetivo: anoCorrente,
+            arquivado: false,
+            lastAccessed: Date.now()
+          }));
+          await db.turmas.bulkAdd(turmasParaCriar);
         }
         setCursoPcpPendente(null);
         setConfirmModal(prev => ({ ...prev, isOpen: false }));
@@ -99,6 +110,10 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     setCursoNome('');
     setCursoModalidade('Integrado');
     setShowNovoCursoForm(false);
+  };
+
+  const handleArchiveCurso = async (id: number, arquivado: boolean) => {
+    await db.cursos.update(id, { arquivado });
   };
 
   const handleDeleteCurso = (id: number, nome: string) => {
@@ -344,13 +359,13 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
           {/* Lista de Cursos Cadastrados */}
           <div className="p-4 flex-1">
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
-              Cursos Cadastrados ({cursos.length})
+              Cursos Cadastrados ({cursosAtivos.length})
             </h3>
-            {cursos.length === 0 && (
+            {cursosAtivos.length === 0 && (
               <p className="text-xs text-gray-400 text-center py-6">Nenhum curso cadastrado. Insira um curso acima.</p>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {cursos.map(c => {
+              {cursosAtivos.map(c => {
                 const isSelected = cursoSelecionadoId === c.id;
                 const turmasDoCurso = turmasAll.filter(t => t.cursoId === c.id && !t.arquivado).length;
                 return (
@@ -380,6 +395,13 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                         </div>
                       </div>
                       <div className="flex gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={e => { e.stopPropagation(); handleArchiveCurso(c.id!, true); }}
+                          className="p-1.5 text-gray-400 hover:text-orange-600 transition-colors"
+                          title="Arquivar curso"
+                        >
+                          <Archive className="w-3.5 h-3.5" />
+                        </button>
                         <button
                           onClick={e => { e.stopPropagation(); handleDeleteCurso(c.id!, c.nome); }}
                           className="p-1.5 text-gray-400 hover:text-red-600 transition-colors"
