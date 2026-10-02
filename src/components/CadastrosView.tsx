@@ -28,7 +28,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
   const [turmaCursoId, setTurmaCursoId] = useState('');
   const [turmaNome, setTurmaNome] = useState('');
   const [turmaCodigo, setTurmaCodigo] = useState('');
-  const [turmaAnoLetivo, setTurmaAnoLetivo] = useState('');
+  const [turmaAnoLetivo, setTurmaAnoLetivo] = useState(new Date().getFullYear().toString());
   const [turmaListCursoId, setTurmaListCursoId] = useState(''); // Filtro pra listagem
 
   // --- Estados do Formulário de Disciplina ---
@@ -159,7 +159,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     // Reset state
     setPpcTurmaIndex('');
     setTurmaNome('');
-    setTurmaAnoLetivo('');
+    setTurmaAnoLetivo(new Date().getFullYear().toString());
     
     if (onTurmaCriada) {
       onTurmaCriada(novaTurmaId as number);
@@ -182,7 +182,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
     setTurmaNome('');
     setTurmaCodigo('');
     setTurmaCursoId('');
-    setTurmaAnoLetivo('');
+    setTurmaAnoLetivo(new Date().getFullYear().toString());
     setPpcTurmaIndex('');
   };
 
@@ -519,9 +519,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                       setPpcTurmaIndex(e.target.value);
                       if (e.target.value !== 'outro' && e.target.value !== '') {
                          const tp = cursosPPC[Number(ppcCursoIndex)].turmas[Number(e.target.value)];
-                         if (tp.codigo.startsWith('1')) setTurmaNome('1ª Série');
-                         else if (tp.codigo.startsWith('2')) setTurmaNome('2ª Série');
-                         else if (tp.codigo.startsWith('3')) setTurmaNome('3ª Série');
+                         setTurmaNome(tp.codigo);
                       }
                     }}
                     className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
