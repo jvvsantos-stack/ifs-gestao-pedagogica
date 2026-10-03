@@ -1,32 +1,49 @@
 import { db } from '../db/database';
-import { v4 as uuidv4 } from 'uuid';
 import { cursosPPC } from '../data/ppcData';
 
 export async function seedDatabase() {
   console.log("Iniciando seed do banco de dados...");
   
-  // Limpar os dados atuais (exceto db.cursos se houver, mas ppcData não está no db de forma isolada, as turmas que possuem os dados).
+  // Limpar os dados atuais (exceto db.cursos)
   await db.turmas.clear();
   await db.disciplinas.clear();
   await db.alunos.clear();
   await db.notas.clear();
   await db.avaliacoes_finais.clear();
 
-  // Dados a gerar:
-  // Técnico em Eletrônica Integrado (Anual): 2025, 2026
-  // Técnico em Eletrônica Subsequente (Semestral): 2025/2, 2026/1
+  // Procurar os cursos no banco de dados para obter o cursoId real
+  const cursosAtuais = await db.cursos.toArray();
+  let integradoCurso = cursosAtuais.find(c => c.modalidade === 'Integrado');
+  let subsequenteCurso = cursosAtuais.find(c => c.modalidade === 'Subsequente');
   
-  const integradoPPC = cursosPPC.find(c => c.modalidade === 'Integrado');
-  const subsequentePPC = cursosPPC.find(c => c.modalidade === 'Subsequente');
-  
-  if (!integradoPPC || !subsequentePPC) {
-    console.error("PPC não encontrado");
+  // Se não existir no banco, cria para poder ter o cursoId
+  if (!integradoCurso) {
+    const ppc = cursosPPC.find(c => c.modalidade === 'Integrado');
+    if (ppc) {
+      const id = await db.cursos.add({ nome: ppc.nome, modalidade: ppc.modalidade });
+      integradoCurso = { id, nome: ppc.nome, modalidade: ppc.modalidade };
+    }
+  }
+
+  if (!subsequenteCurso) {
+    const ppc = cursosPPC.find(c => c.modalidade === 'Subsequente');
+    if (ppc) {
+      const id = await db.cursos.add({ nome: ppc.nome, modalidade: ppc.modalidade });
+      subsequenteCurso = { id, nome: ppc.nome, modalidade: ppc.modalidade };
+    }
+  }
+
+  if (!integradoCurso || !subsequenteCurso || !integradoCurso.id || !subsequenteCurso.id) {
+    console.error("Cursos não encontrados e não foi possível criá-los.");
     return;
   }
 
+  const integradoPPC = cursosPPC.find(c => c.modalidade === 'Integrado')!;
+  const subsequentePPC = cursosPPC.find(c => c.modalidade === 'Subsequente')!;
+
   const turmasCriar = [
-    { ppc: integradoPPC, periodos: ['2025', '2026'] },
-    { ppc: subsequentePPC, periodos: ['2025/2', '2026/1'] }
+    { ppc: integradoPPC, cursoId: integradoCurso.id, periodos: ['2025', '2026'] },
+    { ppc: subsequentePPC, cursoId: subsequenteCurso.id, periodos: ['2025/2', '2026/1'] }
   ];
 
   for (const config of turmasCriar) {
@@ -34,30 +51,33 @@ export async function seedDatabase() {
     
     for (const periodo of config.periodos) {
       for (const turmaPPC of config.ppc.turmas) {
-        // Criar a turma
-        const turmaId = uuidv4();
+        
         const nomeTurma = (turmaPPC as any).nome || (turmaPPC as any).nomeExibicao || '';
         
-        await db.turmas.add({
-          id: turmaId,
+        // Criar a turma (o Dexie gera o ID numérico)
+        const turmaId = await db.turmas.add({
+          cursoId: config.cursoId,
           nome: nomeTurma,
           codigo: turmaPPC.codigo,
-          curso: config.ppc.nome,
-          modalidade: modalidade,
-          periodoLetivo: periodo,
+          anoLetivo: periodo,
+          arquivado: false,
+          lastAccessed: Date.now()
         });
 
-        // Criar disciplinas
-        const disciplinasIds: string[] = [];
+        // Criar disciplinas e guardar IDs gerados
+        const disciplinasIds: number[] = [];
         for (const disc of turmaPPC.disciplinas) {
-          const discId = uuidv4();
-          await db.disciplinas.add({
-            id: discId,
-            turmaId: turmaId,
+          const chAula = disc.horasAula;
+          const chRelogio = Math.round(chAula * (50 / 60)); // conversão padrão
+          
+          const discId = await db.disciplinas.add({
+            turmaId: turmaId as number,
             nome: disc.nome,
-            horasAula: disc.horasAula,
+            chAula,
+            chRelogio,
+            arquivado: false
           });
-          disciplinasIds.push(discId);
+          disciplinasIds.push(discId as number);
         }
 
         // Determinar as etapas para preencher
@@ -68,22 +88,15 @@ export async function seedDatabase() {
 
         // Cadastrar 10 alunos
         for (let i = 1; i <= 10; i++) {
-          const alunoId = uuidv4();
-          
           let perfil = 'A';
           if (i === 7) perfil = 'B';
           else if (i === 8) perfil = 'C';
           else if (i === 9) perfil = 'D';
           else if (i === 10) perfil = 'E';
 
-          let status = 'Ativo';
-
-          await db.alunos.add({
-            id: alunoId,
-            turmaId: turmaId,
-            nome: `Aluno Fictício ${i} (Perfil ${perfil})`,
-            matricula: `${periodo.replace('/', '')}${turmaPPC.codigo.replace('.', '')}${i.toString().padStart(3, '0')}`,
-            status: status
+          const alunoId = await db.alunos.add({
+            turmaId: turmaId as number,
+            nome: `Aluno Fictício ${i} (Perfil ${perfil})`
           });
 
           // Preencher notas para cada disciplina
@@ -125,8 +138,7 @@ export async function seedDatabase() {
               if (nota > 10) nota = 10;
 
               await db.notas.add({
-                id: uuidv4(),
-                alunoId,
+                alunoId: alunoId as number,
                 disciplinaId: discId,
                 etapa,
                 nota,
