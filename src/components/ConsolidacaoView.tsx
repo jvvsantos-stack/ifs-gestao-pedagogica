@@ -102,32 +102,40 @@ export const ConsolidacaoView: React.FC = () => {
                   className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer group flex flex-col h-full"
                 >
                   {/* Top Row */}
-                  <div className="flex justify-between items-start mb-4">
+                  <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-3">
                       <div className="bg-indigo-100 p-2.5 rounded-lg shrink-0 group-hover:bg-indigo-200 transition-colors">
                         <Users className="w-5 h-5 text-indigo-600" />
                       </div>
                       <div className="flex flex-col">
                         <h3 className="text-lg font-bold text-gray-800 leading-tight">{turma.nome}</h3>
-                        <p className="text-sm text-gray-500 line-clamp-1">{curso?.nome || 'Curso Desconhecido'}</p>
                       </div>
                     </div>
-                    <span className="bg-indigo-50 text-indigo-700 text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap shrink-0 border border-indigo-100">
+                    <span className="bg-indigo-50 text-indigo-700 text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap shrink-0 border border-indigo-100">
                       {turma.anoLetivo || 'Sem Período'}
                     </span>
                   </div>
                   
+                  {/* Course Name - Full Width */}
+                  <div className="w-full text-sm text-gray-500 mb-4">
+                    {curso?.nome || 'Curso Desconhecido'}
+                  </div>
+                  
                   {/* Middle Row */}
-                  <div className="flex flex-wrap items-center gap-2 mb-4">
-                    <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-medium border border-gray-200">
-                      Cód: {turma.codigo}
-                    </span>
-                    <span className="bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded flex items-center gap-1 font-medium border border-blue-100">
-                      👥 {qtdAlunos} Alunos
-                    </span>
-                    <span className="bg-purple-50 text-purple-600 text-xs px-2 py-1 rounded flex items-center gap-1 font-medium border border-purple-100">
-                      📚 {qtdDisciplinas} Disciplinas
-                    </span>
+                  <div className="flex flex-col gap-2 mb-4">
+                    <div className="flex items-center gap-2">
+                      <span className="w-[140px] flex justify-center bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-medium border border-gray-200">
+                        Cód: {turma.codigo}
+                      </span>
+                      <span className="bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded flex items-center gap-1 font-medium border border-blue-100">
+                        👥 {qtdAlunos} Alunos
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-[140px] flex justify-center bg-purple-50 text-purple-600 text-xs px-2 py-1 rounded items-center gap-1 font-medium border border-purple-100">
+                        📚 {qtdDisciplinas} Disciplinas
+                      </span>
+                    </div>
                   </div>
                   
                   {/* Footer Button */}
