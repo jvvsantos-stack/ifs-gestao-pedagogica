@@ -34,8 +34,8 @@ const KPICard = ({ title, value, icon, trendText, trendDir, trendColor, iconBg }
 export const AnalisesView: React.FC = () => {
   const [cursoFiltro, setCursoFiltro] = useState<string>('todos');
   const [modalidadeFiltro, setModalidadeFiltro] = useState<string>('todas');
-  const [turmaFiltro, setTurmaFiltro] = useState<string>('todas');
   const [periodoFiltro, setPeriodoFiltro] = useState<string>('todos');
+  const [turmaFiltro, setTurmaFiltro] = useState<string>('todas');
 
   const analisesData = useLiveQuery(async () => {
     const turmasAll = await db.turmas.toArray();
@@ -49,6 +49,7 @@ export const AnalisesView: React.FC = () => {
     const turmasAtivas = turmasAll.filter(t => !t.arquivado);
 
     // Cascading Dropdowns Logic
+    // Nível 1: Curso -> Modalidade
     const modalidadesSet = new Set<string>();
     if (cursoFiltro !== 'todos') {
       const selectedCurso = cursosAll.find(c => c.id === Number(cursoFiltro));
@@ -64,33 +65,36 @@ export const AnalisesView: React.FC = () => {
     const lockedModalidade = cursoFiltro !== 'todos' ? modalidadesDisponiveis[0] : null;
     const effectiveModalidade = lockedModalidade || modalidadeFiltro;
 
-    let turmasDropdownOptions = turmasAtivas;
+    // Turmas filtradas pelo Nível 1
+    let turmasBase = turmasAtivas;
     if (cursoFiltro !== 'todos') {
-      turmasDropdownOptions = turmasDropdownOptions.filter(t => t.cursoId === Number(cursoFiltro));
+      turmasBase = turmasBase.filter(t => t.cursoId === Number(cursoFiltro));
     }
     if (effectiveModalidade !== 'todas') {
-      turmasDropdownOptions = turmasDropdownOptions.filter(t => {
+      turmasBase = turmasBase.filter(t => {
         const curso = cursosAll.find(c => c.id === t.cursoId);
         return curso?.modalidade === effectiveModalidade || curso?.modalidade?.includes(effectiveModalidade);
       });
     }
-    const turmasDisponiveis = turmasDropdownOptions;
 
-    let turmasParaPeriodo = turmasDisponiveis;
-    if (turmaFiltro !== 'todas') {
-      turmasParaPeriodo = turmasParaPeriodo.filter(t => t.id === Number(turmaFiltro));
-    }
-
+    // Nível 2: Período (Derivado do Nível 1)
     const periodosSet = new Set<string>();
-    turmasParaPeriodo.forEach(t => {
+    turmasBase.forEach(t => {
       if (t.anoLetivo) periodosSet.add(t.anoLetivo);
     });
     const periodosDisponiveis = Array.from(periodosSet).filter(Boolean).sort((a,b) => b.localeCompare(a));
 
-    // Finally apply all filters to get the target classes for metrics
-    let turmasFiltradas = turmasParaPeriodo;
+    // Nível 3: Turma (Derivado do Nível 1 e Nível 2)
+    let turmasDropdownOptions = turmasBase;
     if (periodoFiltro !== 'todos') {
-      turmasFiltradas = turmasFiltradas.filter(t => t.anoLetivo === periodoFiltro);
+      turmasDropdownOptions = turmasDropdownOptions.filter(t => t.anoLetivo === periodoFiltro);
+    }
+    const turmasDisponiveis = turmasDropdownOptions;
+
+    // Aplicação final de todos os filtros para as métricas
+    let turmasFiltradas = turmasDisponiveis;
+    if (turmaFiltro !== 'todas') {
+      turmasFiltradas = turmasFiltradas.filter(t => t.id === Number(turmaFiltro));
     }
 
     const turmasIdsFiltradas = turmasFiltradas.map(t => t.id!);
@@ -260,8 +264,8 @@ export const AnalisesView: React.FC = () => {
               onChange={e => {
                 setCursoFiltro(e.target.value);
                 setModalidadeFiltro('todas');
-                setTurmaFiltro('todas');
                 setPeriodoFiltro('todos');
+                setTurmaFiltro('todas');
               }} 
               className="text-sm font-bold text-gray-800 bg-transparent outline-none cursor-pointer max-w-[150px] truncate"
             >
@@ -276,8 +280,8 @@ export const AnalisesView: React.FC = () => {
               value={analisesData.lockedModalidade || modalidadeFiltro} 
               onChange={e => {
                 setModalidadeFiltro(e.target.value);
-                setTurmaFiltro('todas');
                 setPeriodoFiltro('todos');
+                setTurmaFiltro('todas');
               }} 
               disabled={!!analisesData.lockedModalidade}
               className="text-sm font-bold text-gray-800 bg-transparent outline-none cursor-pointer disabled:opacity-60"
@@ -288,29 +292,29 @@ export const AnalisesView: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors">
-            <span className="text-[11px] font-bold text-gray-500 uppercase">Turma</span>
-            <select 
-              value={turmaFiltro} 
-              onChange={e => {
-                setTurmaFiltro(e.target.value);
-                setPeriodoFiltro('todos');
-              }} 
-              className="text-sm font-bold text-gray-800 bg-transparent outline-none cursor-pointer max-w-[120px] truncate"
-            >
-              <option value="todas">Todas</option>
-              {analisesData.turmasDisponiveis.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors">
             <span className="text-[11px] font-bold text-gray-500 uppercase">Período</span>
             <select 
               value={periodoFiltro} 
-              onChange={e => setPeriodoFiltro(e.target.value)} 
+              onChange={e => {
+                setPeriodoFiltro(e.target.value);
+                setTurmaFiltro('todas');
+              }} 
               className="text-sm font-bold text-gray-800 bg-transparent outline-none cursor-pointer"
             >
               <option value="todos">Todos</option>
               {analisesData.periodosDisponiveis.map(p => <option key={p} value={p}>{p}</option>)}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors">
+            <span className="text-[11px] font-bold text-gray-500 uppercase">Turma</span>
+            <select 
+              value={turmaFiltro} 
+              onChange={e => setTurmaFiltro(e.target.value)} 
+              className="text-sm font-bold text-gray-800 bg-transparent outline-none cursor-pointer max-w-[120px] truncate"
+            >
+              <option value="todas">Todas</option>
+              {analisesData.turmasDisponiveis.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
             </select>
           </div>
         </div>
