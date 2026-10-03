@@ -126,7 +126,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                   onChange={e => setSelectedCursoId(e.target.value ? Number(e.target.value) : '')}
                   className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
                 >
-                  <option value="">Todos os Cursos</option>
+                  <option value="" disabled hidden>Todos os Cursos</option>
                   {cursosAll.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
                 </select>
               </div>
@@ -139,7 +139,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                   disabled={!selectedCursoId}
                   className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                 >
-                  <option value="">Selecione o Curso primeiro...</option>
+                  <option value="" disabled hidden>Selecione o Curso primeiro...</option>
                   {periodosDisponiveis.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
@@ -152,7 +152,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                   disabled={!selectedPeriodo}
                   className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                 >
-                  <option value="">Selecione o Período...</option>
+                  <option value="" disabled hidden>Selecione o Período...</option>
                   {turmasDisponiveis.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
                 </select>
               </div>
@@ -165,7 +165,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                   disabled={!selectedTurmaId}
                   className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                 >
-                  <option value="">Selecione a Turma...</option>
+                  <option value="" disabled hidden>Selecione a Turma...</option>
                   {alunosDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
                 </select>
               </div>
