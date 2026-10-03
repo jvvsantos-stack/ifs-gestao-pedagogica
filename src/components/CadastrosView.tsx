@@ -427,8 +427,8 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
   return (
     <div className="p-6 bg-gray-50 min-h-full space-y-8">
       <header className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Cadastros Base</h1>
-        <p className="text-gray-500 text-sm">Gerencie os cursos, turmas e disciplinas da instituição</p>
+        <h1 className="text-2xl font-bold text-gray-800">Estrutura Acadêmica</h1>
+        <p className="text-gray-500 text-sm">Gerenciamento de cursos, disciplinas e períodos letivos</p>
       </header>
 
       <div className="flex flex-col gap-8 w-full">
