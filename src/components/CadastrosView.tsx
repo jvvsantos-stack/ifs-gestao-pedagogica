@@ -543,18 +543,18 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
-                        <div className={`font-semibold text-sm truncate ${isSelected ? 'text-indigo-800' : 'text-gray-800'}`}>
+                        <div className={`font-semibold text-lg truncate ${isSelected ? 'text-indigo-800' : 'text-gray-800'}`}>
                           {c.nome}
                         </div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${
+                        <div className="flex items-center gap-3 mt-2">
+                          <span className={`text-sm font-bold px-2.5 py-1 rounded uppercase ${
                             c.modalidade === 'Integrado'
                               ? 'bg-emerald-100 text-emerald-700'
                               : 'bg-orange-100 text-orange-700'
                           }`}>
                             {c.modalidade}
                           </span>
-                          <span className="text-[10px] text-gray-400">{turmasDoCurso} turma(s) ativa(s)</span>
+                          <span className="text-sm text-gray-500">{turmasDoCurso} turma(s) ativa(s)</span>
                         </div>
                       </div>
                       <div className="flex gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
