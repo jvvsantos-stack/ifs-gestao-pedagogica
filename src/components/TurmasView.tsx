@@ -158,7 +158,7 @@ export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearIni
                       <p className="text-sm text-gray-500 line-clamp-1">{curso?.nome || 'Curso Desconhecido'}</p>
                     </div>
                   </div>
-                  <span className="bg-indigo-50 text-indigo-700 text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap shrink-0">
+                  <span className="bg-indigo-50 text-indigo-700 text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap shrink-0">
                     {t.anoLetivo || 'Sem Período'}
                   </span>
                 </div>
