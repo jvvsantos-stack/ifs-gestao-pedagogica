@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Estagio } from '../db/database';
-import { Plus, Edit2, Trash2, CheckCircle, Archive, Save, X, Briefcase, RotateCcw } from 'lucide-react';
+import { Plus, Edit2, Trash2, CheckCircle, Archive, Save, X, Briefcase, RotateCcw, Search } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
 
 export const EstagiosView: React.FC = () => {
@@ -15,6 +15,8 @@ export const EstagiosView: React.FC = () => {
   const [selectedAlunoId, setSelectedAlunoId] = useState<number | ''>('');
   
   const [formAlunoId, setFormAlunoId] = useState<number | ''>('');
+  
+  const [searchTerm, setSearchTerm] = useState('');
   
   const [currentEstagio, setCurrentEstagio] = useState<Partial<Estagio> | null>(null);
 
@@ -60,17 +62,36 @@ export const EstagiosView: React.FC = () => {
   }, [selectedTurmaId, alunosAll]);
 
   const estagios = useLiveQuery(
-    () => {
+    async () => {
+      let allEstagios = [];
       if (selectedAlunoId) {
-        return db.estagios.where('alunoId').equals(Number(selectedAlunoId)).toArray();
+        allEstagios = await db.estagios.where('alunoId').equals(Number(selectedAlunoId)).toArray();
+      } else if (selectedTurmaId) {
+        allEstagios = await db.estagios.where('turmaId').equals(Number(selectedTurmaId)).toArray();
+      } else if (selectedCursoId) {
+        const validTurmaIds = turmasAll
+           .filter(t => 
+              (!selectedCursoId || t.cursoId === Number(selectedCursoId)) &&
+              (!selectedPeriodo || t.anoLetivo === selectedPeriodo)
+           )
+           .map(t => t.id!);
+        allEstagios = await db.estagios.where('turmaId').anyOf(validTurmaIds).toArray();
+      } else {
+        allEstagios = await db.estagios.toArray();
       }
-      if (selectedTurmaId) {
-        return db.estagios.where('turmaId').equals(Number(selectedTurmaId)).toArray();
-      }
-      return [];
+      return allEstagios;
     },
-    [selectedTurmaId, selectedAlunoId]
+    [selectedCursoId, selectedPeriodo, selectedTurmaId, selectedAlunoId, turmasAll]
   ) || [];
+
+  const estagiosFiltrados = React.useMemo(() => {
+    if (!searchTerm) return estagios;
+    const term = searchTerm.toLowerCase();
+    return estagios.filter(e => {
+      const alunoNome = getAlunoNome(e.alunoId).toLowerCase();
+      return alunoNome.includes(term);
+    });
+  }, [estagios, searchTerm, alunosAll]);
 
   const getAlunoNome = (id: number) => alunosAll.find(a => a.id === id)?.nome || 'Aluno não encontrado';
 
@@ -232,26 +253,42 @@ export const EstagiosView: React.FC = () => {
           </select>
         </div>
       </div>
-      {selectedTurmaId && (
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Estágios Cadastrados</h2>
+      <div>
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+          <h2 className="text-xl font-semibold text-gray-800">Estágios Cadastrados</h2>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+            <div className="relative w-full sm:w-80">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Buscar aluno por nome..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
             <button
               onClick={openNewForm}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              disabled={!selectedTurmaId}
+              title={!selectedTurmaId ? "Selecione uma Turma nos filtros acima para cadastrar" : ""}
+              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap w-full sm:w-auto ${!selectedTurmaId ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
             >
-              <Plus className="w-4 h-4" /> Cadastrar Novo Estágio
+              <Plus className="w-4 h-4" /> Novo Estágio
             </button>
           </div>
+        </div>
 
-          {estagios.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-              <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500">Nenhum estágio cadastrado.</p>
-            </div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {estagios.map(estagio => (
+        {estagiosFiltrados.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+            <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-500">Nenhum estágio encontrado.</p>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {estagiosFiltrados.map(estagio => (
                 <div
                   key={estagio.id}
                   className={`p-5 rounded-xl border ${
@@ -436,7 +473,7 @@ export const EstagiosView: React.FC = () => {
             </form>
           </div>
         </div>
-      )}
+        </div>
 
       {/* Finalizar Modal */}
       {showFinalizar && currentEstagio && (
