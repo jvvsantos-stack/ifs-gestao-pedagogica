@@ -195,7 +195,7 @@ export const EstagiosView: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
             <Briefcase className="w-8 h-8 text-indigo-600" />
-            Controle de Estágios
+            Gestão de Estágios
           </h1>
           <p className="text-gray-500 mt-2">Controle e acompanhamento de estágios dos alunos</p>
         </div>

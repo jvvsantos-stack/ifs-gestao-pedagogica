@@ -61,6 +61,19 @@ export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearIni
   return (
     <div className="flex-1 bg-gray-50 min-h-screen">
       <main className="max-w-6xl mx-auto p-6 space-y-6">
+        {/* Cabeçalho */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-indigo-600 rounded-xl shadow-sm">
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Gestão de Turmas</h2>
+              <p className="text-gray-500 text-sm font-medium">Acesso rápido a diários e controle de alunos</p>
+            </div>
+          </div>
+        </div>
+
         {/* Barra de Filtros */}
         <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 text-indigo-600 mr-2">
