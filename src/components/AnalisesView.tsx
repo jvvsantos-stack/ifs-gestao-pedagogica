@@ -253,7 +253,7 @@ export const AnalisesView: React.FC = () => {
       <div className="flex-1 flex items-center justify-center min-h-screen bg-gray-50">
         <div className="flex flex-col items-center text-gray-500">
           <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-          <p>Processando BI Educacional...</p>
+          <p>Processando Inteligência Pedagógica...</p>
         </div>
       </div>
     );
@@ -269,7 +269,7 @@ export const AnalisesView: React.FC = () => {
               <BarChart3 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 tracking-tight">BI Educacional</h2>
+              <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Inteligência Pedagógica</h2>
               <p className="text-gray-500 text-sm font-medium">Painel de Monitoramento Acadêmico Inteligente</p>
             </div>
           </div>

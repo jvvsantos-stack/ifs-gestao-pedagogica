@@ -195,7 +195,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
               <LayoutDashboard className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Centro de Comando</h2>
+              <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Panorama Acadêmico</h2>
               <p className="text-gray-500 text-sm">Visão geral e pendências operacionais</p>
             </div>
           </div>
