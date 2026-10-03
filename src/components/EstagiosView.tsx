@@ -393,7 +393,6 @@ export const EstagiosView: React.FC = () => {
             </div>
           )}
         </div>
-      )}
 
       {/* Form Modal */}
       {showForm && currentEstagio && (
@@ -473,7 +472,7 @@ export const EstagiosView: React.FC = () => {
             </form>
           </div>
         </div>
-        </div>
+      )}
 
       {/* Finalizar Modal */}
       {showFinalizar && currentEstagio && (
