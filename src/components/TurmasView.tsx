@@ -759,22 +759,22 @@ const DiarioDisciplina: React.FC<{
 
     if (todasNotasDigitadas) {
       mediaParcialNum = somaNotas / numEtapas;
-      mediaParcialStr = mediaParcialNum.toFixed(1);
+      mediaParcialStr = mediaParcialNum.toFixed(1).replace('.', ',');
       
       const notaProvaFinal = av?.provaFinal;
       let finalMediaOrig = mediaParcialNum;
       if (notaProvaFinal !== undefined && notaProvaFinal !== null && String(notaProvaFinal) !== '') {
           finalMediaOrig = (mediaParcialNum + Number(notaProvaFinal)) / 2;
       }
-      mediaFinalOrigStr = finalMediaOrig.toFixed(1);
+      mediaFinalOrigStr = finalMediaOrig.toFixed(1).replace('.', ',');
 
       if (av?.statusConselho === 'aprovado' || av?.aprovadoConselho) {
-        mediaFinalStr = '5.0';
+        mediaFinalStr = '5,0';
         isAprovadoConselho = true;
       } else if (notaProvaFinal === undefined || notaProvaFinal === null || String(notaProvaFinal) === '') {
         mediaFinalStr = mediaParcialStr;
       } else {
-        mediaFinalStr = finalMediaOrig.toFixed(1);
+        mediaFinalStr = finalMediaOrig.toFixed(1).replace('.', ',');
       }
     }
 
@@ -917,13 +917,26 @@ const DiarioDisciplina: React.FC<{
                         <td className="px-2 py-2 border-l border-gray-100">
                           <input 
                             id={`nota-${index}`}
-                            type="number" 
-                            step="0.1" min="0" max="10"
+                            type="text"
                             className="w-full bg-transparent outline-none text-center font-medium" 
-                            defaultValue={notas[currentEtapa]?.nota !== undefined && notas[currentEtapa]?.nota !== null ? Number(notas[currentEtapa].nota).toFixed(1) : ''}
+                            defaultValue={notas[currentEtapa]?.nota !== undefined && notas[currentEtapa]?.nota !== null ? Number(notas[currentEtapa].nota).toFixed(1).replace('.', ',') : ''}
+                            onChange={(e) => {
+                              let val = e.target.value.replace(/\D/g, '');
+                              if (val === '') {
+                                e.target.value = '';
+                                return;
+                              }
+                              let num = parseInt(val, 10);
+                              if (num > 100) {
+                                val = val.slice(0, -1);
+                                num = parseInt(val, 10);
+                              }
+                              const floatVal = num / 10;
+                              e.target.value = floatVal.toFixed(1).replace('.', ',');
+                            }}
                             onBlur={(e) => {
-                              formatNotaBlur(e);
-                              handleSaveNota(aluno.id!, currentEtapa, 'nota', e.target.value);
+                              const finalVal = e.target.value.replace(',', '.');
+                              handleSaveNota(aluno.id!, currentEtapa, 'nota', finalVal);
                             }}
                             onKeyDown={(e) => handleKeyDown(e, 'nota', index)}
                           />
@@ -948,7 +961,9 @@ const DiarioDisciplina: React.FC<{
                       return (
                         <>
                           {etapasParaRenderizar.map(etapa => (
-                            <td key={etapa} className="px-2 py-2 border-l border-gray-100 text-center text-gray-600">{notas[etapa]?.nota !== undefined ? Number(notas[etapa].nota).toFixed(1) : '-'}</td>
+                            <td key={etapa} className="px-2 py-2 border-l border-gray-100 text-center text-gray-600">
+                              {notas[etapa]?.nota !== undefined && notas[etapa]?.nota !== null ? Number(notas[etapa].nota).toFixed(1).replace('.', ',') : '-'}
+                            </td>
                           ))}
                           <td className={`px-2 py-2 border-l border-gray-100 text-center font-medium ${sit.totalFaltas > (disciplina.chAula * 0.25) ? 'text-red-600' : 'text-gray-700'}`}>
                             {sit.totalFaltas}
@@ -958,14 +973,27 @@ const DiarioDisciplina: React.FC<{
                           </td>
                           <td className="px-2 py-2 border-l border-gray-100 bg-blue-50/50">
                             <input 
-                              type="number" 
-                              step="0.1" min="0" max="10"
+                              type="text"
                               className="w-full bg-transparent outline-none text-center text-blue-800 font-medium placeholder-blue-300" 
                               placeholder="-"
-                              defaultValue={av.provaFinal !== undefined ? Number(av.provaFinal).toFixed(1) : ''}
+                              defaultValue={av.provaFinal !== undefined && av.provaFinal !== null ? Number(av.provaFinal).toFixed(1).replace('.', ',') : ''}
+                              onChange={(e) => {
+                                let val = e.target.value.replace(/\D/g, '');
+                                if (val === '') {
+                                  e.target.value = '';
+                                  return;
+                                }
+                                let num = parseInt(val, 10);
+                                if (num > 100) {
+                                  val = val.slice(0, -1);
+                                  num = parseInt(val, 10);
+                                }
+                                const floatVal = num / 10;
+                                e.target.value = floatVal.toFixed(1).replace('.', ',');
+                              }}
                               onBlur={(e) => {
-                                formatNotaBlur(e);
-                                handleSaveAvaliacao(aluno.id!, 'provaFinal', e.target.value);
+                                const finalVal = e.target.value.replace(',', '.');
+                                handleSaveAvaliacao(aluno.id!, 'provaFinal', finalVal);
                               }}
                             />
                           </td>
