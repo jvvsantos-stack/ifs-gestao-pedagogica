@@ -712,11 +712,7 @@ const DiarioDisciplina: React.FC<{
     }
   };
 
-  const formatNotaBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (e.target.value !== '') {
-      e.target.value = Number(e.target.value).toFixed(1);
-    }
-  };
+
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, tipo: 'nota' | 'faltas', index: number) => {
     if (e.key === 'Enter' || e.key === 'Tab') {
