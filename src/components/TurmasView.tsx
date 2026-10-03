@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { db } from '../db/database';
 import type { Turma, Aluno, Disciplina, Nota, AvaliacaoFinal } from '../db/database';
-import { Users, FolderOpen, ArrowLeft, UserPlus, BookOpen, Edit2, Trash2, Upload, X, ClipboardList } from 'lucide-react';
+import { Users, FolderOpen, ArrowLeft, UserPlus, BookOpen, Edit2, Trash2, Upload, X, ClipboardList, Filter } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import * as XLSX from 'xlsx';
 import { ModalOcorrencias } from './ModalOcorrencias';
@@ -13,7 +13,9 @@ interface Props {
 }
 
 export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearInitialOpen }) => {
-  const [selectedCursoId, setSelectedCursoId] = useState<string>('');
+  const [selectedCursoId, setSelectedCursoId] = useState<string>('todos');
+  const [selectedPeriodo, setSelectedPeriodo] = useState<string>('todos');
+  const [activeTab, setActiveTab] = useState<'ativas' | 'arquivadas'>('ativas');
   const [selectedTurma, setSelectedTurma] = useState<Turma | null>(null);
   const [alunosModalTurma, setAlunosModalTurma] = useState<Turma | null>(null);
 
@@ -37,10 +39,20 @@ export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearIni
     }
   }, [initialOpenTurmaAlunosId, turmasAll, clearInitialOpen]);
 
-  const turmasAtivas = turmasAll.filter(t => !t.arquivado);
-  const turmasListadas = selectedCursoId 
-    ? turmasAtivas.filter(t => t.cursoId === Number(selectedCursoId)) 
-    : turmasAtivas;
+  const periodosDisponiveis = React.useMemo(() => {
+    if (selectedCursoId === 'todos') return [];
+    const turmasDoCurso = turmasAll.filter(t => t.cursoId === Number(selectedCursoId));
+    const periodos = turmasDoCurso.map(t => t.anoLetivo).filter(Boolean) as string[];
+    return Array.from(new Set(periodos)).sort();
+  }, [selectedCursoId, turmasAll]);
+
+  const turmasListadas = turmasAll.filter(t => {
+    if (activeTab === 'ativas' && t.arquivado) return false;
+    if (activeTab === 'arquivadas' && !t.arquivado) return false;
+    if (selectedCursoId !== 'todos' && t.cursoId !== Number(selectedCursoId)) return false;
+    if (selectedPeriodo !== 'todos' && t.anoLetivo !== selectedPeriodo) return false;
+    return true;
+  });
 
   if (selectedTurma) {
     return <DiarioTurma turma={selectedTurma} onBack={() => setSelectedTurma(null)} />;
@@ -49,25 +61,70 @@ export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearIni
   return (
     <div className="flex-1 bg-gray-50 min-h-screen">
       <main className="max-w-6xl mx-auto p-6 space-y-6">
-        <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800">Turmas Ativas</h2>
-            <p className="text-gray-500 text-sm">Selecione uma turma para acessar o diário</p>
+        {/* Barra de Filtros */}
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2 text-indigo-600 mr-2">
+            <Filter className="w-5 h-5" />
+            <span className="font-bold text-sm">Filtros:</span>
           </div>
           
-          <div className="w-64">
-            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Filtrar por Curso</label>
-            <select
-              value={selectedCursoId}
-              onChange={e => setSelectedCursoId(e.target.value)}
-              className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+          <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors">
+            <span className="text-[11px] font-bold text-gray-500 uppercase">Curso</span>
+            <select 
+              value={selectedCursoId} 
+              onChange={e => {
+                setSelectedCursoId(e.target.value);
+                setSelectedPeriodo('todos');
+              }} 
+              className="text-sm font-bold text-gray-800 bg-transparent outline-none cursor-pointer max-w-[200px] truncate"
             >
-              <option value="">Todos os Cursos</option>
+              <option value="todos">Todos os Cursos</option>
               {cursos.map(c => (
                 <option key={c.id} value={c.id}>{c.nome}</option>
               ))}
             </select>
           </div>
+
+          <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors">
+            <span className="text-[11px] font-bold text-gray-500 uppercase">Período Letivo</span>
+            <select 
+              value={selectedPeriodo} 
+              onChange={e => setSelectedPeriodo(e.target.value)} 
+              className="text-sm font-bold text-gray-800 bg-transparent outline-none cursor-pointer"
+            >
+              <option value="todos">Todos os Períodos</option>
+              {periodosDisponiveis.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Abas Ativas / Arquivadas */}
+        <div className="flex justify-between items-end border-b border-gray-200 pb-2">
+          <div className="flex gap-6">
+            <button
+              onClick={() => setActiveTab('ativas')}
+              className={`pb-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'ativas' 
+                  ? 'border-indigo-600 text-indigo-600' 
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Turmas Ativas
+            </button>
+            <button
+              onClick={() => setActiveTab('arquivadas')}
+              className={`pb-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'arquivadas' 
+                  ? 'border-indigo-600 text-indigo-600' 
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Turmas Arquivadas
+            </button>
+          </div>
+          <p className="text-sm text-gray-500 pb-2">Selecione uma turma para acessar o diário</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
