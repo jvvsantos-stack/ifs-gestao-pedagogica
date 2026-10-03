@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, type Turma, type Curso, type Aluno, type Estagio } from '../db/database';
+import { db, type Estagio } from '../db/database';
 import { Plus, Edit2, Trash2, CheckCircle, Archive, Save, X, Briefcase, RotateCcw } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
 
