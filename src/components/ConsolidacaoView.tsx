@@ -7,11 +7,33 @@ import { ConfirmModal } from './ConfirmModal';
 
 export const ConsolidacaoView: React.FC = () => {
   const [selectedTurma, setSelectedTurma] = useState<Turma | null>(null);
+  const [selectedCursoId, setSelectedCursoId] = useState<string>('');
+  const [selectedPeriodo, setSelectedPeriodo] = useState<string>('');
 
-  const turmas = useLiveQuery(async () => {
+  const turmasAll = useLiveQuery(async () => {
     const all = await db.turmas.toArray();
     return all.filter(t => !t.arquivado);
   }) || [];
+
+  const cursos = useLiveQuery(() => db.cursos.toArray()) || [];
+  const todosAlunos = useLiveQuery(() => db.alunos.toArray()) || [];
+  const todasDisciplinas = useLiveQuery(() => db.disciplinas.toArray()) || [];
+
+  const cursosUnicosIds = Array.from(new Set(turmasAll.map(t => t.cursoId)));
+  const cursosDisponiveis = cursos.filter(c => cursosUnicosIds.includes(c.id!));
+
+  let periodosDisponiveis: string[] = [];
+  if (selectedCursoId) {
+    const turmasDoCurso = turmasAll.filter(t => t.cursoId === Number(selectedCursoId));
+    periodosDisponiveis = Array.from(new Set(turmasDoCurso.map(t => t.anoLetivo || ''))).filter(Boolean);
+    periodosDisponiveis.sort();
+  }
+
+  const turmasFiltradas = turmasAll.filter(t => {
+    if (selectedCursoId && t.cursoId !== Number(selectedCursoId)) return false;
+    if (selectedPeriodo && t.anoLetivo !== selectedPeriodo) return false;
+    return true;
+  });
 
   return (
     <div className="flex-1 bg-gray-50 flex flex-col h-full overflow-hidden">
@@ -19,32 +41,104 @@ export const ConsolidacaoView: React.FC = () => {
         <DashboardTurma turma={selectedTurma} onBack={() => setSelectedTurma(null)} />
       ) : (
         <div className="p-8 h-full overflow-auto">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-            <Activity className="w-6 h-6 text-indigo-600" />
-            Painel de Inteligência Acadêmica
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {turmas.map(turma => (
-              <div 
-                key={turma.id} 
-                onClick={() => setSelectedTurma(turma)}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer group"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-indigo-50 rounded-lg group-hover:bg-indigo-100 transition-colors">
-                    <Users className="w-6 h-6 text-indigo-600" />
-                  </div>
-                  <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-bold">
-                    {turma.codigo}
-                  </span>
-                </div>
-                <h3 className="text-lg font-bold text-gray-800 mb-1">{turma.nome}</h3>
-                <p className="text-sm text-gray-500 font-medium">Acessar Painel</p>
+          <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <Activity className="w-6 h-6 text-indigo-600" />
+                Painel de Inteligência Acadêmica
+              </h2>
+              <p className="text-gray-500 text-sm mt-1">Selecione uma turma para acessar o painel de consolidação</p>
+            </div>
+            
+            <div className="flex gap-4">
+              <div className="w-64">
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Filtrar por Curso</label>
+                <select
+                  value={selectedCursoId}
+                  onChange={e => {
+                    setSelectedCursoId(e.target.value);
+                    setSelectedPeriodo('');
+                  }}
+                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                >
+                  <option value="">Todos os Cursos</option>
+                  {cursosDisponiveis.map(c => (
+                    <option key={c.id} value={c.id}>{c.nome}</option>
+                  ))}
+                </select>
               </div>
-            ))}
-            {turmas.length === 0 && (
+
+              <div className="w-48">
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Período Letivo</label>
+                <select
+                  value={selectedPeriodo}
+                  onChange={e => setSelectedPeriodo(e.target.value)}
+                  disabled={!selectedCursoId}
+                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none disabled:bg-gray-50 disabled:text-gray-400"
+                >
+                  <option value="">Todos os Períodos</option>
+                  {periodosDisponiveis.map(p => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {turmasFiltradas.map(turma => {
+              const curso = cursos.find(c => c.id === turma.cursoId);
+              const qtdAlunos = todosAlunos.filter(a => a.turmaId === turma.id).length;
+              const qtdDisciplinas = todasDisciplinas.filter(d => d.turmaId === turma.id).length;
+              
+              return (
+                <div 
+                  key={turma.id} 
+                  onClick={() => setSelectedTurma(turma)}
+                  className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer group flex flex-col h-full"
+                >
+                  {/* Top Row */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-indigo-100 p-2.5 rounded-lg shrink-0 group-hover:bg-indigo-200 transition-colors">
+                        <Users className="w-5 h-5 text-indigo-600" />
+                      </div>
+                      <div className="flex flex-col">
+                        <h3 className="text-lg font-bold text-gray-800 leading-tight">{turma.nome}</h3>
+                        <p className="text-sm text-gray-500 line-clamp-1">{curso?.nome || 'Curso Desconhecido'}</p>
+                      </div>
+                    </div>
+                    <span className="bg-indigo-50 text-indigo-700 text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap shrink-0 border border-indigo-100">
+                      {turma.anoLetivo || 'Sem Período'}
+                    </span>
+                  </div>
+                  
+                  {/* Middle Row */}
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-medium border border-gray-200">
+                      Cód: {turma.codigo}
+                    </span>
+                    <span className="bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded flex items-center gap-1 font-medium border border-blue-100">
+                      👥 {qtdAlunos} Alunos
+                    </span>
+                    <span className="bg-purple-50 text-purple-600 text-xs px-2 py-1 rounded flex items-center gap-1 font-medium border border-purple-100">
+                      📚 {qtdDisciplinas} Disciplinas
+                    </span>
+                  </div>
+                  
+                  {/* Footer Button */}
+                  <div className="mt-auto pt-3 border-t border-gray-100">
+                    <div className="w-full bg-indigo-50 text-indigo-700 group-hover:bg-indigo-100 font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm border border-indigo-100">
+                      <Activity className="w-4 h-4" />
+                      Acessar Painel
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            {turmasFiltradas.length === 0 && (
               <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">
-                Nenhuma turma ativa encontrada.
+                Nenhuma turma encontrada para os filtros selecionados.
               </div>
             )}
           </div>
