@@ -785,25 +785,25 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   <div key={t.id} className="bg-white p-4 border border-gray-200 rounded-lg shadow-sm flex flex-col gap-3 group">
                     {/* Cabeçalho */}
                     <div>
-                      <div className="font-bold text-gray-800 text-base leading-tight">{t.nome}</div>
-                      <div className="flex flex-wrap gap-1.5 mt-1.5">
-                        <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded text-[11px] font-bold">{t.codigo}</span>
+                      <div className="font-bold text-gray-800 text-lg leading-tight">{t.nome}</div>
+                      <div className="flex flex-wrap gap-2 mt-1.5">
+                        <span className="text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded text-xs font-bold">{t.codigo}</span>
                         {t.anoLetivo && (
-                          <span className="text-gray-500 bg-gray-100 px-2 py-0.5 rounded text-[11px] font-bold">{t.anoLetivo}</span>
+                          <span className="text-gray-500 bg-gray-100 px-2.5 py-1 rounded text-xs font-bold">{t.anoLetivo}</span>
                         )}
                       </div>
                     </div>
 
                     {/* Status de disciplinas */}
                     {status !== null && (
-                      <div className={`flex items-center gap-1.5 text-[11px] font-medium rounded px-2 py-1 ${
+                      <div className={`flex items-center gap-1.5 text-sm font-medium rounded px-2.5 py-1.5 ${
                         completa
                           ? 'bg-emerald-50 text-emerald-700'
                           : status.cadastradas > 0
                           ? 'bg-amber-50 text-amber-700'
                           : 'bg-gray-100 text-gray-500'
                       }`}>
-                        <CheckCircle2 className="w-3 h-3 shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
                         {completa
                           ? `${status.total}/${status.total} disciplinas completas`
                           : `${status.cadastradas}/${status.total} – faltam ${status.faltando}`}
@@ -817,13 +817,13 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                           const turmaPPC = getCursoPPCParaTurma(t);
                           const isPPC = turmaPPC?.disciplinas.some(dp => dp.nome === d.nome) || false;
                           return (
-                            <div key={d.id} className="text-[10px] bg-gray-50 border border-gray-100 rounded p-1.5 flex justify-between items-center group/disc">
+                            <div key={d.id} className="text-sm bg-gray-50 border border-gray-100 rounded p-2 flex justify-between items-center group/disc">
                               <div className="flex-1 min-w-0 pr-2">
-                                <div className="font-semibold text-gray-700 truncate" title={d.nome}>
-                                  {d.periodoLetivo && <span className="mr-1 text-indigo-600 bg-indigo-100 px-1 rounded">[ {d.periodoLetivo} ]</span>}
+                                <div className="font-semibold text-base text-gray-700 truncate" title={d.nome}>
+                                  {d.periodoLetivo && <span className="mr-1 text-indigo-600 bg-indigo-100 px-1 rounded text-sm">[ {d.periodoLetivo} ]</span>}
                                   {d.nome}
                                 </div>
-                                <div className="text-gray-400">{d.chAula} aulas / {d.chRelogio}h</div>
+                                <div className="text-sm text-gray-500 mt-0.5">{d.chAula} aulas / {d.chRelogio}h</div>
                               </div>
                               <div className="flex gap-1 opacity-0 group-hover/disc:opacity-100 transition-opacity">
                                 <button onClick={() => handleEditDisciplinaClick(d)} className="text-indigo-500 hover:text-indigo-700 p-0.5" title="Editar"><Edit className="w-3 h-3" /></button>
@@ -855,13 +855,13 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                             ? 'Todas as disciplinas já foram geradas'
                             : `Gerar ${status.faltando} disciplina(s) faltando`
                         }
-                        className={`w-full flex items-center justify-center gap-2 text-xs font-bold py-2 rounded transition-colors ${
+                        className={`w-full flex items-center justify-center gap-2 text-sm font-bold py-2.5 rounded transition-colors ${
                           podGerar
                             ? 'bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer'
                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         }`}
                       >
-                        <Wand2 className="w-3.5 h-3.5" />
+                        <Wand2 className="w-4 h-4" />
                         {completa ? 'Disciplinas Geradas' : 'Gerar Disciplinas'}
                       </button>
 
