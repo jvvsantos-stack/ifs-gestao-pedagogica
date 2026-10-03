@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
-import { BarChart3, TrendingDown, Users, GraduationCap, Percent, AlertTriangle, Activity, ArrowUpRight, ArrowDownRight, Filter } from 'lucide-react';
+import { BarChart3, TrendingDown, TrendingUp, Users, GraduationCap, Percent, AlertTriangle, Activity, ArrowUpRight, ArrowDownRight, Filter } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar, Cell } from 'recharts';
 
 interface KPICardProps {
   title: string;
@@ -110,6 +111,7 @@ export const AnalisesView: React.FC = () => {
     const disciplinasStats: Record<string, { soma: number, count: number, reprovados: number, totalFechados: number }> = {};
     const alunosRisk: Record<number, { nome: string, disciplinasAbaixo: number, turma: string }> = {};
     const etapasStats: Record<number, { soma: number, count: number }> = { 1: {soma:0, count:0}, 2: {soma:0, count:0}, 3: {soma:0, count:0}, 4: {soma:0, count:0} };
+    const distribuicaoNotas = { critico: 0, recuperacao: 0, naMedia: 0, excelente: 0 };
 
     for (const disc of disciplinasFiltradas) {
       if (!disciplinasStats[disc.nome]) disciplinasStats[disc.nome] = { soma: 0, count: 0, reprovados: 0, totalFechados: 0 };
@@ -155,6 +157,11 @@ export const AnalisesView: React.FC = () => {
 
           if (mediaFinal < 6.0) alunosRisk[aluno.id!].disciplinasAbaixo++;
 
+          if (mediaFinal < 4.0) distribuicaoNotas.critico++;
+          else if (mediaFinal < 6.0) distribuicaoNotas.recuperacao++;
+          else if (mediaFinal < 9.0) distribuicaoNotas.naMedia++;
+          else distribuicaoNotas.excelente++;
+
           somaGeralNotas += mediaFinal;
           countGeralNotas++;
           disciplinasStats[disc.nome].soma += mediaFinal;
@@ -196,6 +203,15 @@ export const AnalisesView: React.FC = () => {
       .sort((a, b) => a.media - b.media)
       .slice(0, 5);
 
+    const melhoresDisciplinas = Object.keys(disciplinasStats).map(nome => {
+      const stat = disciplinasStats[nome];
+      const media = stat.count > 0 ? stat.soma / stat.count : 0;
+      const taxaReprovacao = stat.totalFechados > 0 ? (stat.reprovados / stat.totalFechados) * 100 : 0;
+      return { nome, media, taxaReprovacao, totalFechados: stat.totalFechados };
+    }).filter(g => g.totalFechados > 0)
+      .sort((a, b) => b.media - a.media)
+      .slice(0, 5);
+
     const riscoList = Object.values(alunosRisk)
       .filter(a => a.disciplinasAbaixo >= 2)
       .sort((a, b) => b.disciplinasAbaixo - a.disciplinasAbaixo)
@@ -203,8 +219,15 @@ export const AnalisesView: React.FC = () => {
 
     const desempenhoEtapas = [1, 2, 3, 4].map(e => ({
       etapa: `${e}ª Etapa`,
-      media: etapasStats[e].count > 0 ? (etapasStats[e].soma / etapasStats[e].count) : 0
+      media: Number((etapasStats[e].count > 0 ? (etapasStats[e].soma / etapasStats[e].count) : 0).toFixed(1))
     })).filter(e => e.media > 0);
+
+    const dadosDistribuicao = [
+      { name: 'Crítico', value: distribuicaoNotas.critico, color: '#ef4444' },
+      { name: 'Recup.', value: distribuicaoNotas.recuperacao, color: '#f59e0b' },
+      { name: 'Na Média', value: distribuicaoNotas.naMedia, color: '#6366f1' },
+      { name: 'Excelente', value: distribuicaoNotas.excelente, color: '#10b981' }
+    ];
 
     return {
       cursosDisponiveis,
@@ -218,8 +241,10 @@ export const AnalisesView: React.FC = () => {
       taxaReprovacaoFalta,
       taxaEvasao,
       gargalos,
+      melhoresDisciplinas,
       riscoList,
-      desempenhoEtapas
+      desempenhoEtapas,
+      dadosDistribuicao
     };
   }, [periodoFiltro, cursoFiltro, modalidadeFiltro, turmaFiltro]);
 
@@ -354,7 +379,8 @@ export const AnalisesView: React.FC = () => {
         </div>
 
         {/* Painéis */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Linha 1: Tops e Risco */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           
           {/* Top 5 Gargalos */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[320px]">
@@ -378,6 +404,35 @@ export const AnalisesView: React.FC = () => {
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                       <div className="bg-red-400 h-1.5 rounded-full transition-all group-hover:bg-red-500" style={{width: `${(g.media/10)*100}%`}}></div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Top 5 Melhores Disciplinas */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[320px]">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-500"><TrendingUp className="w-4 h-4"/></div>
+                <h3 className="text-[15px] font-bold text-gray-800">Top 5 Melhores</h3>
+              </div>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-1 rounded">Maiores Médias</span>
+            </div>
+            
+            <div className="flex-1 flex flex-col justify-evenly">
+              {analisesData.melhoresDisciplinas.length === 0 ? (
+                <div className="text-center text-sm text-gray-400">Dados insuficientes.</div>
+              ) : (
+                analisesData.melhoresDisciplinas.map(g => (
+                  <div key={g.nome} className="group">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="font-semibold text-gray-700 truncate max-w-[200px]" title={g.nome}>{g.nome}</span>
+                      <span className="font-black text-emerald-500">{g.media.toFixed(1)}</span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                      <div className="bg-emerald-400 h-1.5 rounded-full transition-all group-hover:bg-emerald-500" style={{width: `${(g.media/10)*100}%`}}></div>
                     </div>
                   </div>
                 ))
@@ -417,31 +472,68 @@ export const AnalisesView: React.FC = () => {
               {analisesData.riscoList.length === 0 && <div className="text-center text-sm text-gray-400 py-8">Nenhum aluno em risco crítico.</div>}
             </div>
           </div>
+        </div>
 
-          {/* Desempenho por Etapa */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[320px]">
+        {/* Linha 2: Gráficos de Evolução e Distribuição */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          {/* Desempenho por Etapa (Line Chart) */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[350px]">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-indigo-50 rounded-lg text-indigo-500"><Activity className="w-4 h-4"/></div>
                 <h3 className="text-[15px] font-bold text-gray-800">Desempenho por Etapa</h3>
               </div>
             </div>
-            <div className="flex-1 flex items-end justify-between gap-4 mt-2 px-2 pb-2">
-              {analisesData.desempenhoEtapas.length === 0 && <div className="text-center text-sm text-gray-400 w-full mb-10">Sem dados.</div>}
-              {analisesData.desempenhoEtapas.map((et) => (
-                <div key={et.etapa} className="flex flex-col items-center gap-2 flex-1 h-full justify-end group">
-                  <span className="text-sm font-black text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity -mb-1">{et.media.toFixed(1)}</span>
-                  <div className="w-full bg-indigo-50 rounded-t-xl relative flex items-end overflow-hidden shadow-inner" style={{ height: '180px' }}>
-                    <div 
-                      className="w-full bg-indigo-400 transition-all duration-500 rounded-t-xl group-hover:bg-indigo-500 relative" 
-                      style={{ height: `${(et.media/10)*100}%` }}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-t from-indigo-600/30 to-transparent"></div>
-                    </div>
-                  </div>
-                  <span className="text-[10px] uppercase font-bold text-gray-400">{et.etapa}</span>
-                </div>
-              ))}
+            <div className="flex-1 mt-2">
+              {analisesData.desempenhoEtapas.length === 0 ? (
+                <div className="text-center text-sm text-gray-400 w-full h-full flex items-center justify-center">Sem dados.</div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={analisesData.desempenhoEtapas} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                    <XAxis dataKey="etapa" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
+                    <YAxis domain={[0, 10]} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} width={30} />
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      labelStyle={{ color: '#4b5563', fontWeight: 'bold', marginBottom: '4px' }}
+                      itemStyle={{ color: '#4f46e5', fontWeight: 'bold' }}
+                    />
+                    <Line type="monotone" dataKey="media" name="Média Geral" stroke="#4f46e5" strokeWidth={3} dot={{ r: 5, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 7, strokeWidth: 2 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
+
+          {/* Distribuição de Notas (Bar Chart) */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[350px]">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-50 rounded-lg text-blue-500"><BarChart3 className="w-4 h-4"/></div>
+                <h3 className="text-[15px] font-bold text-gray-800">Distribuição de Notas</h3>
+              </div>
+            </div>
+            <div className="flex-1 mt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analisesData.dadosDistribuicao} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af', fontWeight: '500' }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} width={30} />
+                  <Tooltip 
+                    cursor={{fill: '#f9fafb'}}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    itemStyle={{ fontWeight: 'bold', color: '#374151' }}
+                  />
+                  <Bar dataKey="value" name="Alunos" radius={[6, 6, 0, 0]}>
+                    {
+                      analisesData.dadosDistribuicao.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))
+                    }
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
