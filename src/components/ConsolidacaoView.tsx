@@ -41,47 +41,51 @@ export const ConsolidacaoView: React.FC = () => {
         <DashboardTurma turma={selectedTurma} onBack={() => setSelectedTurma(null)} />
       ) : (
         <div className="p-8 h-full overflow-auto">
-          <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <Activity className="w-6 h-6 text-indigo-600" />
-                Painel de Inteligência Acadêmica
-              </h2>
-              <p className="text-gray-500 text-sm mt-1">Selecione uma turma para acessar o painel de consolidação</p>
+          {/* Cabeçalho */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-indigo-600 rounded-xl shadow-sm">
+                <Activity className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Painel de Inteligência Acadêmica</h2>
+                <p className="text-gray-500 text-sm font-medium">Selecione uma turma para acessar o painel de consolidação</p>
+              </div>
             </div>
-            
-            <div className="flex gap-4">
-              <div className="w-64">
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Filtrar por Curso</label>
-                <select
-                  value={selectedCursoId}
-                  onChange={e => {
-                    setSelectedCursoId(e.target.value);
-                    setSelectedPeriodo('');
-                  }}
-                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
-                >
-                  <option value="">Todos os Cursos</option>
-                  {cursosDisponiveis.map(c => (
-                    <option key={c.id} value={c.id}>{c.nome}</option>
-                  ))}
-                </select>
-              </div>
+          </div>
 
-              <div className="w-48">
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Período Letivo</label>
-                <select
-                  value={selectedPeriodo}
-                  onChange={e => setSelectedPeriodo(e.target.value)}
-                  disabled={!selectedCursoId}
-                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none disabled:bg-gray-50 disabled:text-gray-400"
-                >
-                  <option value="">Todos os Períodos</option>
-                  {periodosDisponiveis.map(p => (
-                    <option key={p} value={p}>{p}</option>
-                  ))}
-                </select>
-              </div>
+          {/* Barra de Filtros */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8 flex flex-wrap gap-4 items-end">
+            <div className="flex-1 min-w-[150px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Curso</label>
+              <select
+                value={selectedCursoId}
+                onChange={e => {
+                  setSelectedCursoId(e.target.value);
+                  setSelectedPeriodo('');
+                }}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="">Todos os Cursos</option>
+                {cursosDisponiveis.map(c => (
+                  <option key={c.id} value={c.id}>{c.nome}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex-1 min-w-[150px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Período Letivo</label>
+              <select
+                value={selectedPeriodo}
+                onChange={e => setSelectedPeriodo(e.target.value)}
+                disabled={!selectedCursoId}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                <option value="">Todos os Períodos</option>
+                {periodosDisponiveis.map(p => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
             </div>
           </div>
 
