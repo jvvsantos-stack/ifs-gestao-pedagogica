@@ -5,12 +5,15 @@ import { Plus, Edit2, Trash2, CheckCircle, Archive, Save, X, Briefcase, RotateCc
 import { ConfirmModal } from './ConfirmModal';
 
 export const EstagiosView: React.FC = () => {
-  const [cursos, setCursos] = useState<Curso[]>([]);
-  const [turmas, setTurmas] = useState<Turma[]>([]);
-  const [alunos, setAlunos] = useState<Aluno[]>([]);
+  const cursos = useLiveQuery(() => db.cursos.toArray()) || [];
+  const turmasAll = useLiveQuery(() => db.turmas.toArray()) || [];
+  const alunosAll = useLiveQuery(() => db.alunos.toArray()) || [];
   
   const [selectedCursoId, setSelectedCursoId] = useState<number | ''>('');
+  const [selectedPeriodo, setSelectedPeriodo] = useState<string>('');
   const [selectedTurmaId, setSelectedTurmaId] = useState<number | ''>('');
+  const [selectedAlunoId, setSelectedAlunoId] = useState<number | ''>('');
+  
   const [formAlunoId, setFormAlunoId] = useState<number | ''>('');
   
   const [currentEstagio, setCurrentEstagio] = useState<Partial<Estagio> | null>(null);
@@ -23,40 +26,53 @@ export const EstagiosView: React.FC = () => {
   const [motivoNaoFinalizado, setMotivoNaoFinalizado] = useState('');
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
 
-  // Load Integrado courses
+  // Limpeza em cascata
   useEffect(() => {
-    const loadCursos = async () => {
-      const allCursos = await db.cursos.toArray();
-      setCursos(allCursos.filter(c => c.modalidade && c.modalidade.toLowerCase().includes('integrado')));
-    };
-    loadCursos();
-  }, []);
+    setSelectedPeriodo('');
+    setSelectedTurmaId('');
+    setSelectedAlunoId('');
+  }, [selectedCursoId]);
 
   useEffect(() => {
     setSelectedTurmaId('');
-    setAlunos([]);
-    if (selectedCursoId) {
-      db.turmas.where('cursoId').equals(Number(selectedCursoId)).toArray().then(setTurmas);
-    } else {
-      setTurmas([]);
-    }
-  }, [selectedCursoId]);
+    setSelectedAlunoId('');
+  }, [selectedPeriodo]);
 
-  // Load Alunos when turma changes
   useEffect(() => {
-    if (selectedTurmaId) {
-      db.alunos.where('turmaId').equals(Number(selectedTurmaId)).toArray().then(setAlunos);
-    } else {
-      setAlunos([]);
-    }
+    setSelectedAlunoId('');
   }, [selectedTurmaId]);
 
+  const periodosDisponiveis = React.useMemo(() => {
+    if (!selectedCursoId) return [];
+    const turmasDoCurso = turmasAll.filter(t => t.cursoId === Number(selectedCursoId));
+    const periodos = turmasDoCurso.map(t => t.anoLetivo).filter(Boolean) as string[];
+    return Array.from(new Set(periodos)).sort();
+  }, [selectedCursoId, turmasAll]);
+
+  const turmasDisponiveis = React.useMemo(() => {
+    if (!selectedCursoId || !selectedPeriodo) return [];
+    return turmasAll.filter(t => t.cursoId === Number(selectedCursoId) && t.anoLetivo === selectedPeriodo);
+  }, [selectedCursoId, selectedPeriodo, turmasAll]);
+
+  const alunosDisponiveis = React.useMemo(() => {
+    if (!selectedTurmaId) return [];
+    return alunosAll.filter(a => a.turmaId === Number(selectedTurmaId)).sort((a, b) => a.nome.localeCompare(b.nome));
+  }, [selectedTurmaId, alunosAll]);
+
   const estagios = useLiveQuery(
-    () => selectedTurmaId ? db.estagios.where('turmaId').equals(Number(selectedTurmaId)).toArray() : [],
-    [selectedTurmaId]
+    () => {
+      if (selectedAlunoId) {
+        return db.estagios.where('alunoId').equals(Number(selectedAlunoId)).toArray();
+      }
+      if (selectedTurmaId) {
+        return db.estagios.where('turmaId').equals(Number(selectedTurmaId)).toArray();
+      }
+      return [];
+    },
+    [selectedTurmaId, selectedAlunoId]
   ) || [];
 
-  const getAlunoNome = (id: number) => alunos.find(a => a.id === id)?.nome || 'Aluno não encontrado';
+  const getAlunoNome = (id: number) => alunosAll.find(a => a.id === id)?.nome || 'Aluno não encontrado';
 
   const handleSaveEstagio = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,7 +164,7 @@ export const EstagiosView: React.FC = () => {
       dadosEstagio: { inicio: '', funcaoPrincipal: '', areasAtuacao: '', chDiaria: '' },
       status: 'Ativo'
     });
-    setFormAlunoId('');
+    setFormAlunoId(selectedAlunoId || '');
     setShowForm(true);
   };
 
@@ -160,13 +176,13 @@ export const EstagiosView: React.FC = () => {
             <Briefcase className="w-8 h-8 text-indigo-600" />
             Controle de Estágios
           </h1>
-          <p className="text-gray-500 mt-2">Módulo exclusivo para turmas do Integrado</p>
+          <p className="text-gray-500 mt-2">Controle e acompanhamento de estágios dos alunos</p>
         </div>
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8 flex flex-wrap gap-4 items-end">
-        <div className="flex-1 min-w-[200px]">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Curso (Integrado)</label>
+        <div className="flex-1 min-w-[150px]">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Curso</label>
           <select
             value={selectedCursoId}
             onChange={(e) => setSelectedCursoId(e.target.value ? Number(e.target.value) : '')}
@@ -177,16 +193,42 @@ export const EstagiosView: React.FC = () => {
           </select>
         </div>
 
-        <div className="flex-1 min-w-[200px]">
+        <div className="flex-1 min-w-[150px]">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Período Letivo</label>
+          <select
+            value={selectedPeriodo}
+            onChange={(e) => setSelectedPeriodo(e.target.value)}
+            disabled={!selectedCursoId}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          >
+            <option value="">Selecione o Período...</option>
+            {periodosDisponiveis.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+        </div>
+
+        <div className="flex-1 min-w-[150px]">
           <label className="block text-sm font-medium text-gray-700 mb-1">Turma</label>
           <select
             value={selectedTurmaId}
             onChange={(e) => setSelectedTurmaId(e.target.value ? Number(e.target.value) : '')}
-            disabled={!selectedCursoId}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            disabled={!selectedPeriodo}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
           >
             <option value="">Selecione a Turma...</option>
-            {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
+            {turmasDisponiveis.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
+          </select>
+        </div>
+
+        <div className="flex-1 min-w-[200px]">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Aluno</label>
+          <select
+            value={selectedAlunoId}
+            onChange={(e) => setSelectedAlunoId(e.target.value ? Number(e.target.value) : '')}
+            disabled={!selectedTurmaId}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+          >
+            <option value="">Todos os Alunos...</option>
+            {alunosDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
           </select>
         </div>
       </div>
@@ -342,7 +384,7 @@ export const EstagiosView: React.FC = () => {
                     className="mt-1 w-full p-2 border border-gray-300 rounded"
                   >
                     <option value="">Selecione o Aluno...</option>
-                    {alunos.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
+                    {alunosDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
                   </select>
                 </div>
               </section>
