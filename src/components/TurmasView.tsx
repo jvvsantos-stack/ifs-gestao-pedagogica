@@ -265,7 +265,7 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {disciplinas.map(d => {
+          {[...disciplinas].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')).map(d => {
             const discNotas = notasAll.filter(n => n.disciplinaId === d.id);
             let hasLancamentoParcial = false;
             let totalEtapasCompletas = 0;

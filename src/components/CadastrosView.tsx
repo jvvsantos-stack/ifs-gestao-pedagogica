@@ -813,7 +813,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                     {/* Lista de Disciplinas renderizadas */}
                     {status !== null && status.cadastradas > 0 && (
                       <div className="mt-1 mb-2 flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
-                        {disciplinasAll.filter(d => d.turmaId === t.id && (viewTurmas === 'ativas' ? !d.arquivado : d.arquivado)).map(d => {
+                        {disciplinasAll.filter(d => d.turmaId === t.id && (viewTurmas === 'ativas' ? !d.arquivado : d.arquivado)).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')).map(d => {
                           const turmaPPC = getCursoPPCParaTurma(t);
                           const isPPC = turmaPPC?.disciplinas.some(dp => dp.nome === d.nome) || false;
                           return (
