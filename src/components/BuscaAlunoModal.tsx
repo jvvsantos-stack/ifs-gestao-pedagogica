@@ -9,11 +9,14 @@ interface BuscaAlunoModalProps {
 
 export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTurmaId, setSelectedTurmaId] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
 
+  const [selectedCursoId, setSelectedCursoId] = useState<number | ''>('');
+  const [selectedPeriodo, setSelectedPeriodo] = useState<string>('');
+  const [selectedTurmaId, setSelectedTurmaId] = useState<number | ''>('');
+  const [selectedAlunoId, setSelectedAlunoId] = useState<number | ''>('');
+
   const turmasAll = useLiveQuery(() => db.turmas.toArray()) || [];
-  const turmasAtivas = turmasAll.filter(t => !t.arquivado);
   const alunosAll = useLiveQuery(() => db.alunos.toArray()) || [];
   const cursosAll = useLiveQuery(() => db.cursos.toArray()) || [];
   const disciplinasAll = useLiveQuery(() => db.disciplinas.toArray()) || [];
@@ -22,6 +25,39 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
   const ocorrenciasAll = useLiveQuery(() => db.ocorrencias.toArray()) || [];
   const estagiosAll = useLiveQuery(() => db.estagios.toArray()) || [];
 
+  // Limpeza em cascata
+  React.useEffect(() => {
+    setSelectedPeriodo('');
+    setSelectedTurmaId('');
+    setSelectedAlunoId('');
+  }, [selectedCursoId]);
+
+  React.useEffect(() => {
+    setSelectedTurmaId('');
+    setSelectedAlunoId('');
+  }, [selectedPeriodo]);
+
+  React.useEffect(() => {
+    setSelectedAlunoId('');
+  }, [selectedTurmaId]);
+
+  const periodosDisponiveis = React.useMemo(() => {
+    if (!selectedCursoId) return [];
+    const turmasDoCurso = turmasAll.filter(t => t.cursoId === Number(selectedCursoId));
+    const periodos = turmasDoCurso.map(t => t.anoLetivo).filter(Boolean) as string[];
+    return Array.from(new Set(periodos)).sort();
+  }, [selectedCursoId, turmasAll]);
+
+  const turmasDisponiveis = React.useMemo(() => {
+    if (!selectedCursoId || !selectedPeriodo) return [];
+    return turmasAll.filter(t => t.cursoId === Number(selectedCursoId) && t.anoLetivo === selectedPeriodo && !t.arquivado);
+  }, [selectedCursoId, selectedPeriodo, turmasAll]);
+
+  const alunosDisponiveis = React.useMemo(() => {
+    if (!selectedTurmaId) return [];
+    return alunosAll.filter(a => a.turmaId === Number(selectedTurmaId)).sort((a, b) => a.nome.localeCompare(b.nome));
+  }, [selectedTurmaId, alunosAll]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setHasSearched(true);
@@ -29,9 +65,19 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
 
   const alunosFiltrados = alunosAll.filter(a => {
     if (!hasSearched) return false;
-    const matchName = a.nome.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Se o aluno foi escolhido no dropdown Nível 4, ignora todos os outros filtros (raio-x direto)
+    if (selectedAlunoId) return a.id === Number(selectedAlunoId);
+
+    const matchName = searchTerm ? a.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true;
     const matchTurma = selectedTurmaId ? a.turmaId === Number(selectedTurmaId) : true;
-    return matchName && matchTurma;
+    
+    // Filtros superiores só são checados se a Turma não estiver selecionada
+    const turmaDoAluno = turmasAll.find(t => t.id === a.turmaId);
+    const matchPeriodo = selectedPeriodo && !selectedTurmaId ? turmaDoAluno?.anoLetivo === selectedPeriodo : true;
+    const matchCurso = selectedCursoId && !selectedTurmaId ? turmaDoAluno?.cursoId === Number(selectedCursoId) : true;
+
+    return matchName && matchTurma && matchPeriodo && matchCurso;
   });
 
   return (
@@ -50,38 +96,81 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
         </div>
 
         {/* Search Form */}
-        <div className="p-6 border-b border-gray-100">
-          <form onSubmit={handleSearch} className="flex gap-4">
-            <div className="flex-1">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Nome do Aluno</label>
-              <input 
-                type="text" 
-                required
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                placeholder="Digite o nome do aluno..."
-              />
-            </div>
-            <div className="w-64">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Turma (Opcional)</label>
-              <select 
-                value={selectedTurmaId}
-                onChange={e => setSelectedTurmaId(e.target.value)}
-                className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-              >
-                <option value="">Todas as turmas</option>
-                {turmasAtivas.map(t => (
-                  <option key={t.id} value={t.id}>{t.nome} ({t.codigo})</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex items-end">
-              <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors flex items-center gap-2 h-[42px]">
+        <div className="p-6 border-b border-gray-100 bg-white">
+          <form onSubmit={handleSearch} className="flex flex-col gap-4">
+            
+            {/* Linha Superior: Nome Livre e Botão */}
+            <div className="flex gap-4 items-end">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">Nome do Aluno (Busca Livre)</label>
+                <input 
+                  type="text" 
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
+                  placeholder="Digite o nome do aluno (opcional)..."
+                />
+              </div>
+              <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 h-[42px] min-w-[150px]">
                 <Search className="w-4 h-4" />
                 Pesquisar
               </button>
             </div>
+
+            {/* Linha Inferior: Filtros em Cascata */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">1. Curso</label>
+                <select 
+                  value={selectedCursoId}
+                  onChange={e => setSelectedCursoId(e.target.value ? Number(e.target.value) : '')}
+                  className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                >
+                  <option value="">Todos os Cursos</option>
+                  {cursosAll.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">2. Período Letivo</label>
+                <select 
+                  value={selectedPeriodo}
+                  onChange={e => setSelectedPeriodo(e.target.value)}
+                  disabled={!selectedCursoId}
+                  className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                >
+                  <option value="">Selecione o Curso primeiro...</option>
+                  {periodosDisponiveis.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">3. Turma</label>
+                <select 
+                  value={selectedTurmaId}
+                  onChange={e => setSelectedTurmaId(e.target.value ? Number(e.target.value) : '')}
+                  disabled={!selectedPeriodo}
+                  className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                >
+                  <option value="">Selecione o Período...</option>
+                  {turmasDisponiveis.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">4. Aluno (Específico)</label>
+                <select 
+                  value={selectedAlunoId}
+                  onChange={e => setSelectedAlunoId(e.target.value ? Number(e.target.value) : '')}
+                  disabled={!selectedTurmaId}
+                  className="w-full text-sm border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                >
+                  <option value="">Selecione a Turma...</option>
+                  {alunosDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
+                </select>
+              </div>
+            </div>
+            
           </form>
         </div>
 
