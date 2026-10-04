@@ -480,10 +480,11 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
       for (const r of raw) {
         const norm: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(r)) {
-          norm[k.trim().toLowerCase()] = v;
+          const keyNormalized = String(k).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          norm[keyNormalized] = v;
         }
         const nome = String(norm['nome do aluno'] || norm['nome'] || norm['aluno'] || '').trim();
-        if (nome.length > 5) {
+        if (nome.length > 0) {
           rawNames.push(nome);
         }
       }
@@ -493,10 +494,10 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
         return;
       }
 
-      const invalidKeywords = ['instituto', 'diário', 'diario', 'nome', 'aluno', 'componente', 'situação', 'ordem'];
+      const invalidKeywords = ['instituto', 'diario', 'nome', 'aluno', 'componente', 'situacao', 'ordem'];
       const validNames = rawNames.filter(name => {
         const lower = normalize(name);
-        if (lower.length < 5) return false;
+        if (lower.length === 0) return false;
         return !invalidKeywords.some(kw => lower.includes(kw));
       });
 
