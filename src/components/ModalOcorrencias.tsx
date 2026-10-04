@@ -183,7 +183,7 @@ export const ModalOcorrencias: React.FC<Props> = ({ aluno, onClose }) => {
                   <input 
                     type="file" 
                     accept=".pdf, image/*" 
-                    className="className="hidden dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" 
+                    className="hidden dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800" 
                     ref={fileInputRef}
                     onChange={handleFile}
                   />

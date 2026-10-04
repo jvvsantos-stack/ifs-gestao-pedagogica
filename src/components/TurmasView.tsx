@@ -573,7 +573,7 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
           <input 
             type="file" 
             accept=".xlsx, .csv" 
-            className="className="hidden dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" 
+            className="hidden dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800" 
             ref={fileInputRef}
             onChange={handleImportFile}
           />
@@ -984,7 +984,7 @@ const DiarioDisciplina: React.FC<{
                           <input 
                             id={`nota-${index}`}
                             type="text"
-                            className="className="w-full bg-transparent outline-none text-center font-medium dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" 
+                            className="w-full bg-transparent outline-none text-center font-medium dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800" 
                             defaultValue={notas[currentEtapa]?.nota !== undefined && notas[currentEtapa]?.nota !== null ? Number(notas[currentEtapa].nota).toFixed(1).replace('.', ',') : ''}
                             onChange={(e) => {
                               let val = e.target.value.replace(/\D/g, '');
@@ -1012,7 +1012,7 @@ const DiarioDisciplina: React.FC<{
                             id={`faltas-${index}`}
                             type="number" 
                             step="1" min="0"
-                            className="className="w-full bg-transparent outline-none text-center dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" 
+                            className="w-full bg-transparent outline-none text-center dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800" 
                             defaultValue={notas[currentEtapa]?.faltas !== undefined && notas[currentEtapa]?.faltas !== null ? notas[currentEtapa].faltas : ''}
                             onBlur={(e) => handleSaveNota(aluno.id!, currentEtapa, 'faltas', e.target.value, e)}
                             onKeyDown={(e) => handleKeyDown(e, 'faltas', index)}
@@ -1040,7 +1040,7 @@ const DiarioDisciplina: React.FC<{
                           <td className="px-2 py-2 border-l border-gray-100 bg-blue-50 dark:bg-blue-900/20/50">
                             <input 
                               type="text"
-                              className="className="w-full bg-transparent outline-none text-center text-blue-800 font-medium placeholder-blue-300 dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" 
+                              className="w-full bg-transparent outline-none text-center text-blue-800 font-medium placeholder-blue-300 dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800" 
                               placeholder="-"
                               defaultValue={av.provaFinal !== undefined && av.provaFinal !== null ? Number(av.provaFinal).toFixed(1).replace('.', ',') : ''}
                               onChange={(e) => {

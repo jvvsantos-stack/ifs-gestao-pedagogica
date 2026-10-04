@@ -261,7 +261,7 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
               id="file-upload"
               type="file"
               accept=".csv,.xlsx,.xls"
-              className="className="hidden dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800""
+              className="hidden dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"
               onChange={handleFileInput}
             />
             <label htmlFor="file-upload" className="cursor-pointer block">
