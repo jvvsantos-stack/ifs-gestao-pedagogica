@@ -1,7 +1,12 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import os
+
+def rewrite_suap_importer():
+    filepath = "src/components/SuapImporter.tsx"
+    
+    content = """import React, { useState, useCallback, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { Upload, FileSpreadsheet, CheckCircle, AlertCircle, Loader2, X, ChevronDown, ChevronUp, Download } from 'lucide-react';
-import { db } from '../db/database';
+import { db, Turma, Curso } from '../db/database';
 
 interface RowData {
   nome: string;
@@ -128,12 +133,15 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
   const [savedCount, setSavedCount] = useState(0);
+  
+  const [turma, setTurma] = useState<Turma | null>(null);
   const [isIntegrado, setIsIntegrado] = useState(true);
 
   useEffect(() => {
     const loadInfo = async () => {
       const t = await db.turmas.get(turmaId);
       if (t) {
+        setTurma(t);
         const c = await db.cursos.get(t.cursoId);
         if (c) {
           setIsIntegrado(c.modalidade.toLowerCase().includes('integrado'));
@@ -435,3 +443,11 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
     </div>
   );
 };
+"""
+
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(content)
+    print(f"Rewritten {filepath}")
+
+if __name__ == "__main__":
+    rewrite_suap_importer()
