@@ -48,6 +48,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         </div>
 
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center gap-3 px-4 py-3 mb-6 rounded-lg font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white bg-slate-800/30 border border-slate-700/50"
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun className="w-5 h-5" />
+                <span>Modo Claro</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-5 h-5" />
+                <span>Modo Escuro</span>
+              </>
+            )}
+          </button>
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -69,25 +86,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           })}
         </nav>
 
-        {/* Theme Toggle */}
-        <div className="p-4 border-t border-slate-800">
-          <button
-            onClick={toggleTheme}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white"
-          >
-            {theme === 'dark' ? (
-              <>
-                <Sun className="w-5 h-5" />
-                <span>Modo Claro</span>
-              </>
-            ) : (
-              <>
-                <Moon className="w-5 h-5" />
-                <span>Modo Escuro</span>
-              </>
-            )}
-          </button>
-        </div>
+
       </aside>
 
       {/* Main Content Area */}
