@@ -230,23 +230,40 @@ export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId, mode = 'd
             return;
           }
 
+          const line1 = (sheetData[0] || []).map(String).map(s => s.trim());
           const line2 = (sheetData[1] || []).map(String).map(s => s.trim());
-          if (line2[0] !== 'ALUNOS' || line2[1] !== 'N' || line2[2] !== 'F') {
-            setErrorMsg('Formato de arquivo inválido. A linha 2 deve iniciar com ALUNOS, N, F...');
+
+          if (line2[0] !== 'ALUNOS') {
+            setErrorMsg('Formato de arquivo inválido. A linha 2 deve iniciar com "ALUNOS" na primeira coluna.');
             setStatus('error');
             return;
           }
 
-          const line1 = (sheetData[0] || []).map(String).map(s => s.trim());
-          const disciplinasNomes = line1.filter((s, i) => i > 0 && i % 2 !== 0 && s !== '');
+          // Mapeamento dinâmico de colunas N e F por disciplina
+          const disciplinasCols: { nome: string, colN: number, colF: number }[] = [];
+          let currentDisc = '';
           
-          if (disciplinasNomes.length === 0) {
-            setErrorMsg('Nenhuma disciplina encontrada na Linha 1.');
+          for (let c = 1; c < Math.max(line1.length, line2.length); c++) {
+            if (line1[c] && line1[c] !== '') {
+              currentDisc = line1[c];
+            }
+            if (currentDisc && line2[c] === 'N') {
+              const colF = line2[c + 1] === 'F' ? c + 1 : -1;
+              if (colF !== -1) {
+                disciplinasCols.push({ nome: currentDisc, colN: c, colF });
+                c++; // pula a coluna F para não ler novamente
+              }
+            }
+          }
+          
+          if (disciplinasCols.length === 0) {
+            setErrorMsg('Nenhuma coluna de Notas (N) e Faltas (F) encontrada para as disciplinas.');
             setStatus('error');
             return;
           }
 
           const parsed: RowData[] = [];
+          const currentEtapaStr = String(selectedEtapa);
           
           // Process rows from line 3 onwards
           for (let i = 2; i < sheetData.length; i++) {
@@ -254,24 +271,21 @@ export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId, mode = 'd
             const alunoNome = rowArr[0];
             if (!alunoNome) continue;
 
-            for (let d = 0; d < disciplinasNomes.length; d++) {
-              const discName = disciplinasNomes[d];
-              const colN = 1 + (d * 2);
-              const colF = colN + 1;
-              
-              const valN = rowArr[colN] === '-' ? null : parseNumber(rowArr[colN]);
-              const valF = rowArr[colF] === '-' ? null : parseNumber(rowArr[colF]);
+            for (const discMap of disciplinasCols) {
+              const valN = rowArr[discMap.colN] === '-' ? null : parseNumber(rowArr[discMap.colN]);
+              const valF = rowArr[discMap.colF] === '-' ? null : parseNumber(rowArr[discMap.colF]);
 
               if (valN !== null || valF !== null) {
                 const rowData: RowData = {
                   nome: alunoNome,
-                  disciplina: discName,
+                  disciplina: discMap.nome,
                 };
-                if (selectedEtapa === 1) { rowData.nota1 = valN; rowData.faltas1 = valF; }
-                else if (selectedEtapa === 2) { rowData.nota2 = valN; rowData.faltas2 = valF; }
-                else if (selectedEtapa === 3) { rowData.nota3 = valN; rowData.faltas3 = valF; }
-                else if (selectedEtapa === 4) { rowData.nota4 = valN; rowData.faltas4 = valF; }
-                else if (selectedEtapa === 'PF') { rowData.provaFinal = valN; }
+                
+                if (currentEtapaStr === '1') { rowData.nota1 = valN; rowData.faltas1 = valF; }
+                else if (currentEtapaStr === '2') { rowData.nota2 = valN; rowData.faltas2 = valF; }
+                else if (currentEtapaStr === '3') { rowData.nota3 = valN; rowData.faltas3 = valF; }
+                else if (currentEtapaStr === '4') { rowData.nota4 = valN; rowData.faltas4 = valF; }
+                else if (currentEtapaStr === 'PF') { rowData.provaFinal = valN; }
                 
                 parsed.push(rowData);
               }
