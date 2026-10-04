@@ -128,9 +128,10 @@ async function saveToDb(rows: RowData[], turmaId: number, isIntegrado: boolean, 
 interface Props {
   turmaId: number;
   disciplinaId?: number;
+  mode?: 'discipline' | 'class';
 }
 
-export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId }) => {
+export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId, mode = 'discipline' }) => {
   const [status, setStatus] = useState<ImportStatus>('idle');
   const [rows, setRows] = useState<RowData[]>([]);
   const [errorMsg, setErrorMsg] = useState('');
@@ -138,6 +139,7 @@ export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId }) => {
   const [showPreview, setShowPreview] = useState(true);
   const [savedCount, setSavedCount] = useState(0);
   const [isIntegrado, setIsIntegrado] = useState(true);
+  const [selectedEtapa, setSelectedEtapa] = useState<number | 'PF' | ''>('');
 
   useEffect(() => {
     const loadInfo = async () => {
@@ -156,6 +158,30 @@ export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId }) => {
     let headers: string[];
     let data: any[][] = [];
     
+    if (mode === 'class') {
+      const disciplinas = await db.disciplinas.where('turmaId').equals(turmaId).toArray();
+      disciplinas.sort((a, b) => a.nome.localeCompare(b.nome));
+      
+      const line1: string[] = ['']; // Célula A1 vazia
+      const line2: string[] = ['ALUNOS'];
+      
+      disciplinas.forEach(d => {
+        line1.push(d.nome, '');
+        line2.push('N', 'F');
+      });
+      
+      const alunos = await db.alunos.where('turmaId').equals(turmaId).toArray();
+      alunos.sort((a, b) => a.nome.localeCompare(b.nome));
+      
+      data = alunos.map(a => [a.nome]); // Outras colunas ficam vazias automaticamente
+      
+      const ws = XLSX.utils.aoa_to_sheet([line1, line2, ...data]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Template');
+      XLSX.writeFile(wb, `Template_Lote_${isIntegrado ? 'Integrado' : 'Subsequente'}.xlsx`);
+      return;
+    }
+
     if (disciplinaId) {
        headers = isIntegrado 
         ? ['Nome do Aluno', 'Nota Etapa 1', 'Faltas Etapa 1', 'Nota Etapa 2', 'Faltas Etapa 2', 'Nota Etapa 3', 'Faltas Etapa 3', 'Nota Etapa 4', 'Faltas Etapa 4', 'Prova Final']
@@ -197,6 +223,73 @@ export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId }) => {
           return;
         }
 
+        if (mode === 'class') {
+          if (sheetData.length < 2) {
+            setErrorMsg('Formato de arquivo inválido. A planilha em lote deve ter pelo menos 2 linhas de cabeçalho.');
+            setStatus('error');
+            return;
+          }
+
+          const line2 = (sheetData[1] || []).map(String).map(s => s.trim());
+          if (line2[0] !== 'ALUNOS' || line2[1] !== 'N' || line2[2] !== 'F') {
+            setErrorMsg('Formato de arquivo inválido. A linha 2 deve iniciar com ALUNOS, N, F...');
+            setStatus('error');
+            return;
+          }
+
+          const line1 = (sheetData[0] || []).map(String).map(s => s.trim());
+          const disciplinasNomes = line1.filter((s, i) => i > 0 && i % 2 !== 0 && s !== '');
+          
+          if (disciplinasNomes.length === 0) {
+            setErrorMsg('Nenhuma disciplina encontrada na Linha 1.');
+            setStatus('error');
+            return;
+          }
+
+          const parsed: RowData[] = [];
+          
+          // Process rows from line 3 onwards
+          for (let i = 2; i < sheetData.length; i++) {
+            const rowArr = (sheetData[i] || []).map(String).map(s => s.trim());
+            const alunoNome = rowArr[0];
+            if (!alunoNome) continue;
+
+            for (let d = 0; d < disciplinasNomes.length; d++) {
+              const discName = disciplinasNomes[d];
+              const colN = 1 + (d * 2);
+              const colF = colN + 1;
+              
+              const valN = rowArr[colN] === '-' ? null : parseNumber(rowArr[colN]);
+              const valF = rowArr[colF] === '-' ? null : parseNumber(rowArr[colF]);
+
+              if (valN !== null || valF !== null) {
+                const rowData: RowData = {
+                  nome: alunoNome,
+                  disciplina: discName,
+                };
+                if (selectedEtapa === 1) { rowData.nota1 = valN; rowData.faltas1 = valF; }
+                else if (selectedEtapa === 2) { rowData.nota2 = valN; rowData.faltas2 = valF; }
+                else if (selectedEtapa === 3) { rowData.nota3 = valN; rowData.faltas3 = valF; }
+                else if (selectedEtapa === 4) { rowData.nota4 = valN; rowData.faltas4 = valF; }
+                else if (selectedEtapa === 'PF') { rowData.provaFinal = valN; }
+                
+                parsed.push(rowData);
+              }
+            }
+          }
+
+          if (parsed.length === 0) {
+            setErrorMsg('Nenhum registro válido encontrado. Verifique se as notas/faltas estão preenchidas.');
+            setStatus('error');
+            return;
+          }
+
+          setRows(parsed);
+          setStatus('preview');
+          return;
+        }
+
+        // Mode discipline logic below
         const headers = (sheetData[0] || []).map(String).map(s => s.trim());
         while (headers.length > 0 && headers[headers.length - 1] === '') {
           headers.pop();
@@ -242,15 +335,15 @@ export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId }) => {
           return {
             nome: String(norm['nome do aluno'] || norm['nome'] || norm['aluno'] || '').trim(),
             disciplina: String(norm['disciplina'] || norm['componente'] || '').trim(),
-            nota1: parseNumber(norm['nota etapa 1'] ?? norm['nota 1'] ?? norm['n1']),
-            faltas1: parseNumber(norm['faltas etapa 1'] ?? norm['faltas 1'] ?? norm['f1']),
-            nota2: parseNumber(norm['nota etapa 2'] ?? norm['nota 2'] ?? norm['n2']),
-            faltas2: parseNumber(norm['faltas etapa 2'] ?? norm['faltas 2'] ?? norm['f2']),
-            nota3: parseNumber(norm['nota etapa 3'] ?? norm['nota 3'] ?? norm['n3']),
-            faltas3: parseNumber(norm['faltas etapa 3'] ?? norm['faltas 3'] ?? norm['f3']),
-            nota4: parseNumber(norm['nota etapa 4'] ?? norm['nota 4'] ?? norm['n4']),
-            faltas4: parseNumber(norm['faltas etapa 4'] ?? norm['faltas 4'] ?? norm['f4']),
-            provaFinal: parseNumber(norm['prova final'] ?? norm['pf'] ?? norm['exame']),
+            nota1: norm['nota etapa 1'] === '-' ? null : parseNumber(norm['nota etapa 1'] ?? norm['nota 1'] ?? norm['n1']),
+            faltas1: norm['faltas etapa 1'] === '-' ? null : parseNumber(norm['faltas etapa 1'] ?? norm['faltas 1'] ?? norm['f1']),
+            nota2: norm['nota etapa 2'] === '-' ? null : parseNumber(norm['nota etapa 2'] ?? norm['nota 2'] ?? norm['n2']),
+            faltas2: norm['faltas etapa 2'] === '-' ? null : parseNumber(norm['faltas etapa 2'] ?? norm['faltas 2'] ?? norm['f2']),
+            nota3: norm['nota etapa 3'] === '-' ? null : parseNumber(norm['nota etapa 3'] ?? norm['nota 3'] ?? norm['n3']),
+            faltas3: norm['faltas etapa 3'] === '-' ? null : parseNumber(norm['faltas etapa 3'] ?? norm['faltas 3'] ?? norm['f3']),
+            nota4: norm['nota etapa 4'] === '-' ? null : parseNumber(norm['nota etapa 4'] ?? norm['nota 4'] ?? norm['n4']),
+            faltas4: norm['faltas etapa 4'] === '-' ? null : parseNumber(norm['faltas etapa 4'] ?? norm['faltas 4'] ?? norm['f4']),
+            provaFinal: norm['prova final'] === '-' ? null : parseNumber(norm['prova final'] ?? norm['pf'] ?? norm['exame']),
           };
         }).filter(r => r.nome !== '');
 
@@ -268,7 +361,7 @@ export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId }) => {
       }
     };
     reader.readAsArrayBuffer(file);
-  }, []);
+  }, [disciplinaId, isIntegrado, mode, selectedEtapa]);
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -323,9 +416,29 @@ export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId }) => {
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors"
         >
           <Download className="w-4 h-4" />
-          Baixar Modelo para esta Turma
+          {mode === 'class' ? 'Baixar Modelo da Turma (Lote)' : 'Baixar Modelo para esta Turma'}
         </button>
       </div>
+
+      {mode === 'class' && (
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-slate-300 mb-2">
+            Selecione a Etapa para Importação *
+          </label>
+          <select
+            value={selectedEtapa}
+            onChange={(e) => setSelectedEtapa(e.target.value as any)}
+            className="w-full md:w-1/2 p-2.5 border border-gray-300 dark:border-slate-600 rounded-lg outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:bg-slate-900 dark:text-slate-100"
+          >
+            <option value="" disabled>Selecione uma etapa...</option>
+            <option value={1}>Etapa 1</option>
+            <option value={2}>Etapa 2</option>
+            {isIntegrado && <option value={3}>Etapa 3</option>}
+            {isIntegrado && <option value={4}>Etapa 4</option>}
+            <option value="PF">Prova Final</option>
+          </select>
+        </div>
+      )}
 
       {/* Instruction */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm text-blue-800 dark:text-blue-300">
@@ -338,21 +451,41 @@ export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId }) => {
           <div
             onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
             onDragLeave={() => setIsDragOver(false)}
-            onDrop={handleDrop}
+            onDrop={(e) => {
+              if (mode === 'class' && !selectedEtapa) {
+                e.preventDefault();
+                setIsDragOver(false);
+                setErrorMsg('Selecione a Etapa antes de selecionar o arquivo.');
+                setStatus('error');
+                return;
+              }
+              handleDrop(e);
+            }}
+            onClick={(e) => {
+              if (mode === 'class' && !selectedEtapa) {
+                e.preventDefault();
+                setErrorMsg('Selecione a Etapa antes de selecionar o arquivo.');
+                setStatus('error');
+              }
+            }}
             className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer ${
               isDragOver
                 ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30'
                 : 'border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 hover:border-indigo-300 hover:bg-indigo-50 dark:bg-indigo-900/30'
-            }`}
+            } ${mode === 'class' && !selectedEtapa ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <input
               id="file-upload"
               type="file"
               accept=".csv,.xlsx,.xls"
               className="hidden dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"
-              onChange={handleFileInput}
+              onChange={(e) => {
+                if (mode === 'class' && !selectedEtapa) return;
+                handleFileInput(e);
+              }}
+              disabled={mode === 'class' && !selectedEtapa}
             />
-            <label htmlFor="file-upload" className="cursor-pointer block">
+            <label htmlFor="file-upload" className={`cursor-pointer block ${mode === 'class' && !selectedEtapa ? 'pointer-events-none' : ''}`}>
               <Upload
                 className={`w-12 h-12 mx-auto mb-4 ${isDragOver ? 'text-indigo-500' : 'text-gray-400 dark:text-slate-500'}`}
               />

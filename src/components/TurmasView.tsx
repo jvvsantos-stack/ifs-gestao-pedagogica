@@ -216,6 +216,20 @@ export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearIni
 const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, onBack }) => {
   const [selectedDisciplinaId, setSelectedDisciplinaId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<number | 'consolidacao'>(1);
+  const [showClassImporter, setShowClassImporter] = useState(false);
+
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; type?: 'warning' | 'success' | 'info'; isAlert?: boolean; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+
+  const showAlert = (title: string, message: string, type: 'warning' | 'success' | 'info' = 'info') => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      type,
+      isAlert: true,
+      onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+    });
+  };
   
   const disciplinasTodas = useLiveQuery(() => db.disciplinas.where('turmaId').equals(turma.id!).toArray()) || [];
   const disciplinas = disciplinasTodas.filter(d => !d.arquivado);
@@ -260,9 +274,24 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
       </header>
 
       <main className="flex-1 p-6">
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200">Disciplinas da Turma</h2>
-          <p className="text-gray-500 dark:text-slate-400 text-sm">Selecione uma etapa para iniciar o lançamento de notas</p>
+        <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200">Disciplinas da Turma</h2>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">Selecione uma etapa para iniciar o lançamento de notas</p>
+          </div>
+          <button
+            onClick={() => {
+              if (alunos.length === 0) {
+                showAlert('Aviso', 'Não é possível importar notas. Cadastre os alunos na turma primeiro.', 'warning');
+              } else {
+                setShowClassImporter(true);
+              }
+            }}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg flex items-center gap-2 text-sm transition-colors"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Importar Notas da Turma (Lote)
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -366,6 +395,33 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
           )}
         </div>
       </main>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        type={confirmModal.type}
+        {...(!confirmModal.isAlert && {
+          onCancel: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+        })}
+      />
+
+      {showClassImporter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col">
+             <div className="sticky top-0 bg-white dark:bg-slate-900 p-4 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center z-10">
+               <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">Importar Notas em Lote - {turma.nome}</h2>
+               <button onClick={() => setShowClassImporter(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors text-gray-500 dark:text-gray-400">
+                 <X className="w-5 h-5" />
+               </button>
+             </div>
+             <div className="p-6">
+                <SuapImporter turmaId={turma.id!} mode="class" />
+             </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
