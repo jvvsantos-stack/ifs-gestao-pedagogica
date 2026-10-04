@@ -466,6 +466,25 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
       const firstSheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[firstSheetName];
       
+      const sheetData = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, defval: '' });
+      if (sheetData.length === 0) {
+        showAlert('Erro', 'Nenhum dado encontrado no arquivo.', 'warning');
+        return;
+      }
+
+      const headers = (sheetData[0] || []).map(String).map(s => s.trim());
+      while (headers.length > 0 && headers[headers.length - 1] === '') {
+        headers.pop();
+      }
+
+      const expectedHeaders = ['Nome do Aluno'];
+      const isValid = headers.length === expectedHeaders.length && headers.every((h, i) => h === expectedHeaders[i]);
+
+      if (!isValid) {
+        showAlert('Erro', 'Formato de arquivo inválido. Por favor, utilize estritamente a Planilha Modelo baixada pelo sistema e não altere os títulos das colunas.', 'warning');
+        return;
+      }
+
       const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
         defval: '',
         raw: false,

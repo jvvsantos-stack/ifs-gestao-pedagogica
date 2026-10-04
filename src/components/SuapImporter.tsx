@@ -189,6 +189,37 @@ export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId }) => {
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
+
+        const sheetData = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, defval: '' });
+        if (sheetData.length === 0) {
+          setErrorMsg('Nenhum dado encontrado no arquivo.');
+          setStatus('error');
+          return;
+        }
+
+        const headers = (sheetData[0] || []).map(String).map(s => s.trim());
+        while (headers.length > 0 && headers[headers.length - 1] === '') {
+          headers.pop();
+        }
+        
+        let expectedHeaders: string[] = [];
+        if (disciplinaId) {
+          expectedHeaders = isIntegrado 
+            ? ['Nome do Aluno', 'Nota Etapa 1', 'Faltas Etapa 1', 'Nota Etapa 2', 'Faltas Etapa 2', 'Nota Etapa 3', 'Faltas Etapa 3', 'Nota Etapa 4', 'Faltas Etapa 4', 'Prova Final']
+            : ['Nome do Aluno', 'Nota Etapa 1', 'Faltas Etapa 1', 'Nota Etapa 2', 'Faltas Etapa 2', 'Prova Final'];
+        } else {
+          expectedHeaders = isIntegrado 
+            ? ['Nome do Aluno', 'Disciplina', 'Nota Etapa 1', 'Faltas Etapa 1', 'Nota Etapa 2', 'Faltas Etapa 2', 'Nota Etapa 3', 'Faltas Etapa 3', 'Nota Etapa 4', 'Faltas Etapa 4', 'Prova Final']
+            : ['Nome do Aluno', 'Disciplina', 'Nota Etapa 1', 'Faltas Etapa 1', 'Nota Etapa 2', 'Faltas Etapa 2', 'Prova Final'];
+        }
+
+        const isValid = headers.length === expectedHeaders.length && headers.every((h, i) => h === expectedHeaders[i]);
+
+        if (!isValid) {
+          setErrorMsg('Formato de arquivo inválido. Por favor, utilize estritamente a Planilha Modelo baixada pelo sistema e não altere os títulos das colunas.');
+          setStatus('error');
+          return;
+        }
         
         const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
           defval: '',
