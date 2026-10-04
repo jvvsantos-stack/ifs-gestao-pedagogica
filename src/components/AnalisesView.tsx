@@ -460,7 +460,7 @@ export const AnalisesView: React.FC = () => {
                 <tbody className="divide-y divide-gray-50">
                   {analisesData.riscoList.map(r => (
                     <tr key={r.nome} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
-                      <td className="py-2.5 px-3 font-bold text-gray-700 dark:text-slate-300 truncate max-w-[120px]">{r.nome}</td>
+                      <td className="py-2.5 px-3 font-bold text-gray-700 dark:text-slate-300 truncate max-w-[120px]" title={r.nome}>{r.nome.split('(')[0].trim()}</td>
                       <td className="py-2.5 px-3 text-gray-500 dark:text-slate-400 truncate max-w-[80px]">{r.turma}</td>
                       <td className="py-2.5 px-3 text-center">
                         <span className="bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-full text-[10px]">{r.disciplinasAbaixo}</span>
