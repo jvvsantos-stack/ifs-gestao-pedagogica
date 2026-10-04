@@ -75,52 +75,54 @@ async function saveToDb(rows: RowData[], turmaId: number, isIntegrado: boolean, 
       }
     }
 
-    // 3. Clear existing notas and avaliacoes for this student+discipline
-    const existing_notas = await db.notas
-      .where('alunoId')
-      .equals(alunoId)
-      .filter((n) => n.disciplinaId === disciplinaId)
-      .toArray();
-    if (existing_notas.length > 0) {
-      await db.notas.bulkDelete(existing_notas.map((n) => n.id!));
-    }
-
-    const existing_av = await db.avaliacoes_finais
-      .where('alunoId')
-      .equals(alunoId)
-      .filter((a) => a.disciplinaId === disciplinaId)
-      .toArray();
-    if (existing_av.length > 0) {
-      await db.avaliacoes_finais.bulkDelete(existing_av.map((a) => a.id!));
-    }
-
-    // 4. Add Notas (Only if there is a value or 0, null is ignored)
-    const addNotaIfPresent = async (etapa: number, nota: number | null | undefined, faltas: number | null | undefined) => {
+    // 3. Add or Update Notas (Only if there is a value or 0, null is ignored)
+    const updateOrAddNota = async (etapa: number, nota: number | null | undefined, faltas: number | null | undefined) => {
       if (nota !== null || faltas !== null) {
-        // If either nota or faltas is present, we save the row. If one is null, it's treated as undefined/0 depending on logic, 
-        // but we keep exactly what was provided to respect "Vazios devem ser mantidos vazios".
-        const record: any = { alunoId, disciplinaId, etapa };
-        if (nota !== null && nota !== undefined) record.nota = nota;
-        if (faltas !== null && faltas !== undefined) record.faltas = faltas;
-        await db.notas.add(record);
+        const existingNota = await db.notas
+          .where('alunoId')
+          .equals(alunoId)
+          .filter((n) => n.disciplinaId === disciplinaId && n.etapa === etapa)
+          .first();
+
+        if (existingNota && existingNota.id) {
+          const updates: any = {};
+          if (nota !== null && nota !== undefined) updates.nota = nota;
+          if (faltas !== null && faltas !== undefined) updates.faltas = faltas;
+          await db.notas.update(existingNota.id, updates);
+        } else {
+          const record: any = { alunoId, disciplinaId, etapa };
+          if (nota !== null && nota !== undefined) record.nota = nota;
+          if (faltas !== null && faltas !== undefined) record.faltas = faltas;
+          await db.notas.add(record);
+        }
       }
     };
 
-    await addNotaIfPresent(1, row.nota1, row.faltas1);
-    await addNotaIfPresent(2, row.nota2, row.faltas2);
+    await updateOrAddNota(1, row.nota1, row.faltas1);
+    await updateOrAddNota(2, row.nota2, row.faltas2);
     
     if (isIntegrado) {
-      await addNotaIfPresent(3, row.nota3, row.faltas3);
-      await addNotaIfPresent(4, row.nota4, row.faltas4);
+      await updateOrAddNota(3, row.nota3, row.faltas3);
+      await updateOrAddNota(4, row.nota4, row.faltas4);
     }
 
-    // 5. Add Prova Final if present
+    // 4. Add or Update Prova Final if present
     if (row.provaFinal !== null && row.provaFinal !== undefined) {
-      await db.avaliacoes_finais.add({
-        alunoId,
-        disciplinaId,
-        provaFinal: row.provaFinal
-      });
+      const existingAv = await db.avaliacoes_finais
+        .where('alunoId')
+        .equals(alunoId)
+        .filter((a) => a.disciplinaId === disciplinaId)
+        .first();
+
+      if (existingAv && existingAv.id) {
+        await db.avaliacoes_finais.update(existingAv.id, { provaFinal: row.provaFinal });
+      } else {
+        await db.avaliacoes_finais.add({
+          alunoId,
+          disciplinaId,
+          provaFinal: row.provaFinal
+        });
+      }
     }
   }
 }
