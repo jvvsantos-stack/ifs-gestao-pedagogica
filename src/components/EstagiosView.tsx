@@ -288,7 +288,11 @@ export const EstagiosView: React.FC = () => {
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
-            {estagiosFiltrados.map(estagio => (
+            {estagiosFiltrados.map(estagio => {
+              const turma = turmasAll.find(t => t.id === estagio.turmaId);
+              const curso = cursos.find(c => c.id === turma?.cursoId);
+
+              return (
                 <div
                   key={estagio.id}
                   className={`p-5 rounded-xl border ${
@@ -303,8 +307,13 @@ export const EstagiosView: React.FC = () => {
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex flex-col mb-1.5">
                         <span className="font-bold text-lg text-gray-900">{getAlunoNome(estagio.alunoId)}</span>
+                        {(curso || turma) && (
+                          <span className="text-sm text-gray-500 mt-0.5">
+                            {[curso?.nome, turma?.nome, turma?.anoLetivo].filter(Boolean).join(' • ')}
+                          </span>
+                        )}
                       </div>
                       <h3 className="font-semibold text-indigo-700">{estagio.dadosEmpresa?.nome}</h3>
                       <p className="text-sm text-gray-600 mt-1"><span className="font-medium">Função:</span> {estagio.dadosEstagio?.funcaoPrincipal}</p>
@@ -389,7 +398,8 @@ export const EstagiosView: React.FC = () => {
                     </button>
                   </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
           )}
         </div>
