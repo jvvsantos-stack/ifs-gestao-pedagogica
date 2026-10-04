@@ -275,7 +275,7 @@ export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId, mode = 'd
 
             for (const discMap of disciplinasCols) {
               const valN = rowArr[discMap.colN] === '-' ? null : parseNumber(rowArr[discMap.colN]);
-              const valF = rowArr[discMap.colF] === '-' ? null : parseNumber(rowArr[discMap.colF]);
+              const valF = currentEtapaStr === 'PF' ? null : (rowArr[discMap.colF] === '-' ? null : parseNumber(rowArr[discMap.colF]));
 
               if (valN !== null || valF !== null) {
                 const rowData: RowData = {
