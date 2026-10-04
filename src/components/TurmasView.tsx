@@ -89,7 +89,7 @@ export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearIni
                 setSelectedCursoId(e.target.value);
                 setSelectedPeriodo('todos');
               }} 
-              className="text-sm font-bold text-gray-800 dark:text-slate-200 bg-transparent outline-none cursor-pointer max-w-[200px] truncate"
+              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent dark:bg-slate-800 dark:border-slate-700 dark:focus:ring-slate-600 outline-none cursor-pointer max-w-[200px] truncate"
             >
               <option value="todos">Todos os Cursos</option>
               {cursos.map(c => (
@@ -103,7 +103,7 @@ export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearIni
             <select 
               value={selectedPeriodo} 
               onChange={e => setSelectedPeriodo(e.target.value)} 
-              className="text-sm font-bold text-gray-800 dark:text-slate-200 bg-transparent outline-none cursor-pointer"
+              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent dark:bg-slate-800 dark:border-slate-700 dark:focus:ring-slate-600 outline-none cursor-pointer"
             >
               <option value="todos">Todos os Períodos</option>
               {periodosDisponiveis.map(p => (

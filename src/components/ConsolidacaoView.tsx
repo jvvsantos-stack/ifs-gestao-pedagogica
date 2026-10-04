@@ -562,7 +562,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                               <span className="text-xs text-gray-500 dark:text-slate-400 font-normal">({notaOrig?.toFixed(1)})</span>
                             </div>
                           ) : (
-                            <span className={nota >= 6.0 ? 'text-green-600' : 'text-red-600'}>
+                            <span className={nota >= 6.0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                               {nota.toFixed(1)}
                             </span>
                           )}
@@ -619,16 +619,16 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                           ))}
                         </div>
                       ) : item.hasReprovacaoPorFalta ? (
-                        <span className="text-red-500 font-medium">Reprovação por Faltas</span>
+                        <span className="text-red-500 dark:text-red-400 font-medium">Reprovação por Faltas</span>
                       ) : item.cursandoCount > 0 ? (
                         <span className="text-gray-400 dark:text-slate-500 italic">Diários em andamento...</span>
                       ) : null}
                     </td>
                     <td className="px-4 py-3 text-center align-middle font-medium">
-                      {item.statusText === 'Aguardando Decisão' && <span className="text-amber-600 font-bold">{item.statusText}</span>}
-                      {item.statusText === 'Aprovado no Conselho' && <span className="text-green-600 font-bold">{item.statusText}</span>}
-                      {item.statusText === 'Reprovado no Conselho' && <span className="text-red-600 font-bold">{item.statusText}</span>}
-                      {(item.statusText.startsWith('Retido') || item.statusText.startsWith('Reprovado por') || item.statusText === 'Reprovado') && <span className="text-red-600">{item.statusText}</span>}
+                      {item.statusText === 'Aguardando Decisão' && <span className="text-amber-600 dark:text-amber-400 font-bold">{item.statusText}</span>}
+                      {item.statusText === 'Aprovado no Conselho' && <span className="text-green-600 dark:text-green-400 font-bold">{item.statusText}</span>}
+                      {item.statusText === 'Reprovado no Conselho' && <span className="text-red-600 dark:text-red-400 font-bold">{item.statusText}</span>}
+                      {(item.statusText.startsWith('Retido') || item.statusText.startsWith('Reprovado por') || item.statusText === 'Reprovado') && <span className="text-red-600 dark:text-red-400">{item.statusText}</span>}
                       {item.statusText === 'Aguardando Fechamento' && <span className="text-gray-500 dark:text-slate-400">{item.statusText}</span>}
                     </td>
                     <td className="px-4 py-3 text-center align-middle">
@@ -819,7 +819,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                         <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
                           {item.aluno.nome}
                         </td>
-                        <td className="px-4 py-3 text-center align-middle font-bold text-green-600">
+                        <td className="px-4 py-3 text-center align-middle font-bold text-green-600 dark:text-green-400">
                           {item.nota.toFixed(1)}
                         </td>
                         <td className="px-4 py-3 text-center align-middle text-gray-600 dark:text-slate-300">
@@ -887,7 +887,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                     <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
                       {item.aluno.nome}
                     </td>
-                    <td className="px-4 py-3 text-center align-middle font-bold text-indigo-600">
+                    <td className="px-4 py-3 text-center align-middle font-bold text-indigo-600 dark:text-indigo-400">
                       {item.mediaGeral !== null ? item.mediaGeral.toFixed(2) : (
                         <span className="text-gray-400 dark:text-slate-500 font-normal italic text-xs">Sem notas registradas</span>
                       )}
