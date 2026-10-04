@@ -36,7 +36,7 @@ export const ConsolidacaoView: React.FC = () => {
   });
 
   return (
-    <div className="flex-1 bg-gray-50 flex flex-col h-full overflow-hidden">
+    <div className="flex-1 bg-gray-50 dark:bg-slate-900 flex flex-col h-full overflow-hidden">
       {selectedTurma ? (
         <DashboardTurma turma={selectedTurma} onBack={() => setSelectedTurma(null)} />
       ) : (
@@ -48,23 +48,23 @@ export const ConsolidacaoView: React.FC = () => {
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Painel de Inteligência Acadêmica</h2>
-                <p className="text-gray-500 text-sm font-medium">Selecione uma turma para acessar o painel de consolidação</p>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100 tracking-tight">Painel de Inteligência Acadêmica</h2>
+                <p className="text-gray-500 dark:text-slate-400 text-sm font-medium">Selecione uma turma para acessar o painel de consolidação</p>
               </div>
             </div>
           </div>
 
           {/* Barra de Filtros */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8 flex flex-wrap gap-4 items-end">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 mb-8 flex flex-wrap gap-4 items-end dark:text-slate-100">
             <div className="flex-1 min-w-[150px]">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Curso</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Curso</label>
               <select
                 value={selectedCursoId}
                 onChange={e => {
                   setSelectedCursoId(e.target.value);
                   setSelectedPeriodo('');
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               >
                 <option value="">Todos os Cursos</option>
                 {cursosDisponiveis.map(c => (
@@ -74,12 +74,12 @@ export const ConsolidacaoView: React.FC = () => {
             </div>
 
             <div className="flex-1 min-w-[150px]">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Período Letivo</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Período Letivo</label>
               <select
                 value={selectedPeriodo}
                 onChange={e => setSelectedPeriodo(e.target.value)}
                 disabled={!selectedCursoId}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:dark:bg-slate-800 dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 dark:text-slate-500 disabled:cursor-not-allowed"
               >
                 <option value="">Todos os Períodos</option>
                 {periodosDisponiveis.map(p => (
@@ -99,35 +99,35 @@ export const ConsolidacaoView: React.FC = () => {
                 <div 
                   key={turma.id} 
                   onClick={() => setSelectedTurma(turma)}
-                  className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer group flex flex-col h-full"
+                  className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer group flex flex-col h-full dark:text-slate-100"
                 >
                   {/* Top Row */}
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-3">
-                      <div className="bg-indigo-100 p-2.5 rounded-lg shrink-0 group-hover:bg-indigo-200 transition-colors">
+                      <div className="bg-indigo-100 dark:bg-indigo-900/40 p-2.5 rounded-lg shrink-0 group-hover:bg-indigo-200 transition-colors">
                         <Users className="w-5 h-5 text-indigo-600" />
                       </div>
                       <div className="flex flex-col">
-                        <h3 className="text-lg font-bold text-gray-800 leading-tight">{turma.nome}</h3>
+                        <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100 leading-tight">{turma.nome}</h3>
                       </div>
                     </div>
-                    <span className="bg-indigo-50 text-indigo-700 text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap shrink-0 border border-indigo-100">
+                    <span className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap shrink-0 border border-indigo-100">
                       {turma.anoLetivo || 'Sem Período'}
                     </span>
                   </div>
                   
                   {/* Course Name - Full Width */}
-                  <div className="w-full text-sm text-gray-500 mb-4">
+                  <div className="w-full text-sm text-gray-500 dark:text-slate-400 mb-4">
                     {curso?.nome || 'Curso Desconhecido'}
                   </div>
                   
                   {/* Middle Row */}
                   <div className="flex flex-col gap-2 mb-4">
                     <div className="flex items-center gap-2">
-                      <span className="w-[140px] flex justify-center bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-medium border border-gray-200">
+                      <span className="w-[140px] flex justify-center bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 text-xs px-2 py-1 rounded font-medium border border-gray-200 dark:border-slate-700">
                         Cód: {turma.codigo}
                       </span>
-                      <span className="bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded flex items-center gap-1 font-medium border border-blue-100">
+                      <span className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 text-xs px-2 py-1 rounded flex items-center gap-1 font-medium border border-blue-100">
                         👥 {qtdAlunos} Alunos
                       </span>
                     </div>
@@ -140,7 +140,7 @@ export const ConsolidacaoView: React.FC = () => {
                   
                   {/* Footer Button */}
                   <div className="mt-auto pt-3 border-t border-gray-100">
-                    <div className="w-full bg-indigo-50 text-indigo-700 group-hover:bg-indigo-100 font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm border border-indigo-100">
+                    <div className="w-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 group-hover:bg-indigo-100 dark:bg-indigo-900/40 font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm border border-indigo-100">
                       <Activity className="w-4 h-4" />
                       Acessar Painel
                     </div>
@@ -149,7 +149,7 @@ export const ConsolidacaoView: React.FC = () => {
               );
             })}
             {turmasFiltradas.length === 0 && (
-              <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">
+              <div className="col-span-full py-12 text-center text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 rounded-xl border border-dashed border-gray-300 dark:border-slate-600">
                 Nenhuma turma encontrada para os filtros selecionados.
               </div>
             )}
@@ -450,56 +450,56 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
 
   return (
     <div className="flex flex-col h-full">
-      <header className="bg-white border-b border-gray-200 px-6 pt-4 flex flex-col gap-4 shadow-sm shrink-0">
+      <header className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-6 pt-4 flex flex-col gap-4 shadow-sm shrink-0 dark:text-slate-100">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 text-gray-600 dark:text-slate-300 hover:text-indigo-600 transition-colors text-sm font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             Voltar
           </button>
           <span className="text-gray-300">|</span>
-          <h1 className="text-gray-800 font-semibold text-lg">Painel de Inteligência Acadêmica</h1>
-          <span className="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded font-bold ml-2">
+          <h1 className="text-gray-800 dark:text-slate-100 font-semibold text-lg">Painel de Inteligência Acadêmica</h1>
+          <span className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 text-xs px-2 py-1 rounded font-bold ml-2">
             {turma.codigo}
           </span>
         </div>
         
-        <div className="flex gap-6 border-b border-gray-200 overflow-x-auto">
+        <div className="flex gap-6 border-b border-gray-200 dark:border-slate-700 overflow-x-auto">
           <button 
             onClick={() => setActiveTab('mapa')} 
-            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'mapa' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'mapa' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:border-slate-600'}`}
           >
             Mapa Global
           </button>
           <button 
             onClick={() => setActiveTab('conselho')} 
-            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'conselho' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'conselho' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:border-slate-600'}`}
           >
             Conselho de Classe
           </button>
           <button 
             onClick={() => setActiveTab('estatisticas')} 
-            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'estatisticas' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'estatisticas' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:border-slate-600'}`}
           >
             Estatísticas
           </button>
           <button 
             onClick={() => setActiveTab('risco')} 
-            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'risco' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'risco' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:border-slate-600'}`}
           >
             Alerta de Risco
           </button>
           <button 
             onClick={() => setActiveTab('monitoria')} 
-            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'monitoria' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'monitoria' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:border-slate-600'}`}
           >
             Ranking de Monitoria
           </button>
           <button 
             onClick={() => setActiveTab('ranking')} 
-            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'ranking' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            className={`whitespace-nowrap px-2 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'ranking' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 hover:border-gray-300 dark:border-slate-600'}`}
           >
             Ranking Geral
           </button>
@@ -508,21 +508,21 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
 
       <main className="flex-1 p-6 overflow-hidden flex flex-col">
         {activeTab === 'mapa' && (
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm flex-1 overflow-auto">
+          <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm flex-1 overflow-auto dark:text-slate-100">
             <table className="w-full text-sm border-collapse">
-              <thead className="bg-gray-100 sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+              <thead className="bg-gray-100 dark:bg-slate-800 sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
                 <tr>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[200px] sticky left-0 bg-gray-100 z-20">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 border-r min-w-[200px] sticky left-0 bg-gray-100 dark:bg-slate-800 z-20">
                     Aluno
                   </th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[150px] sticky left-[200px] bg-gray-100 z-20">
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 border-r min-w-[150px] sticky left-[200px] bg-gray-100 dark:bg-slate-800 z-20">
                     Status Pé de Meia
                   </th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 border-r min-w-[150px] sticky left-[350px] bg-gray-100 z-20">
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 border-r min-w-[150px] sticky left-[350px] bg-gray-100 dark:bg-slate-800 z-20">
                     Situação
                   </th>
                   {disciplinas.map(d => (
-                    <th key={d.id} className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 min-w-[120px]">
+                    <th key={d.id} className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 min-w-[120px]">
                       <div className="truncate max-w-[150px]" title={d.nome}>{d.nome}</div>
                     </th>
                   ))}
@@ -530,20 +530,20 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {alunosProcessed.map(item => (
-                  <tr key={item.aluno.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-800 align-middle border-r sticky left-0 bg-white group-hover:bg-gray-50">
+                  <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
+                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-100 align-middle border-r sticky left-0 bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900">
                       {item.aluno.nome}
                     </td>
-                    <td className="px-4 py-3 text-center align-middle border-r sticky left-[200px] bg-white group-hover:bg-gray-50 font-bold">
-                      <span className={`px-2 py-1 rounded text-xs font-bold inline-block ${item.isPeDeMeiaApto ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
+                    <td className="px-4 py-3 text-center align-middle border-r sticky left-[200px] bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900 font-bold dark:text-slate-100">
+                      <span className={`px-2 py-1 rounded text-xs font-bold inline-block ${item.isPeDeMeiaApto ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
                         {item.isPeDeMeiaApto ? 'Apto' : 'Não Apto'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center align-middle border-r sticky left-[350px] bg-white group-hover:bg-gray-50 font-bold">
+                    <td className="px-4 py-3 text-center align-middle border-r sticky left-[350px] bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900 font-bold dark:text-slate-100">
                       <span className={`px-2 py-1 rounded text-xs font-bold inline-block
-                        ${item.statusText.includes('Aprovado') ? 'bg-emerald-100 text-emerald-800' :
+                        ${item.statusText.includes('Aprovado') ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800' :
                           item.statusText.includes('Retido') || item.statusText.includes('Reprovado') ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 text-gray-800'
+                          'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-100'
                         }`}>
                         {item.statusText}
                       </span>
@@ -559,7 +559,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                           ) : isConselho ? (
                             <div className="flex flex-col items-center justify-center">
                               <span className="text-blue-600 font-semibold">{nota.toFixed(1)}</span>
-                              <span className="text-xs text-gray-500 font-normal">({notaOrig?.toFixed(1)})</span>
+                              <span className="text-xs text-gray-500 dark:text-slate-400 font-normal">({notaOrig?.toFixed(1)})</span>
                             </div>
                           ) : (
                             <span className={nota >= 6.0 ? 'text-green-600' : 'text-red-600'}>
@@ -573,7 +573,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                 ))}
                 {alunosProcessed.length === 0 && (
                   <tr>
-                    <td colSpan={disciplinas.length + 1} className="py-12 text-center text-gray-500">
+                    <td colSpan={disciplinas.length + 1} className="py-12 text-center text-gray-500 dark:text-slate-400">
                       Nenhum dado para exibir.
                     </td>
                   </tr>
@@ -584,44 +584,44 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
         )}
 
         {activeTab === 'conselho' && (
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm flex-1 overflow-auto">
+          <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm flex-1 overflow-auto dark:text-slate-100">
             <table className="w-full text-sm border-collapse">
-              <thead className="bg-gray-100 sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+              <thead className="bg-gray-100 dark:bg-slate-800 sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
                 <tr>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700 border-b border-gray-200 w-1/4">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-1/4">
                     Aluno
                   </th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700 border-b border-gray-200 w-1/3">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-1/3">
                     Disciplinas Pendentes
                   </th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 w-1/5">
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-1/5">
                     Status no Conselho
                   </th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200">
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700">
                     Ação
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {conselhoAlunos.map(item => (
-                  <tr key={item.aluno.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-800 align-middle">
+                  <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
+                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-100 align-middle">
                       {item.aluno.nome}
                     </td>
                     <td className="px-4 py-3 align-middle">
                       {item.pendencias.length > 0 ? (
                         <div className="flex flex-col gap-1">
                           {item.pendencias.map(p => (
-                            <div key={p.disc.id} className="flex justify-between items-center text-sm bg-gray-50 border border-gray-100 rounded px-2 py-1">
-                              <span className="text-gray-600 truncate mr-2">{p.disc.nome}</span>
-                              <span className={`font-bold ${p.eligible ? 'text-gray-700' : 'text-red-500'}`}>{p.mediaStr}</span>
+                            <div key={p.disc.id} className="flex justify-between items-center text-sm bg-gray-50 dark:bg-slate-900 border border-gray-100 rounded px-2 py-1">
+                              <span className="text-gray-600 dark:text-slate-300 truncate mr-2">{p.disc.nome}</span>
+                              <span className={`font-bold ${p.eligible ? 'text-gray-700 dark:text-slate-300' : 'text-red-500'}`}>{p.mediaStr}</span>
                             </div>
                           ))}
                         </div>
                       ) : item.hasReprovacaoPorFalta ? (
                         <span className="text-red-500 font-medium">Reprovação por Faltas</span>
                       ) : item.cursandoCount > 0 ? (
-                        <span className="text-gray-400 italic">Diários em andamento...</span>
+                        <span className="text-gray-400 dark:text-slate-500 italic">Diários em andamento...</span>
                       ) : null}
                     </td>
                     <td className="px-4 py-3 text-center align-middle font-medium">
@@ -629,7 +629,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                       {item.statusText === 'Aprovado no Conselho' && <span className="text-green-600 font-bold">{item.statusText}</span>}
                       {item.statusText === 'Reprovado no Conselho' && <span className="text-red-600 font-bold">{item.statusText}</span>}
                       {(item.statusText.startsWith('Retido') || item.statusText.startsWith('Reprovado por') || item.statusText === 'Reprovado') && <span className="text-red-600">{item.statusText}</span>}
-                      {item.statusText === 'Aguardando Fechamento' && <span className="text-gray-500">{item.statusText}</span>}
+                      {item.statusText === 'Aguardando Fechamento' && <span className="text-gray-500 dark:text-slate-400">{item.statusText}</span>}
                     </td>
                     <td className="px-4 py-3 text-center align-middle">
                       {item.isEligible && item.conselhoDecision === null && (
@@ -651,7 +651,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                       {item.isEligible && item.conselhoDecision !== null && (
                         <button 
                           onClick={() => handleDesfazerDecisao(item.aluno.id!, item.pendencias)}
-                          className="text-gray-500 hover:text-gray-700 font-medium py-1.5 px-3 rounded-lg text-sm transition-colors flex items-center gap-1 mx-auto"
+                          className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 font-medium py-1.5 px-3 rounded-lg text-sm transition-colors flex items-center gap-1 mx-auto"
                         >
                           Desfazer
                         </button>
@@ -661,7 +661,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                 ))}
                 {conselhoAlunos.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-12 text-center text-gray-500">
+                    <td colSpan={4} className="py-12 text-center text-gray-500 dark:text-slate-400">
                       Nenhum aluno em dependência nesta turma.
                     </td>
                   </tr>
@@ -673,64 +673,64 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
 
         {activeTab === 'estatisticas' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center items-center text-center">
-              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 flex flex-col justify-center items-center text-center dark:text-slate-100">
+              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-full flex items-center justify-center mb-4">
                 <Users className="w-6 h-6" />
               </div>
-              <h3 className="text-gray-500 font-medium text-sm mb-1">Total de Alunos</h3>
-              <p className="text-3xl font-bold text-gray-800">{alunos.length}</p>
+              <h3 className="text-gray-500 dark:text-slate-400 font-medium text-sm mb-1">Total de Alunos</h3>
+              <p className="text-3xl font-bold text-gray-800 dark:text-slate-100">{alunos.length}</p>
             </div>
             
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center items-center text-center">
-              <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-4">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 flex flex-col justify-center items-center text-center dark:text-slate-100">
+              <div className="w-12 h-12 bg-green-50 dark:bg-green-900/20 text-green-600 rounded-full flex items-center justify-center mb-4">
                 <BarChart2 className="w-6 h-6" />
               </div>
-              <h3 className="text-gray-500 font-medium text-sm mb-1">Taxa de Sucesso (Notas Azuis)</h3>
-              <p className="text-3xl font-bold text-gray-800">
+              <h3 className="text-gray-500 dark:text-slate-400 font-medium text-sm mb-1">Taxa de Sucesso (Notas Azuis)</h3>
+              <p className="text-3xl font-bold text-gray-800 dark:text-slate-100">
                 {taxaSucesso.toFixed(1)}%
               </p>
-              <p className="text-xs text-gray-400 mt-1">Das notas fechadas</p>
+              <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Das notas fechadas</p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center items-center text-center">
-              <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-4">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 flex flex-col justify-center items-center text-center dark:text-slate-100">
+              <div className="w-12 h-12 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-full flex items-center justify-center mb-4">
                 <Scale className="w-6 h-6" />
               </div>
-              <h3 className="text-gray-500 font-medium text-sm mb-1">Disciplina Crítica</h3>
-              <p className="text-xl font-bold text-gray-800 line-clamp-2">
+              <h3 className="text-gray-500 dark:text-slate-400 font-medium text-sm mb-1">Disciplina Crítica</h3>
+              <p className="text-xl font-bold text-gray-800 dark:text-slate-100 line-clamp-2">
                 {discCriticaName}
               </p>
-              <p className="text-xs text-gray-400 mt-1">Menor média da turma</p>
+              <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Menor média da turma</p>
             </div>
           </div>
         )}
 
         {activeTab === 'risco' && (
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm flex-1 overflow-auto">
+          <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm flex-1 overflow-auto dark:text-slate-100">
             <table className="w-full text-sm border-collapse">
-              <thead className="bg-gray-100 sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+              <thead className="bg-gray-100 dark:bg-slate-800 sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
                 <tr>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700 border-b border-gray-200 w-1/4">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-1/4">
                     Aluno
                   </th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700 border-b border-gray-200">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700">
                     Disciplinas em Situação de Risco
                   </th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 w-1/5">
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-1/5">
                     Nível de Risco Global
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {alunosRisco.map(item => (
-                  <tr key={item.aluno.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-800 align-middle">
+                  <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
+                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-100 align-middle">
                       {item.aluno.nome}
                     </td>
                     <td className="px-4 py-3 align-middle">
                       <div className="flex flex-col gap-1">
                         {item.disciplinasRisco.map(d => (
-                          <div key={d.disc.id} className="flex justify-between items-center text-sm bg-red-50 border border-red-100 rounded px-2 py-1">
+                          <div key={d.disc.id} className="flex justify-between items-center text-sm bg-red-50 dark:bg-red-900/20 border border-red-100 rounded px-2 py-1">
                             <span className="text-red-800 truncate mr-2 font-medium">{d.disc.nome}</span>
                             <span className={`font-bold ${d.percent >= 1.0 ? 'text-red-700' : 'text-red-500'}`}>
                               {d.faltasTot} faltas
@@ -745,7 +745,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                           <AlertTriangle className="w-4 h-4" /> Muito Alto
                         </span>
                       ) : (
-                        <span className="text-orange-600 bg-orange-100 px-3 py-1 rounded-full flex items-center justify-center gap-1 w-fit mx-auto">
+                        <span className="text-orange-600 bg-orange-100 dark:bg-orange-900/40 px-3 py-1 rounded-full flex items-center justify-center gap-1 w-fit mx-auto">
                           <AlertTriangle className="w-4 h-4" /> Alto
                         </span>
                       )}
@@ -754,7 +754,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                 ))}
                 {alunosRisco.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="py-12 text-center text-gray-500">
+                    <td colSpan={3} className="py-12 text-center text-gray-500 dark:text-slate-400">
                       Nenhum aluno em situação crítica de faltas simultâneas nesta turma.
                     </td>
                   </tr>
@@ -765,13 +765,13 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
         )}
 
         {activeTab === 'monitoria' && (
-          <div className="flex flex-col h-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
-              <span className="text-gray-700 font-semibold">Ranking de Desempenho</span>
+          <div className="flex flex-col h-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden dark:text-slate-100">
+            <div className="p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 flex items-center justify-between">
+              <span className="text-gray-700 dark:text-slate-300 font-semibold">Ranking de Desempenho</span>
               <select
                 value={monitoriaDiscId}
                 onChange={e => setMonitoriaDiscId(e.target.value ? Number(e.target.value) : '')}
-                className="block w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-3 border"
+                className="block w-64 rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-3 border"
               >
                 <option value="">-- Selecione uma Disciplina --</option>
                 {disciplinas.map(d => (
@@ -782,54 +782,54 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
 
             <div className="flex-1 overflow-auto">
               {!monitoriaDiscId ? (
-                <div className="flex flex-col items-center justify-center h-full text-gray-500 space-y-4 p-12">
+                <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-slate-400 space-y-4 p-12">
                   <Award className="w-16 h-16 text-gray-300" />
                   <p className="text-lg">Selecione uma disciplina acima para gerar o ranking.</p>
                 </div>
               ) : (
                 <table className="w-full text-sm border-collapse">
-                  <thead className="bg-gray-100 sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                  <thead className="bg-gray-100 dark:bg-slate-800 sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
                     <tr>
-                      <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 w-24">
+                      <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-24">
                         Colocação
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-gray-700 border-b border-gray-200">
+                      <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700">
                         Aluno
                       </th>
-                      <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 w-1/4">
+                      <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-1/4">
                         Média Obtida
                       </th>
-                      <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 w-1/4">
+                      <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-1/4">
                         Faltas
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {rankingMonitoria.map((item, index) => (
-                      <tr key={item.aluno.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
                         <td className="px-4 py-3 text-center align-middle">
                           {index === 0 ? (
                             <span className="flex items-center justify-center text-yellow-500 font-bold">
                               <Award className="w-5 h-5 mr-1" /> 1º
                             </span>
                           ) : (
-                            <span className="font-bold text-gray-500">{index + 1}º</span>
+                            <span className="font-bold text-gray-500 dark:text-slate-400">{index + 1}º</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 font-medium text-gray-800 align-middle">
+                        <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-100 align-middle">
                           {item.aluno.nome}
                         </td>
                         <td className="px-4 py-3 text-center align-middle font-bold text-green-600">
                           {item.nota.toFixed(1)}
                         </td>
-                        <td className="px-4 py-3 text-center align-middle text-gray-600">
+                        <td className="px-4 py-3 text-center align-middle text-gray-600 dark:text-slate-300">
                           {item.faltas}
                         </td>
                       </tr>
                     ))}
                     {rankingMonitoria.length === 0 && (
                       <tr>
-                        <td colSpan={4} className="py-12 text-center text-gray-500">
+                        <td colSpan={4} className="py-12 text-center text-gray-500 dark:text-slate-400">
                           Nenhum dado registrado para esta disciplina.
                         </td>
                       </tr>
@@ -842,27 +842,27 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
         )}
 
         {activeTab === 'ranking' && (
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm flex-1 overflow-auto">
+          <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm flex-1 overflow-auto dark:text-slate-100">
             <table className="w-full text-sm border-collapse">
-              <thead className="bg-gray-100 sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+              <thead className="bg-gray-100 dark:bg-slate-800 sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
                 <tr>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 w-24">
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-24">
                     Posição
                   </th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700 border-b border-gray-200">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700">
                     Aluno
                   </th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 w-1/4">
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-1/4">
                     Média Geral
                   </th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700 border-b border-gray-200 w-1/4">
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-1/4">
                     Disciplinas Contabilizadas
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {rankingGeral.map((item, index) => (
-                  <tr key={item.aluno.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
                     <td className="px-4 py-3 text-center align-middle">
                       {item.mediaGeral !== null ? (
                         index === 0 ? (
@@ -870,7 +870,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                             <Award className="w-5 h-5 mr-1" /> 1º
                           </span>
                         ) : index === 1 ? (
-                          <span className="flex items-center justify-center text-gray-400 font-bold">
+                          <span className="flex items-center justify-center text-gray-400 dark:text-slate-500 font-bold">
                             <Award className="w-5 h-5 mr-1" /> 2º
                           </span>
                         ) : index === 2 ? (
@@ -878,28 +878,28 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                             <Award className="w-5 h-5 mr-1" /> 3º
                           </span>
                         ) : (
-                          <span className="font-bold text-gray-500">{index + 1}º</span>
+                          <span className="font-bold text-gray-500 dark:text-slate-400">{index + 1}º</span>
                         )
                       ) : (
                         <span className="text-gray-300">-</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-800 align-middle">
+                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-100 align-middle">
                       {item.aluno.nome}
                     </td>
                     <td className="px-4 py-3 text-center align-middle font-bold text-indigo-600">
                       {item.mediaGeral !== null ? item.mediaGeral.toFixed(2) : (
-                        <span className="text-gray-400 font-normal italic text-xs">Sem notas registradas</span>
+                        <span className="text-gray-400 dark:text-slate-500 font-normal italic text-xs">Sem notas registradas</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-center align-middle text-gray-600">
+                    <td className="px-4 py-3 text-center align-middle text-gray-600 dark:text-slate-300">
                       {item.qtdDisciplinasValidas} de {disciplinas.length}
                     </td>
                   </tr>
                 ))}
                 {rankingGeral.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-12 text-center text-gray-500">
+                    <td colSpan={4} className="py-12 text-center text-gray-500 dark:text-slate-400">
                       Nenhum aluno registrado.
                     </td>
                   </tr>

@@ -7,8 +7,12 @@ import { registerSW } from 'virtual:pwa-register'
 
 registerSW({ immediate: true })
 
+import { ThemeProvider } from './components/ThemeContext'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
   </StrictMode>,
 )

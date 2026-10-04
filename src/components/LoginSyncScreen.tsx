@@ -38,14 +38,14 @@ export const LoginSyncScreen: React.FC<Props> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 space-y-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8 space-y-4 dark:text-slate-100">
         <div className="text-center mb-4">
           <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
             <User className="text-blue-600 w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800">Perfil e Sincronização</h2>
-          <p className="text-gray-500 mt-1">Gerencie sua conta e sincronize dados</p>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100">Perfil e Sincronização</h2>
+          <p className="text-gray-500 dark:text-slate-400 mt-1">Gerencie sua conta e sincronize dados</p>
         </div>
 
         {!isLoggedIn ? (
@@ -58,7 +58,7 @@ export const LoginSyncScreen: React.FC<Props> = ({ onLoginSuccess }) => {
           </button>
         ) : (
           <div className="space-y-4">
-            <div className="bg-green-50 text-green-700 p-4 rounded-lg flex items-center gap-3">
+            <div className="bg-green-50 dark:bg-green-900/20 text-green-700 p-4 rounded-lg flex items-center gap-3">
               <CheckCircle className="w-5 h-5" />
               <div>
                 <p className="font-medium">Usuário Autenticado</p>
@@ -71,7 +71,7 @@ export const LoginSyncScreen: React.FC<Props> = ({ onLoginSuccess }) => {
               disabled={syncStatus === 'syncing'}
               className={`w-full font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors ${
                 syncStatus === 'syncing'
-                  ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                  ? 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 cursor-not-allowed'
                   : 'bg-indigo-600 hover:bg-indigo-700 text-white'
               }`}
             >
@@ -90,11 +90,11 @@ export const LoginSyncScreen: React.FC<Props> = ({ onLoginSuccess }) => {
               </p>
             )}
 
-            <hr className="border-gray-200" />
+            <hr className="border-gray-200 dark:border-slate-700" />
 
             <button
               onClick={handleLogout}
-              className="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+              className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-900 text-gray-700 dark:text-slate-300 font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
             >
               <LogOut className="w-5 h-5" />
               Sair da Conta

@@ -86,13 +86,13 @@ export async function seedDatabase() {
         if (periodo === '2026') etapasParaPreencher = 2; // Integrado 2026: Meio de ano
         if (periodo === '2026/1') etapasParaPreencher = 1; // Subsequente 2026/1: Meio de semestre
 
-        // Cadastrar 10 alunos
-        for (let i = 1; i <= 10; i++) {
+        // Cadastrar 250 alunos (Stress Test)
+        for (let i = 1; i <= 250; i++) {
           let perfil = 'A';
-          if (i === 7) perfil = 'B';
-          else if (i === 8) perfil = 'C';
-          else if (i === 9) perfil = 'D';
-          else if (i === 10) perfil = 'E';
+          if (i % 10 === 7) perfil = 'B';
+          else if (i % 10 === 8) perfil = 'C';
+          else if (i % 10 === 9) perfil = 'D';
+          else if (i % 10 === 0) perfil = 'E';
 
           const alunoId = await db.alunos.add({
             turmaId: turmaId as number,

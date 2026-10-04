@@ -21,11 +21,11 @@ interface RowData {
 type ImportStatus = 'idle' | 'loading' | 'preview' | 'saving' | 'success' | 'error';
 
 const SITUACAO_LABELS: Record<Situacao, { label: string; color: string }> = {
-  APR: { label: 'Aprovado', color: 'text-green-700 bg-green-100' },
+  APR: { label: 'Aprovado', color: 'text-green-700 bg-green-100 dark:bg-green-900/40' },
   CUR: { label: 'Em Curso', color: 'text-blue-700 bg-blue-100' },
   PF:  { label: 'Prova Final', color: 'text-yellow-700 bg-yellow-100' },
   REP: { label: 'Reprovado', color: 'text-red-700 bg-red-100' },
-  '-': { label: '-', color: 'text-gray-500 bg-gray-100' },
+  '-': { label: '-', color: 'text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-800' },
 };
 
 function parseSituacao(raw: string): Situacao {
@@ -233,12 +233,12 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
     <div className="max-w-5xl mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="bg-indigo-100 p-2 rounded-lg">
+        <div className="bg-indigo-100 dark:bg-indigo-900/40 p-2 rounded-lg">
           <FileSpreadsheet className="w-6 h-6 text-indigo-600" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-gray-800">Importador SUAP</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">Importador SUAP</h2>
+          <p className="text-sm text-gray-500 dark:text-slate-400">
             Importe planilhas CSV/XLSX exportadas do SUAP
           </p>
         </div>
@@ -253,8 +253,8 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
             onDrop={handleDrop}
             className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer ${
               isDragOver
-                ? 'border-indigo-400 bg-indigo-50'
-                : 'border-gray-300 bg-gray-50 hover:border-indigo-300 hover:bg-indigo-50'
+                ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30'
+                : 'border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 hover:border-indigo-300 hover:bg-indigo-50 dark:bg-indigo-900/30'
             }`}
           >
             <input
@@ -266,17 +266,17 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
             />
             <label htmlFor="file-upload" className="cursor-pointer block">
               <Upload
-                className={`w-12 h-12 mx-auto mb-4 ${isDragOver ? 'text-indigo-500' : 'text-gray-400'}`}
+                className={`w-12 h-12 mx-auto mb-4 ${isDragOver ? 'text-indigo-500' : 'text-gray-400 dark:text-slate-500'}`}
               />
-              <p className="text-lg font-medium text-gray-700">
+              <p className="text-lg font-medium text-gray-700 dark:text-slate-300">
                 {isDragOver ? 'Solte o arquivo aqui' : 'Arraste ou clique para selecionar'}
               </p>
-              <p className="text-sm text-gray-400 mt-1">CSV, XLSX ou XLS exportado do SUAP</p>
+              <p className="text-sm text-gray-400 dark:text-slate-500 mt-1">CSV, XLSX ou XLS exportado do SUAP</p>
             </label>
           </div>
 
           {status === 'error' && (
-            <div className="flex items-start gap-3 bg-red-50 text-red-700 border border-red-200 rounded-lg p-4">
+            <div className="flex items-start gap-3 bg-red-50 dark:bg-red-900/20 text-red-700 border border-red-200 rounded-lg p-4">
               <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
               <p className="text-sm">{errorMsg}</p>
             </div>
@@ -288,28 +288,28 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
       {status === 'loading' && (
         <div className="flex flex-col items-center justify-center py-16 gap-4">
           <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
-          <p className="text-gray-600">Lendo o arquivo...</p>
+          <p className="text-gray-600 dark:text-slate-300">Lendo o arquivo...</p>
         </div>
       )}
 
       {/* Preview */}
       {status === 'preview' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+          <div className="flex items-center justify-between bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 rounded-lg p-4">
             <div className="flex items-center gap-2 text-indigo-700">
               <CheckCircle className="w-5 h-5" />
               <span className="font-medium">{rows.length} registros detectados</span>
             </div>
-            <button onClick={handleReset} className="text-gray-400 hover:text-gray-600">
+            <button onClick={handleReset} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300">
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Preview Table */}
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden dark:text-slate-100">
             <button
               onClick={() => setShowPreview((v) => !v)}
-              className="w-full flex items-center justify-between px-5 py-3 bg-gray-50 hover:bg-gray-100 transition-colors text-sm font-medium text-gray-700"
+              className="w-full flex items-center justify-between px-5 py-3 bg-gray-50 dark:bg-slate-900 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-sm font-medium text-gray-700 dark:text-slate-300"
             >
               Pré-visualização dos dados
               {showPreview ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -318,10 +318,10 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
             {showPreview && (
               <div className="overflow-x-auto max-h-96">
                 <table className="min-w-full text-sm">
-                  <thead className="bg-gray-50 sticky top-0">
+                  <thead className="bg-gray-50 dark:bg-slate-900 sticky top-0">
                     <tr>
                       {['Aluno', 'Matrícula', 'Turma', 'Disciplina', 'N1', 'N2', 'N3', 'N4', 'NF', 'Faltas', 'Situação'].map((h) => (
-                        <th key={h} className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">
+                        <th key={h} className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wide whitespace-nowrap">
                           {h}
                         </th>
                       ))}
@@ -331,11 +331,11 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
                     {rows.map((r, i) => {
                       const sit = SITUACAO_LABELS[r.situacao];
                       return (
-                        <tr key={i} className="hover:bg-gray-50">
-                          <td className="px-4 py-2 font-medium text-gray-800 whitespace-nowrap">{r.nome}</td>
-                          <td className="px-4 py-2 text-gray-500">{r.matricula}</td>
-                          <td className="px-4 py-2 text-gray-500 whitespace-nowrap">{r.turma}</td>
-                          <td className="px-4 py-2 text-gray-600 whitespace-nowrap">{r.disciplina}</td>
+                        <tr key={i} className="hover:bg-gray-50 dark:hover:bg-slate-900">
+                          <td className="px-4 py-2 font-medium text-gray-800 dark:text-slate-100 whitespace-nowrap">{r.nome}</td>
+                          <td className="px-4 py-2 text-gray-500 dark:text-slate-400">{r.matricula}</td>
+                          <td className="px-4 py-2 text-gray-500 dark:text-slate-400 whitespace-nowrap">{r.turma}</td>
+                          <td className="px-4 py-2 text-gray-600 dark:text-slate-300 whitespace-nowrap">{r.disciplina}</td>
                           <td className="px-4 py-2 text-center">{r.nota1 ?? '-'}</td>
                           <td className="px-4 py-2 text-center">{r.nota2 ?? '-'}</td>
                           <td className="px-4 py-2 text-center">{r.nota3 ?? '-'}</td>
@@ -366,7 +366,7 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
             </button>
             <button
               onClick={handleReset}
-              className="px-5 py-3 border border-gray-300 hover:bg-gray-50 rounded-lg text-gray-600 transition-colors"
+              className="px-5 py-3 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-900 rounded-lg text-gray-600 dark:text-slate-300 transition-colors"
             >
               Cancelar
             </button>
@@ -378,19 +378,19 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
       {status === 'saving' && (
         <div className="flex flex-col items-center justify-center py-16 gap-4">
           <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
-          <p className="text-gray-600">Salvando dados no banco local...</p>
+          <p className="text-gray-600 dark:text-slate-300">Salvando dados no banco local...</p>
         </div>
       )}
 
       {/* Success */}
       {status === 'success' && (
         <div className="flex flex-col items-center py-12 gap-5">
-          <div className="bg-green-100 rounded-full p-4">
+          <div className="bg-green-100 dark:bg-green-900/40 rounded-full p-4">
             <CheckCircle className="w-12 h-12 text-green-600" />
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-gray-800">Importação concluída!</p>
-            <p className="text-gray-500 mt-1">
+            <p className="text-xl font-bold text-gray-800 dark:text-slate-100">Importação concluída!</p>
+            <p className="text-gray-500 dark:text-slate-400 mt-1">
               {savedCount} registros foram salvos com sucesso no banco local.
             </p>
           </div>

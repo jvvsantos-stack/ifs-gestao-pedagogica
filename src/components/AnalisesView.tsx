@@ -15,19 +15,19 @@ interface KPICardProps {
 }
 
 const KPICard = ({ title, value, icon, trendText, trendDir, trendColor, iconBg }: KPICardProps) => (
-  <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between gap-4 transition-all hover:shadow-md">
+  <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between gap-4 transition-all hover:shadow-md dark:text-slate-100">
     <div className="flex justify-between items-start">
       <div className={`p-3 rounded-xl ${iconBg}`}>
         {icon}
       </div>
-      <div className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full ${trendColor === 'green' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+      <div className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full ${trendColor === 'green' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600' : 'bg-red-50 dark:bg-red-900/20 text-red-600'}`}>
         {trendDir === 'up' ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
         {trendText}
       </div>
     </div>
     <div>
-      <h3 className="text-2xl font-black text-gray-800">{value}</h3>
-      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">{title}</p>
+      <h3 className="text-2xl font-black text-gray-800 dark:text-slate-100">{value}</h3>
+      <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mt-0.5">{title}</p>
     </div>
   </div>
 );
@@ -250,8 +250,8 @@ export const AnalisesView: React.FC = () => {
 
   if (!analisesData) {
     return (
-      <div className="flex-1 flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="flex flex-col items-center text-gray-500">
+      <div className="flex-1 flex items-center justify-center min-h-screen bg-gray-50 dark:bg-slate-900">
+        <div className="flex flex-col items-center text-gray-500 dark:text-slate-400">
           <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
           <p>Processando Inteligência Pedagógica...</p>
         </div>
@@ -260,7 +260,7 @@ export const AnalisesView: React.FC = () => {
   }
 
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen">
+    <div className="flex-1 bg-gray-50 dark:bg-slate-900 min-h-screen">
       <main className="max-w-[1400px] mx-auto p-6">
         
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
@@ -269,21 +269,21 @@ export const AnalisesView: React.FC = () => {
               <BarChart3 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Inteligência Pedagógica</h2>
-              <p className="text-gray-500 text-sm font-medium">Painel de Monitoramento Acadêmico Inteligente</p>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100 tracking-tight">Inteligência Pedagógica</h2>
+              <p className="text-gray-500 dark:text-slate-400 text-sm font-medium">Painel de Monitoramento Acadêmico Inteligente</p>
             </div>
           </div>
         </div>
 
         {/* Barra de Filtros Global */}
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-wrap items-center gap-4 mb-6">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 flex flex-wrap items-center gap-4 mb-6 dark:text-slate-100">
           <div className="flex items-center gap-2 text-indigo-600 mr-2">
             <Filter className="w-5 h-5" />
             <span className="font-bold text-sm">Filtros Globais:</span>
           </div>
           
-          <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors">
-            <span className="text-[11px] font-bold text-gray-500 uppercase">Curso</span>
+          <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-indigo-300 transition-colors">
+            <span className="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase">Curso</span>
             <select 
               value={cursoFiltro} 
               onChange={e => {
@@ -292,15 +292,15 @@ export const AnalisesView: React.FC = () => {
                 setPeriodoFiltro('todos');
                 setTurmaFiltro('todas');
               }} 
-              className="text-sm font-bold text-gray-800 bg-transparent outline-none cursor-pointer max-w-[150px] truncate"
+              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent outline-none cursor-pointer max-w-[150px] truncate"
             >
               <option value="todos">Todos</option>
               {analisesData.cursosDisponiveis.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
             </select>
           </div>
 
-          <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors">
-            <span className="text-[11px] font-bold text-gray-500 uppercase">Modalidade</span>
+          <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-indigo-300 transition-colors">
+            <span className="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase">Modalidade</span>
             <select 
               value={analisesData.lockedModalidade || modalidadeFiltro} 
               onChange={e => {
@@ -309,34 +309,34 @@ export const AnalisesView: React.FC = () => {
                 setTurmaFiltro('todas');
               }} 
               disabled={!!analisesData.lockedModalidade}
-              className="text-sm font-bold text-gray-800 bg-transparent outline-none cursor-pointer disabled:opacity-60"
+              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent outline-none cursor-pointer disabled:opacity-60"
             >
               <option value="todas">Todas</option>
               {analisesData.modalidadesDisponiveis.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
 
-          <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors">
-            <span className="text-[11px] font-bold text-gray-500 uppercase">Período</span>
+          <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-indigo-300 transition-colors">
+            <span className="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase">Período</span>
             <select 
               value={periodoFiltro} 
               onChange={e => {
                 setPeriodoFiltro(e.target.value);
                 setTurmaFiltro('todas');
               }} 
-              className="text-sm font-bold text-gray-800 bg-transparent outline-none cursor-pointer"
+              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent outline-none cursor-pointer"
             >
               <option value="todos">Todos</option>
               {analisesData.periodosDisponiveis.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
 
-          <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-indigo-300 transition-colors">
-            <span className="text-[11px] font-bold text-gray-500 uppercase">Turma</span>
+          <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 hover:border-indigo-300 transition-colors">
+            <span className="text-[11px] font-bold text-gray-500 dark:text-slate-400 uppercase">Turma</span>
             <select 
               value={turmaFiltro} 
               onChange={e => setTurmaFiltro(e.target.value)} 
-              className="text-sm font-bold text-gray-800 bg-transparent outline-none cursor-pointer max-w-[120px] truncate"
+              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent outline-none cursor-pointer max-w-[120px] truncate"
             >
               <option value="todas">Todas</option>
               {analisesData.turmasDisponiveis.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -350,7 +350,7 @@ export const AnalisesView: React.FC = () => {
             title="Total de Alunos" 
             value={analisesData.totalAlunos.toString()} 
             icon={<Users className="w-5 h-5"/>} 
-            trendText="1.2%" trendDir="up" trendColor="green" iconBg="bg-blue-50 text-blue-600" 
+            trendText="1.2%" trendDir="up" trendColor="green" iconBg="bg-blue-50 dark:bg-blue-900/20 text-blue-600" 
           />
           <KPICard 
             title="Média Institucional" 
@@ -362,19 +362,19 @@ export const AnalisesView: React.FC = () => {
             title="Taxa de Aprovação" 
             value={`${analisesData.taxaAprovacao.toFixed(1)}%`} 
             icon={<Percent className="w-5 h-5"/>} 
-            trendText="2.1%" trendDir="up" trendColor="green" iconBg="bg-emerald-50 text-emerald-600" 
+            trendText="2.1%" trendDir="up" trendColor="green" iconBg="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600" 
           />
           <KPICard 
             title="Taxa de Evasão" 
             value={`${analisesData.taxaEvasao.toFixed(1)}%`} 
             icon={<TrendingDown className="w-5 h-5"/>} 
-            trendText="0.5%" trendDir="down" trendColor="green" iconBg="bg-orange-50 text-orange-600" 
+            trendText="0.5%" trendDir="down" trendColor="green" iconBg="bg-orange-50 dark:bg-orange-900/20 text-orange-600" 
           />
           <KPICard 
             title="Reprovações p/ Falta" 
             value={`${analisesData.taxaReprovacaoFalta.toFixed(1)}%`} 
             icon={<AlertTriangle className="w-5 h-5"/>} 
-            trendText="1.2%" trendDir="down" trendColor="green" iconBg="bg-red-50 text-red-600" 
+            trendText="1.2%" trendDir="down" trendColor="green" iconBg="bg-red-50 dark:bg-red-900/20 text-red-600" 
           />
         </div>
 
@@ -383,26 +383,26 @@ export const AnalisesView: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           
           {/* Top 5 Gargalos */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[320px]">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[320px] dark:text-slate-100">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-50 rounded-lg text-red-500"><TrendingDown className="w-4 h-4"/></div>
-                <h3 className="text-[15px] font-bold text-gray-800">Top 5 Gargalos</h3>
+                <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-500"><TrendingDown className="w-4 h-4"/></div>
+                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-100">Top 5 Gargalos</h3>
               </div>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-1 rounded">Menores Médias</span>
+              <span className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest bg-gray-50 dark:bg-slate-900 px-2 py-1 rounded">Menores Médias</span>
             </div>
             
             <div className="flex-1 flex flex-col justify-evenly">
               {analisesData.gargalos.length === 0 ? (
-                <div className="text-center text-sm text-gray-400">Dados insuficientes.</div>
+                <div className="text-center text-sm text-gray-400 dark:text-slate-500">Dados insuficientes.</div>
               ) : (
                 analisesData.gargalos.map(g => (
                   <div key={g.nome} className="group">
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="font-semibold text-gray-700 truncate max-w-[200px]" title={g.nome}>{g.nome}</span>
+                      <span className="font-semibold text-gray-700 dark:text-slate-300 truncate max-w-[200px]" title={g.nome}>{g.nome}</span>
                       <span className="font-black text-red-500">{g.media.toFixed(1)}</span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-gray-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
                       <div className="bg-red-400 h-1.5 rounded-full transition-all group-hover:bg-red-500" style={{width: `${(g.media/10)*100}%`}}></div>
                     </div>
                   </div>
@@ -412,26 +412,26 @@ export const AnalisesView: React.FC = () => {
           </div>
 
           {/* Top 5 Melhores Disciplinas */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[320px]">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[320px] dark:text-slate-100">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-500"><TrendingUp className="w-4 h-4"/></div>
-                <h3 className="text-[15px] font-bold text-gray-800">Top 5 Melhores</h3>
+                <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg text-emerald-500"><TrendingUp className="w-4 h-4"/></div>
+                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-100">Top 5 Melhores</h3>
               </div>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-1 rounded">Maiores Médias</span>
+              <span className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest bg-gray-50 dark:bg-slate-900 px-2 py-1 rounded">Maiores Médias</span>
             </div>
             
             <div className="flex-1 flex flex-col justify-evenly">
               {analisesData.melhoresDisciplinas.length === 0 ? (
-                <div className="text-center text-sm text-gray-400">Dados insuficientes.</div>
+                <div className="text-center text-sm text-gray-400 dark:text-slate-500">Dados insuficientes.</div>
               ) : (
                 analisesData.melhoresDisciplinas.map(g => (
                   <div key={g.nome} className="group">
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="font-semibold text-gray-700 truncate max-w-[200px]" title={g.nome}>{g.nome}</span>
+                      <span className="font-semibold text-gray-700 dark:text-slate-300 truncate max-w-[200px]" title={g.nome}>{g.nome}</span>
                       <span className="font-black text-emerald-500">{g.media.toFixed(1)}</span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-gray-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
                       <div className="bg-emerald-400 h-1.5 rounded-full transition-all group-hover:bg-emerald-500" style={{width: `${(g.media/10)*100}%`}}></div>
                     </div>
                   </div>
@@ -441,16 +441,16 @@ export const AnalisesView: React.FC = () => {
           </div>
 
           {/* Risco Acadêmico */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[320px]">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[320px] dark:text-slate-100">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-50 rounded-lg text-amber-600"><AlertTriangle className="w-4 h-4"/></div>
-                <h3 className="text-[15px] font-bold text-gray-800">Risco Acadêmico</h3>
+                <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-600"><AlertTriangle className="w-4 h-4"/></div>
+                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-100">Risco Acadêmico</h3>
               </div>
             </div>
             <div className="overflow-auto flex-1 pr-1 custom-scrollbar">
               <table className="w-full text-left text-xs">
-                <thead className="bg-gray-50 text-gray-500 sticky top-0">
+                <thead className="bg-gray-50 dark:bg-slate-900 text-gray-500 dark:text-slate-400 sticky top-0">
                   <tr>
                     <th className="py-2 px-3 font-semibold rounded-l-lg">Aluno</th>
                     <th className="py-2 px-3 font-semibold">Turma</th>
@@ -459,9 +459,9 @@ export const AnalisesView: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {analisesData.riscoList.map(r => (
-                    <tr key={r.nome} className="hover:bg-gray-50 transition-colors">
-                      <td className="py-2.5 px-3 font-bold text-gray-700 truncate max-w-[120px]">{r.nome}</td>
-                      <td className="py-2.5 px-3 text-gray-500 truncate max-w-[80px]">{r.turma}</td>
+                    <tr key={r.nome} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
+                      <td className="py-2.5 px-3 font-bold text-gray-700 dark:text-slate-300 truncate max-w-[120px]">{r.nome}</td>
+                      <td className="py-2.5 px-3 text-gray-500 dark:text-slate-400 truncate max-w-[80px]">{r.turma}</td>
                       <td className="py-2.5 px-3 text-center">
                         <span className="bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-full text-[10px]">{r.disciplinasAbaixo}</span>
                       </td>
@@ -469,7 +469,7 @@ export const AnalisesView: React.FC = () => {
                   ))}
                 </tbody>
               </table>
-              {analisesData.riscoList.length === 0 && <div className="text-center text-sm text-gray-400 py-8">Nenhum aluno em risco crítico.</div>}
+              {analisesData.riscoList.length === 0 && <div className="text-center text-sm text-gray-400 dark:text-slate-500 py-8">Nenhum aluno em risco crítico.</div>}
             </div>
           </div>
         </div>
@@ -478,16 +478,16 @@ export const AnalisesView: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* Desempenho por Etapa (Line Chart) */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[350px]">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[350px] dark:text-slate-100">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-indigo-50 rounded-lg text-indigo-500"><Activity className="w-4 h-4"/></div>
-                <h3 className="text-[15px] font-bold text-gray-800">Desempenho por Etapa</h3>
+                <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-500"><Activity className="w-4 h-4"/></div>
+                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-100">Desempenho por Etapa</h3>
               </div>
             </div>
             <div className="flex-1 mt-2">
               {analisesData.desempenhoEtapas.length === 0 ? (
-                <div className="text-center text-sm text-gray-400 w-full h-full flex items-center justify-center">Sem dados.</div>
+                <div className="text-center text-sm text-gray-400 dark:text-slate-500 w-full h-full flex items-center justify-center">Sem dados.</div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={analisesData.desempenhoEtapas} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
@@ -507,11 +507,11 @@ export const AnalisesView: React.FC = () => {
           </div>
 
           {/* Distribuição de Notas (Bar Chart) */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[350px]">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[350px] dark:text-slate-100">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-50 rounded-lg text-blue-500"><BarChart3 className="w-4 h-4"/></div>
-                <h3 className="text-[15px] font-bold text-gray-800">Distribuição de Notas</h3>
+                <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-500"><BarChart3 className="w-4 h-4"/></div>
+                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-100">Distribuição de Notas</h3>
               </div>
             </div>
             <div className="flex-1 mt-2">

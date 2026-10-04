@@ -26,18 +26,18 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
             <Cloud className="w-12 h-12 text-white" />
           </div>
         </div>
-        <h2 className="text-center text-3xl font-extrabold text-gray-900 tracking-tight">
+        <h2 className="text-center text-3xl font-extrabold text-gray-900 dark:text-slate-100 tracking-tight">
           IFS Gestão Pedagógica
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-gray-600 dark:text-slate-300">
           Faça login com sua conta do Google para acessar a plataforma e sincronizar seus dados.
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100">
+        <div className="bg-white dark:bg-slate-800 py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100 dark:text-slate-100">
           <div className="space-y-6">
-            <div className="flex items-center justify-center bg-gray-50 p-4 rounded-xl text-sm text-gray-500 mb-6">
+            <div className="flex items-center justify-center bg-gray-50 dark:bg-slate-900 p-4 rounded-xl text-sm text-gray-500 dark:text-slate-400 mb-6">
               <Lock className="w-4 h-4 mr-2" />
               Acesso restrito e seguro via Google
             </div>

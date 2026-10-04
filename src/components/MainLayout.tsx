@@ -1,5 +1,6 @@
 import React from 'react';
-import { LayoutDashboard, BookOpen, Database, BarChart, Cloud, Layers, Briefcase } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Database, BarChart, Cloud, Layers, Briefcase, Sun, Moon } from 'lucide-react';
+import { useTheme } from './ThemeContext';
 
 export type TabId = 'dashboard' | 'turmas' | 'cadastros' | 'estagios' | 'analises' | 'consolidacao' | 'sync';
 
@@ -15,6 +16,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   setActiveTab,
   children,
 }) => {
+  const { theme, toggleTheme } = useTheme();
+
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'cadastros', label: 'Cadastros', icon: Database },
@@ -26,9 +29,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   ] as const;
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col transition-all duration-300 shadow-xl shrink-0">
+      <aside className="w-64 bg-slate-900 dark:bg-slate-950 text-slate-300 flex flex-col transition-all duration-300 shadow-xl shrink-0">
         <div className="flex items-center gap-4 mt-6 mb-2 px-6">
           {/* Logo Oficial do IFS (Imagem) */}
           <img 
@@ -65,6 +68,26 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
             );
           })}
         </nav>
+
+        {/* Theme Toggle */}
+        <div className="p-4 border-t border-slate-800">
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors text-slate-400 hover:bg-slate-800 hover:text-white"
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun className="w-5 h-5" />
+                <span>Modo Claro</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-5 h-5" />
+                <span>Modo Escuro</span>
+              </>
+            )}
+          </button>
+        </div>
       </aside>
 
       {/* Main Content Area */}

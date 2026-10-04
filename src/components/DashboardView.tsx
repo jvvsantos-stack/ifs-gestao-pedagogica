@@ -186,7 +186,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
   }) || { turmas: [], totalTurmas: 0, totalDisciplinas: 0, totalAlunos: 0, alertasConselho: [], alertasEvasao: [], diariosPendentesDisciplinas: [], cursos: [] };
 
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen">
+    <div className="flex-1 bg-gray-50 dark:bg-slate-900 min-h-screen">
       <main className="max-w-6xl mx-auto p-6 space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
@@ -195,8 +195,8 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
               <LayoutDashboard className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Panorama Acadêmico</h2>
-              <p className="text-gray-500 text-sm">Visão geral e pendências operacionais</p>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100 tracking-tight">Panorama Acadêmico</h2>
+              <p className="text-gray-500 dark:text-slate-400 text-sm">Visão geral e pendências operacionais</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -215,7 +215,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
             </button>
             <button 
               onClick={() => setShowBuscaAluno(true)}
-              className="bg-white hover:bg-gray-50 text-indigo-600 border border-indigo-200 shadow-sm font-semibold py-2.5 px-6 rounded-xl transition-all flex items-center gap-2 hover:shadow-md hover:border-indigo-300"
+              className="bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-900 text-indigo-600 border border-indigo-200 shadow-sm font-semibold py-2.5 px-6 rounded-xl transition-all flex items-center gap-2 hover:shadow-md hover:border-indigo-300 dark:text-slate-100"
             >
               <Search className="w-5 h-5" />
               Buscar Aluno
@@ -225,41 +225,41 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
 
         {/* Cards de Resumo */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="bg-blue-50 p-4 rounded-xl text-blue-600">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 dark:text-slate-100">
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl text-blue-600">
               <Users className="w-8 h-8" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total de Alunos</p>
-              <h3 className="text-3xl font-bold text-gray-800">{dashboardData.totalAlunos}</h3>
+              <p className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total de Alunos</p>
+              <h3 className="text-3xl font-bold text-gray-800 dark:text-slate-100">{dashboardData.totalAlunos}</h3>
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="bg-indigo-50 p-4 rounded-xl text-indigo-600">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 dark:text-slate-100">
+            <div className="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-xl text-indigo-600">
               <BookOpen className="w-8 h-8" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Turmas Ativas</p>
-              <h3 className="text-3xl font-bold text-gray-800">{dashboardData.totalTurmas}</h3>
+              <p className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Turmas Ativas</p>
+              <h3 className="text-3xl font-bold text-gray-800 dark:text-slate-100">{dashboardData.totalTurmas}</h3>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="bg-emerald-50 p-4 rounded-xl text-emerald-600">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 dark:text-slate-100">
+            <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-xl text-emerald-600">
               <FolderOpen className="w-8 h-8" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Disciplinas</p>
-              <h3 className="text-3xl font-bold text-gray-800">{dashboardData.totalDisciplinas}</h3>
+              <p className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Disciplinas</p>
+              <h3 className="text-3xl font-bold text-gray-800 dark:text-slate-100">{dashboardData.totalDisciplinas}</h3>
             </div>
           </div>
         </div>
 
         {/* Seção de Pendências */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 overflow-hidden dark:text-slate-100">
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 dark:bg-slate-900/50 flex justify-between items-center">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-amber-500" />
               Pendências e Alertas
             </h3>
@@ -274,7 +274,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
             ) : (
               <ul className="space-y-4">
                 {dashboardData.diariosPendentesDisciplinas.length > 0 && (
-                  <li className="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl shadow-md shadow-red-500/10">
+                  <li className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 text-red-800 rounded-xl shadow-md shadow-red-500/10">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
                         <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
@@ -297,7 +297,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
                   </li>
                 )}
                 {dashboardData.alertasConselho.map((alerta, idx) => (
-                  <li key={`conselho-${idx}`} className="p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl">
+                  <li key={`conselho-${idx}`} className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 text-amber-800 rounded-xl">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
                         <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
@@ -328,8 +328,8 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
 
         {/* Alerta Crítico de Faltas Global */}
         {dashboardData.alertasEvasao.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-red-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-red-100 bg-red-50/50 flex justify-between items-center">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-red-200 overflow-hidden dark:text-slate-100">
+            <div className="px-6 py-4 border-b border-red-100 bg-red-50 dark:bg-red-900/20/50 flex justify-between items-center">
               <h3 className="text-lg font-bold text-red-800 flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
                 Risco Global de Evasão/Faltas
@@ -338,7 +338,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
             <div className="p-6">
               <ul className="space-y-3">
                 {dashboardData.alertasEvasao.map((alerta, idx) => (
-                  <li key={`evasao-${idx}`} className="flex flex-col p-4 bg-red-50 border border-red-100 text-red-800 rounded-xl text-sm gap-2">
+                  <li key={`evasao-${idx}`} className="flex flex-col p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 text-red-800 rounded-xl text-sm gap-2">
                     {alerta.freqGlobal !== undefined && alerta.freqGlobal < 80 && (
                       <div className="bg-red-600 text-white font-bold py-1 px-3 rounded-lg text-center w-full shadow-sm mb-2">
                         ❌ Não Elegível Pé de meia (Frequência: {alerta.freqGlobal.toFixed(1)}%)
@@ -357,7 +357,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
                         {alerta.freqGlobal !== undefined && alerta.freqGlobal < 75 ? (
                           <p className="text-sm text-red-700 font-semibold">Reprovado por Faltas</p>
                         ) : (
-                          <p className="text-sm text-gray-700">Frequência geral prejudicada, mas ainda dentro do limite acadêmico de 25%.</p>
+                          <p className="text-sm text-gray-700 dark:text-slate-300">Frequência geral prejudicada, mas ainda dentro do limite acadêmico de 25%.</p>
                         )}
                       </div>
                     </div>
@@ -371,7 +371,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
         {/* Acesso Rápido às Turmas */}
         <div>
           <div className="flex justify-between items-center mb-4 px-1">
-            <h3 className="text-lg font-bold text-gray-800">Acesso Rápido</h3>
+            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100">Acesso Rápido</h3>
             <button 
               onClick={() => setActiveTab('turmas')}
               className="text-indigo-600 hover:text-indigo-700 text-sm font-semibold flex items-center gap-1"
@@ -389,24 +389,24 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
                     await db.turmas.update(t.id!, { lastAccessed: Date.now() });
                     setActiveTab('turmas'); 
                   }}
-                  className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer group"
+                  className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer group dark:text-slate-100"
                 >
                   <div className="flex justify-between items-start mb-4">
-                    <div className="bg-indigo-50 p-3 rounded-lg group-hover:bg-indigo-100 transition-colors">
+                    <div className="bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded-lg group-hover:bg-indigo-100 dark:bg-indigo-900/40 transition-colors">
                       <Users className="w-6 h-6 text-indigo-600" />
                     </div>
-                    <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded-full">
+                    <span className="bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 text-xs font-semibold px-2 py-1 rounded-full">
                       {t.codigo}
                     </span>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-1">{t.nome}</h3>
-                  <p className="text-sm text-gray-500">{curso?.nome || 'Curso Desconhecido'}</p>
+                  <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100 mb-1">{t.nome}</h3>
+                  <p className="text-sm text-gray-500 dark:text-slate-400">{curso?.nome || 'Curso Desconhecido'}</p>
                 </div>
               );
             })}
             
             {dashboardData.turmas.length === 0 && (
-              <div className="col-span-full text-center py-12 text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">
+              <div className="col-span-full text-center py-12 text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 rounded-xl border border-dashed border-gray-300 dark:border-slate-600">
                 Nenhuma turma ativa cadastrada.
               </div>
             )}

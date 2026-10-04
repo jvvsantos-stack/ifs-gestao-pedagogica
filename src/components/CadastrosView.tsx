@@ -425,24 +425,24 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
   const cursosPPCJaInseridos = new Set(cursos.map(c => c.nome));
 
   return (
-    <div className="p-6 bg-gray-50 min-h-full space-y-8">
+    <div className="p-6 bg-gray-50 dark:bg-slate-900 min-h-full space-y-8">
       <header className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Estrutura Acadêmica</h1>
-        <p className="text-gray-500 text-sm">Gerenciamento de cursos, disciplinas e períodos letivos</p>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100">Estrutura Acadêmica</h1>
+        <p className="text-gray-500 dark:text-slate-400 text-sm">Gerenciamento de cursos, disciplinas e períodos letivos</p>
       </header>
 
       <div className="flex flex-col gap-8 w-full">
 
         {/* ============ SEÇÃO 1: CURSOS ============ */}
-        <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col w-full">
-          <div className="p-4 border-b border-gray-100 bg-indigo-50/30">
-            <h2 className="text-lg font-bold text-gray-800">1. Cursos</h2>
-            <p className="text-xs text-gray-500 mt-0.5">Selecione um curso do PPC para inserir ou adicione um novo manualmente.</p>
+        <section className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 flex flex-col w-full dark:text-slate-100">
+          <div className="p-4 border-b border-gray-100 bg-indigo-50 dark:bg-indigo-900/30/30">
+            <h2 className="text-lg font-bold text-gray-800 dark:text-slate-100">1. Cursos</h2>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Selecione um curso do PPC para inserir ou adicione um novo manualmente.</p>
           </div>
 
           <div className="p-4 border-b border-gray-100 shrink-0">
             {/* Dropdown de seleção */}
-            <label className="block text-xs font-medium text-gray-700 mb-1">Adicionar Curso</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Adicionar Curso</label>
             <div className="flex gap-2">
               <select
                 defaultValue=""
@@ -458,7 +458,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   // Reseta o select visualmente
                   e.target.value = '';
                 }}
-                className="flex-1 text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                className="flex-1 text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
               >
                 <option value="" disabled>Selecione um curso para inserir...</option>
                 {cursosPPC.map((c, i) => (
@@ -472,27 +472,27 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
             {/* Formulário de Novo Curso Manual */}
             {showNovoCursoForm && (
-              <form onSubmit={handleSaveNovoCurso} className="space-y-3 mt-4 p-4 bg-gray-50 rounded-lg border border-dashed border-gray-200 animate-fade-in">
+              <form onSubmit={handleSaveNovoCurso} className="space-y-3 mt-4 p-4 bg-gray-50 dark:bg-slate-900 rounded-lg border border-dashed border-gray-200 dark:border-slate-700 animate-fade-in">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs font-bold text-gray-600 uppercase tracking-wider">Novo Curso Manual</span>
-                  <button type="button" onClick={() => setShowNovoCursoForm(false)} className="text-gray-400 hover:text-red-500 transition-colors">
+                  <span className="text-xs font-bold text-gray-600 dark:text-slate-300 uppercase tracking-wider">Novo Curso Manual</span>
+                  <button type="button" onClick={() => setShowNovoCursoForm(false)} className="text-gray-400 dark:text-slate-500 hover:text-red-500 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Nome do Curso</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Nome do Curso</label>
                   <input
                     type="text"
                     required
                     autoFocus
                     value={cursoNome}
                     onChange={e => setCursoNome(e.target.value)}
-                    className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                     placeholder="Ex: Técnico em Automação"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Modalidade</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Modalidade</label>
                   <div className="flex gap-2">
                     {(['Integrado', 'Subsequente'] as const).map(mod => (
                       <button
@@ -501,7 +501,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                         onClick={() => setCursoModalidade(mod)}
                         className={`flex-1 text-sm py-2 rounded font-medium border transition-colors ${cursoModalidade === mod
                           ? 'bg-indigo-600 text-white border-indigo-600'
-                          : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'
+                          : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 border-gray-300 dark:border-slate-600 hover:border-indigo-400'
                         }`}
                       >
                         {mod}
@@ -521,11 +521,11 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
           {/* Lista de Cursos Cadastrados */}
           <div className="p-4 flex-1">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">
               Cursos Cadastrados ({cursosAtivos.length})
             </h3>
             {cursosAtivos.length === 0 && (
-              <p className="text-xs text-gray-400 text-center py-6">Nenhum curso cadastrado. Insira um curso acima.</p>
+              <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">Nenhum curso cadastrado. Insira um curso acima.</p>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {cursosAtivos.map(c => {
@@ -537,37 +537,37 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                     onClick={() => setCursoSelecionadoId(isSelected ? null : c.id!)}
                     className={`p-4 border-2 rounded-lg cursor-pointer transition-all group ${
                       isSelected
-                        ? 'border-indigo-500 bg-indigo-50 shadow-md'
-                        : 'border-gray-200 bg-white hover:border-indigo-300 hover:shadow-sm'
+                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-md'
+                        : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-300 hover:shadow-sm'
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
-                        <div className={`font-semibold text-lg truncate ${isSelected ? 'text-indigo-800' : 'text-gray-800'}`}>
+                        <div className={`font-semibold text-lg truncate ${isSelected ? 'text-indigo-800' : 'text-gray-800 dark:text-slate-100'}`}>
                           {c.nome}
                         </div>
                         <div className="flex items-center gap-3 mt-2">
                           <span className={`text-sm font-bold px-2.5 py-1 rounded uppercase ${
                             c.modalidade === 'Integrado'
-                              ? 'bg-emerald-100 text-emerald-700'
-                              : 'bg-orange-100 text-orange-700'
+                              ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700'
+                              : 'bg-orange-100 dark:bg-orange-900/40 text-orange-700'
                           }`}>
                             {c.modalidade}
                           </span>
-                          <span className="text-sm text-gray-500">{turmasDoCurso} turma(s) ativa(s)</span>
+                          <span className="text-sm text-gray-500 dark:text-slate-400">{turmasDoCurso} turma(s) ativa(s)</span>
                         </div>
                       </div>
                       <div className="flex gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={e => { e.stopPropagation(); handleArchiveCurso(c.id!, true); }}
-                          className="p-1.5 text-gray-400 hover:text-orange-600 transition-colors"
+                          className="p-1.5 text-gray-400 dark:text-slate-500 hover:text-orange-600 transition-colors"
                           title="Arquivar curso"
                         >
                           <Archive className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={e => { e.stopPropagation(); handleDeleteCurso(c.id!, c.nome); }}
-                          className="p-1.5 text-gray-400 hover:text-red-600 transition-colors"
+                          className="p-1.5 text-gray-400 dark:text-slate-500 hover:text-red-600 transition-colors"
                           title="Excluir curso"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -587,10 +587,10 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         </section>
 
         {/* ============ SEÇÃO 2: TURMAS ============ */}
-        <section className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col w-full">
-          <div className="p-4 border-b border-gray-100 bg-indigo-50/30 flex justify-between items-center">
+        <section className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 flex flex-col w-full dark:text-slate-100">
+          <div className="p-4 border-b border-gray-100 bg-indigo-50 dark:bg-indigo-900/30/30 flex justify-between items-center">
             <div>
-              <h2 className="text-lg font-bold text-gray-800">2. Turmas</h2>
+              <h2 className="text-lg font-bold text-gray-800 dark:text-slate-100">2. Turmas</h2>
               {cursoSelecionadoId && (
                 <p className="text-xs text-indigo-600 mt-0.5 font-medium">
                   Filtrando: {cursos.find(c => c.id === cursoSelecionadoId)?.nome}
@@ -606,13 +606,13 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
           {/* Formulário de Turma Manual */}
           <div className="p-4 border-b border-gray-100 shrink-0">
-            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+            <div className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">
               {editingTurmaId ? 'Editando Turma' : 'Adicionar Turma Manualmente'}
             </div>
             <form onSubmit={handleSaveTurmaManual} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Curso Pai</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Curso Pai</label>
                   <select
                     required
                     value={turmaCursoId}
@@ -626,7 +626,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                         setTurmaAnoLetivo(c.modalidade?.includes('Subsequente') ? `${anoCorrente}.1` : anoCorrente);
                       }
                     }}
-                    className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                   >
                     <option value="" disabled>Selecione...</option>
                     {cursos.map(c => (
@@ -635,7 +635,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Código da Turma</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Código da Turma</label>
                   {(() => {
                     const cDb = cursos.find(c => c.id === Number(turmaCursoId));
                     const cPPC = cDb ? cursosPPC.find(cp => cp.nome === cDb.nome) : null;
@@ -658,7 +658,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                                 }
                               }
                             }}
-                            className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                            className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                           >
                             <option value="" disabled>Selecione a turma...</option>
                             {cPPC.turmas.map(t => (
@@ -677,7 +677,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                           required
                           value={turmaCodigo === 'outro_manual_trigger' ? '' : turmaCodigo}
                           onChange={e => setTurmaCodigo(e.target.value)}
-                          className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                          className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                           placeholder="Ex: 1IELN.M"
                           autoFocus={turmaCodigo === 'outro_manual_trigger'}
                         />
@@ -698,24 +698,24 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   })()}
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Nome de Exibição</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Nome de Exibição</label>
                   <input
                     type="text"
                     required
                     value={turmaNome}
                     onChange={e => setTurmaNome(e.target.value)}
-                    className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                     placeholder="Ex: 1ª Série"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Período Letivo</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Período Letivo</label>
                   <input
                     type="text"
                     required
                     value={turmaAnoLetivo}
                     onChange={e => setTurmaAnoLetivo(e.target.value)}
-                    className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                     placeholder={cursos.find(c => c.id === Number(turmaCursoId))?.modalidade?.includes('Subsequente') ? "Ex: 2026.1" : "Ex: 2026"}
                   />
                 </div>
@@ -732,18 +732,18 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
           </div>
 
           {/* Lista de Turmas */}
-          <div className="p-4 flex-1 bg-gray-50/50">
-            <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+          <div className="p-4 flex-1 bg-gray-50 dark:bg-slate-900/50">
+            <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-slate-700 pb-2">
               <div className="flex gap-2">
                 <button
                   onClick={() => setViewTurmas('ativas')}
-                  className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'ativas' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100'}`}
+                  className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'ativas' ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'}`}
                 >
                   Ativas
                 </button>
                 <button
                   onClick={() => setViewTurmas('arquivadas')}
-                  className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'arquivadas' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:bg-gray-100'}`}
+                  className={`text-xs font-bold px-3 py-1.5 rounded transition-colors ${viewTurmas === 'arquivadas' ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700' : 'text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800'}`}
                 >
                   Arquivadas
                 </button>
@@ -765,14 +765,14 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
             </div>
 
             {!cursoSelecionadoId && (
-              <div className="text-center py-8 text-sm text-gray-400">
+              <div className="text-center py-8 text-sm text-gray-400 dark:text-slate-500">
                 <BookOpen className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                 Selecione um curso acima para ver suas turmas.
               </div>
             )}
 
             {cursoSelecionadoId && turmasBase.length === 0 && (
-              <p className="text-xs text-gray-400 text-center py-6">Nenhuma turma {viewTurmas === 'ativas' ? 'ativa' : 'arquivada'} para este curso.</p>
+              <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-6">Nenhuma turma {viewTurmas === 'ativas' ? 'ativa' : 'arquivada'} para este curso.</p>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -782,14 +782,14 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                 const completa = status !== null && status.faltando === 0;
 
                 return (
-                  <div key={t.id} className="bg-white p-4 border border-gray-200 rounded-lg shadow-sm flex flex-col gap-3 group">
+                  <div key={t.id} className="bg-white dark:bg-slate-800 p-4 border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm flex flex-col gap-3 group dark:text-slate-100">
                     {/* Cabeçalho */}
                     <div>
-                      <div className="font-bold text-gray-800 text-lg leading-tight">{t.nome}</div>
+                      <div className="font-bold text-gray-800 dark:text-slate-100 text-lg leading-tight">{t.nome}</div>
                       <div className="flex flex-wrap gap-2 mt-1.5">
-                        <span className="text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded text-xs font-bold">{t.codigo}</span>
+                        <span className="text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1 rounded text-xs font-bold">{t.codigo}</span>
                         {t.anoLetivo && (
-                          <span className="text-gray-500 bg-gray-100 px-2.5 py-1 rounded text-xs font-bold">{t.anoLetivo}</span>
+                          <span className="text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 px-2.5 py-1 rounded text-xs font-bold">{t.anoLetivo}</span>
                         )}
                       </div>
                     </div>
@@ -798,10 +798,10 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                     {status !== null && (
                       <div className={`flex items-center gap-1.5 text-sm font-medium rounded px-2.5 py-1.5 ${
                         completa
-                          ? 'bg-emerald-50 text-emerald-700'
+                          ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700'
                           : status.cadastradas > 0
-                          ? 'bg-amber-50 text-amber-700'
-                          : 'bg-gray-100 text-gray-500'
+                          ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700'
+                          : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400'
                       }`}>
                         <CheckCircle2 className="w-4 h-4 shrink-0" />
                         {completa
@@ -817,13 +817,13 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                           const turmaPPC = getCursoPPCParaTurma(t);
                           const isPPC = turmaPPC?.disciplinas.some(dp => dp.nome === d.nome) || false;
                           return (
-                            <div key={d.id} className="text-sm bg-gray-50 border border-gray-100 rounded p-2 flex justify-between items-center group/disc">
+                            <div key={d.id} className="text-sm bg-gray-50 dark:bg-slate-900 border border-gray-100 rounded p-2 flex justify-between items-center group/disc">
                               <div className="flex-1 min-w-0 pr-2">
-                                <div className="font-semibold text-base text-gray-700 truncate" title={d.nome}>
-                                  {d.periodoLetivo && <span className="mr-1 text-indigo-600 bg-indigo-100 px-1 rounded text-sm">[ {d.periodoLetivo} ]</span>}
+                                <div className="font-semibold text-base text-gray-700 dark:text-slate-300 truncate" title={d.nome}>
+                                  {d.periodoLetivo && <span className="mr-1 text-indigo-600 bg-indigo-100 dark:bg-indigo-900/40 px-1 rounded text-sm">[ {d.periodoLetivo} ]</span>}
                                   {d.nome}
                                 </div>
-                                <div className="text-sm text-gray-500 mt-0.5">{d.chAula} aulas / {d.chRelogio}h</div>
+                                <div className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{d.chAula} aulas / {d.chRelogio}h</div>
                               </div>
                               <div className="flex gap-1 opacity-0 group-hover/disc:opacity-100 transition-opacity">
                                 <button onClick={() => handleEditDisciplinaClick(d)} className="text-indigo-500 hover:text-indigo-700 p-0.5" title="Editar"><Edit className="w-3 h-3" /></button>
@@ -858,7 +858,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                         className={`w-full flex items-center justify-center gap-2 text-sm font-bold py-2.5 rounded transition-colors ${
                           podGerar
                             ? 'bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer'
-                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 cursor-not-allowed'
                         }`}
                       >
                         <Wand2 className="w-4 h-4" />
@@ -871,21 +871,21 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                           <>
                             <button
                               onClick={() => handleEditTurma(t)}
-                              className="p-1.5 text-gray-400 hover:text-indigo-600 transition-colors"
+                              className="p-1.5 text-gray-400 dark:text-slate-500 hover:text-indigo-600 transition-colors"
                               title="Editar"
                             >
                               <Edit className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleArchiveTurma(t.id!, true)}
-                              className="p-1.5 text-gray-400 hover:text-orange-600 transition-colors"
+                              className="p-1.5 text-gray-400 dark:text-slate-500 hover:text-orange-600 transition-colors"
                               title="Arquivar"
                             >
                               <Archive className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleDeleteTurma(t.id!)}
-                              className="p-1.5 text-gray-400 hover:text-red-600 transition-colors"
+                              className="p-1.5 text-gray-400 dark:text-slate-500 hover:text-red-600 transition-colors"
                               title="Excluir"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -895,14 +895,14 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                           <>
                             <button
                               onClick={() => handleArchiveTurma(t.id!, false)}
-                              className="p-1.5 text-gray-400 hover:text-green-600 transition-colors"
+                              className="p-1.5 text-gray-400 dark:text-slate-500 hover:text-green-600 transition-colors"
                               title="Restaurar"
                             >
                               <ArchiveRestore className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleDeleteTurma(t.id!)}
-                              className="p-1.5 text-gray-400 hover:text-red-600 transition-colors"
+                              className="p-1.5 text-gray-400 dark:text-slate-500 hover:text-red-600 transition-colors"
                               title="Excluir"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -923,35 +923,35 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
       {/* Modal Edit Disciplina */}
       {editingDisciplina && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
-          <div className="bg-white rounded-lg p-5 w-full max-w-sm shadow-xl">
-            <h3 className="text-sm font-bold text-gray-800 mb-3">Editar Disciplina</h3>
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-5 w-full max-w-sm shadow-xl dark:text-slate-100">
+            <h3 className="text-sm font-bold text-gray-800 dark:text-slate-100 mb-3">Editar Disciplina</h3>
             <form onSubmit={handleSaveDisciplinaEdit} className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Nome</label>
+                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Nome</label>
                 <input
                   type="text"
                   required
                   value={editDiscNome}
                   onChange={e => setEditDiscNome(e.target.value)}
-                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">CH Aulas (horas-aula)</label>
+                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">CH Aulas (horas-aula)</label>
                 <input
                   type="number"
                   required
                   min="1"
                   value={editDiscChAula}
                   onChange={e => setEditDiscChAula(e.target.value)}
-                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                 />
               </div>
               <div className="flex gap-2 justify-end mt-4">
                 <button
                   type="button"
                   onClick={() => setEditingDisciplina(null)}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded transition-colors"
                 >
                   Cancelar
                 </button>
@@ -970,28 +970,28 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
       {/* Modal Nova Oferta Letiva */}
       {ofertaModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
-          <div className="bg-white rounded-lg p-5 w-full max-w-sm shadow-xl">
-            <h3 className="text-sm font-bold text-gray-800 mb-2">Gerar Turmas do PPC</h3>
-            <p className="text-xs text-gray-500 mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-5 w-full max-w-sm shadow-xl dark:text-slate-100">
+            <h3 className="text-sm font-bold text-gray-800 dark:text-slate-100 mb-2">Gerar Turmas do PPC</h3>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">
               Para qual Período Letivo deseja gerar as turmas?
             </p>
             <form onSubmit={handleGerarTurmasPPC} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Período Letivo (ex: 2026, 2026.1)</label>
+                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Período Letivo (ex: 2026, 2026.1)</label>
                 <input
                   type="text"
                   required
                   autoFocus
                   value={ofertaAnoLetivo}
                   onChange={e => setOfertaAnoLetivo(e.target.value)}
-                  className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                 />
               </div>
               <div className="flex gap-2 justify-end mt-4">
                 <button
                   type="button"
                   onClick={() => setOfertaModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded transition-colors"
                 >
                   Cancelar
                 </button>
@@ -1010,16 +1010,16 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
       {/* Modal Gerar Disciplinas */}
       {gerarDiscModalOpen && gerarDiscTurmaSelecionada && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
-          <div className="bg-white rounded-lg p-5 w-full max-w-sm shadow-xl">
-            <h3 className="text-sm font-bold text-gray-800 mb-2">Configurar Período Letivo</h3>
-            <p className="text-xs text-gray-500 mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-5 w-full max-w-sm shadow-xl dark:text-slate-100">
+            <h3 className="text-sm font-bold text-gray-800 dark:text-slate-100 mb-2">Configurar Período Letivo</h3>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">
               Defina o período para as novas disciplinas desta turma.
             </p>
             <form onSubmit={confirmGerarDisciplinas} className="space-y-4">
               {cursos.find(c => c.id === gerarDiscTurmaSelecionada.cursoId)?.modalidade?.includes('Subsequente') ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Ano (YYYY)</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Ano (YYYY)</label>
                     <input
                       type="text"
                       required
@@ -1027,16 +1027,16 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                       maxLength={4}
                       value={gerarDiscAno}
                       onChange={e => setGerarDiscAno(e.target.value)}
-                      className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                      className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Período</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Período</label>
                     <select
                       required
                       value={gerarDiscSemestre}
                       onChange={e => setGerarDiscSemestre(e.target.value)}
-                      className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                      className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                     >
                       <option value="1">1</option>
                       <option value="2">2</option>
@@ -1045,7 +1045,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                 </div>
               ) : (
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Ano Letivo (YYYY)</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Ano Letivo (YYYY)</label>
                   <input
                     type="text"
                     required
@@ -1053,7 +1053,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                     maxLength={4}
                     value={gerarDiscAno}
                     onChange={e => setGerarDiscAno(e.target.value)}
-                    className="w-full text-sm border border-gray-300 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                   />
                 </div>
               )}
@@ -1061,7 +1061,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                 <button
                   type="button"
                   onClick={() => setGerarDiscModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded transition-colors"
                 >
                   Cancelar
                 </button>

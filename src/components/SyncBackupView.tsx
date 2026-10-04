@@ -60,21 +60,21 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
   };
 
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen">
+    <div className="flex-1 bg-gray-50 dark:bg-slate-900 min-h-screen">
       <main className="max-w-4xl mx-auto p-6 space-y-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-3 bg-indigo-600 rounded-xl shadow-sm">
             <Cloud className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Sync e Backup</h2>
-            <p className="text-gray-500 text-sm">Gerencie sua conta e sincronização de dados</p>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100 tracking-tight">Sync e Backup</h2>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">Gerencie sua conta e sincronização de dados</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 overflow-hidden dark:text-slate-100">
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 dark:bg-slate-900/50 flex justify-between items-center">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2">
               <UserIcon className="w-5 h-5 text-indigo-500" />
               Sua Conta
             </h3>
@@ -85,18 +85,18 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
                 {userInfo?.picture ? (
                   <img src={userInfo.picture} alt="Foto de Perfil" className="w-12 h-12 rounded-full shadow-sm" />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                  <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-600 font-bold text-lg">
                     {userInfo?.name?.charAt(0) || 'U'}
                   </div>
                 )}
                 <div>
-                  <p className="font-bold text-gray-800 text-lg leading-tight">{userInfo?.name || 'Utilizador Autenticado'}</p>
-                  <p className="text-sm text-gray-500">{userInfo?.email || 'Sessão ativa com o Google'}</p>
+                  <p className="font-bold text-gray-800 dark:text-slate-100 text-lg leading-tight">{userInfo?.name || 'Utilizador Autenticado'}</p>
+                  <p className="text-sm text-gray-500 dark:text-slate-400">{userInfo?.email || 'Sessão ativa com o Google'}</p>
                 </div>
               </div>
               <button
                 onClick={onLogout}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-xl font-bold transition-all w-full sm:w-auto"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-red-50 dark:bg-red-900/20 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-xl font-bold transition-all w-full sm:w-auto"
               >
                 <LogOut className="w-5 h-5" />
                 Sair da Conta
@@ -105,9 +105,9 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 overflow-hidden dark:text-slate-100">
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 dark:bg-slate-900/50 flex justify-between items-center">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2">
               <Cloud className="w-5 h-5 text-indigo-500" />
               Sincronização Nuvem (Google Drive)
             </h3>
@@ -119,7 +119,7 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
           </div>
           <div className="p-6">
             <div className="space-y-6">
-              <div className="flex items-center gap-3 p-4 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-200">
+              <div className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 rounded-xl border border-emerald-200">
                 <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                 <div>
                   <p className="font-semibold">Sincronização Vinculada</p>
@@ -128,12 +128,12 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Ações Manuais</h4>
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider mb-3">Ações Manuais</h4>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button 
                     onClick={handleForceUpload}
                     disabled={syncStatus === 'syncing'}
-                    className="flex-1 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                    className="flex-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-900 px-4 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                   >
                     <CloudUpload className="w-5 h-5 text-indigo-500" />
                     Forçar Envio de Backup
@@ -141,7 +141,7 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
                   <button 
                     onClick={handleForceDownload}
                     disabled={syncStatus === 'syncing'}
-                    className="flex-1 bg-white border border-gray-200 text-red-600 hover:bg-red-50 px-4 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                    className="flex-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-red-600 hover:bg-red-50 dark:bg-red-900/20 px-4 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 dark:text-slate-100"
                   >
                     <CloudDownload className="w-5 h-5 text-red-500" />
                     Restaurar Backup da Nuvem
