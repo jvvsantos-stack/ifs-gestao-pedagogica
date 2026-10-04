@@ -43,6 +43,9 @@ async function saveToDb(rows: RowData[], turmaId: number, isIntegrado: boolean, 
     if (existingAluno?.id !== undefined) {
       alunoId = existingAluno.id;
     } else {
+      if (fixedDisciplinaId) {
+        throw new Error(`Aluno(a) '${row.nome}' não encontrado(a) na turma. A importação foi interrompida para garantir a integridade. Cadastre o(a) aluno(a) primeiro ou corrija o nome na planilha.`);
+      }
       alunoId = await db.alunos.add({
         nome: row.nome,
         turmaId: turmaId,

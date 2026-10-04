@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { db } from '../db/database';
 import type { Turma, Aluno, Disciplina, Nota, AvaliacaoFinal } from '../db/database';
-import { Users, FolderOpen, ArrowLeft, UserPlus, BookOpen, Edit2, Trash2, Upload, X, ClipboardList, Filter, FileSpreadsheet } from 'lucide-react';
+import { Users, FolderOpen, ArrowLeft, UserPlus, BookOpen, Edit2, Trash2, Upload, X, ClipboardList, Filter, FileSpreadsheet, Download } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import * as XLSX from 'xlsx';
 import { ModalOcorrencias } from './ModalOcorrencias';
@@ -440,22 +440,18 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
     }
   };
 
+  const handleDownloadTemplateLista = () => {
+    const ws = XLSX.utils.aoa_to_sheet([['Nome do Aluno']]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Template');
+    XLSX.writeFile(wb, `Template_Alunos.xlsx`);
+  };
+
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
-      const isCSV = file.name.endsWith('.csv');
-      
-      const readAsText = (f: File): Promise<string> => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (evt) => resolve(evt.target?.result as string);
-          reader.onerror = reject;
-          reader.readAsText(f, 'ISO-8859-1');
-        });
-      };
-
       const readAsArrayBuffer = (f: File): Promise<ArrayBuffer> => {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
@@ -465,37 +461,36 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
         });
       };
 
-      let rawNames: string[] = [];
+      const buffer = await readAsArrayBuffer(file);
+      const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
+      const firstSheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[firstSheetName];
+      
+      const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+        defval: '',
+        raw: false,
+      });
 
-      if (isCSV) {
-        const text = await readAsText(file);
-        const lines = text.split('\n');
-        for (const line of lines) {
-          const cells = line.split(';');
-          for (const cell of cells) {
-            const val = cell.trim();
-            if (val.length > 5) {
-              rawNames.push(val);
-              break;
-            }
-          }
+      if (raw.length === 0) {
+        showAlert('Erro', 'Nenhum dado encontrado no arquivo.', 'warning');
+        return;
+      }
+
+      let rawNames: string[] = [];
+      for (const r of raw) {
+        const norm: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(r)) {
+          norm[k.trim().toLowerCase()] = v;
         }
-      } else {
-        const buffer = await readAsArrayBuffer(file);
-        const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const sheetData = XLSX.utils.sheet_to_json<any[]>(workbook.Sheets[firstSheetName], { header: 1 });
-        
-        for (const row of sheetData) {
-          if (!row || !Array.isArray(row)) continue;
-          for (const cell of row) {
-            const val = String(cell || '').trim();
-            if (val.length > 5) {
-              rawNames.push(val);
-              break;
-            }
-          }
+        const nome = String(norm['nome do aluno'] || norm['nome'] || norm['aluno'] || '').trim();
+        if (nome.length > 5) {
+          rawNames.push(nome);
         }
+      }
+
+      if (rawNames.length === 0) {
+        showAlert('Erro', 'Nenhum aluno encontrado. Certifique-se de usar a coluna "Nome do Aluno".', 'warning');
+        return;
       }
 
       const invalidKeywords = ['instituto', 'diário', 'diario', 'nome', 'aluno', 'componente', 'situação', 'ordem'];
@@ -546,7 +541,7 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
           </button>
         </div>
         
-        <div className="p-4 border-b border-gray-100 bg-gray-50 dark:bg-slate-900 flex gap-3">
+        <div className="p-4 border-b border-gray-100 bg-gray-50 dark:bg-slate-900 flex gap-3 flex-wrap">
           <button
             onClick={handleAddManual}
             className="flex-1 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 dark:text-slate-100 dark:focus:ring-slate-600 hover:border-indigo-400 hover:text-indigo-600 text-gray-700 dark:text-slate-300 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 text-sm transition-colors shadow-sm"
@@ -554,13 +549,21 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
             <UserPlus className="w-4 h-4" />
             Adicionar Manualmente
           </button>
+
+          <button
+            onClick={handleDownloadTemplateLista}
+            className="flex-1 bg-white dark:bg-slate-800 border border-indigo-300 text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 text-sm transition-colors shadow-sm"
+          >
+            <Download className="w-4 h-4" />
+            Baixar Modelo
+          </button>
           
           <button
             onClick={() => fileInputRef.current?.click()}
             className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 text-sm transition-colors shadow-sm"
           >
             <Upload className="w-4 h-4" />
-            Importar Lista (Excel/CSV)
+            Importar Lista
           </button>
           
           <button
@@ -907,7 +910,13 @@ const DiarioDisciplina: React.FC<{
           </span>
           <div className="flex-1"></div>
           <button
-            onClick={() => setShowImporter(true)}
+            onClick={() => {
+              if (alunos.length === 0) {
+                showAlert('Aviso', 'Não é possível importar notas. Cadastre os alunos na turma primeiro.', 'warning');
+              } else {
+                setShowImporter(true);
+              }
+            }}
             className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg flex items-center gap-2 text-sm transition-colors"
           >
             <FileSpreadsheet className="w-4 h-4" />
