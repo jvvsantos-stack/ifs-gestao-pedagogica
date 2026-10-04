@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { db } from '../db/database';
 import type { Turma, Aluno, Disciplina, Nota, AvaliacaoFinal } from '../db/database';
-import { Users, FolderOpen, ArrowLeft, UserPlus, BookOpen, Edit2, Trash2, Upload, X, ClipboardList, Filter } from 'lucide-react';
+import { Users, FolderOpen, ArrowLeft, UserPlus, BookOpen, Edit2, Trash2, Upload, X, ClipboardList, Filter, FileSpreadsheet } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import * as XLSX from 'xlsx';
 import { ModalOcorrencias } from './ModalOcorrencias';
 import { ConfirmModal } from './ConfirmModal';
+import { SuapImporter } from './SuapImporter';
 
 interface Props {
   initialOpenTurmaAlunosId?: number | null;
@@ -688,6 +689,7 @@ const DiarioDisciplina: React.FC<{
   onBack: () => void;
 }> = ({ turma, disciplina, alunos, initialTab, onBack }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [showImporter, setShowImporter] = useState(false);
 
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; type?: 'warning' | 'success' | 'info'; isAlert?: boolean; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
 
@@ -903,6 +905,14 @@ const DiarioDisciplina: React.FC<{
           <span className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 text-xs px-2 py-1 rounded font-bold ml-2">
             {turma.codigo}
           </span>
+          <div className="flex-1"></div>
+          <button
+            onClick={() => setShowImporter(true)}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg flex items-center gap-2 text-sm transition-colors"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Importar Notas/Faltas (Planilha)
+          </button>
         </div>
         
         {/* Tabs */}
@@ -1108,6 +1118,21 @@ const DiarioDisciplina: React.FC<{
           onCancel: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
         })}
       />
+      {showImporter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col">
+             <div className="sticky top-0 bg-white dark:bg-slate-900 p-4 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center z-10">
+               <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">Importar Notas e Faltas - {disciplina.nome}</h2>
+               <button onClick={() => setShowImporter(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors text-gray-500 dark:text-gray-400">
+                 <X className="w-5 h-5" />
+               </button>
+             </div>
+             <div className="p-6">
+                <SuapImporter turmaId={turma.id!} disciplinaId={disciplina.id!} />
+             </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

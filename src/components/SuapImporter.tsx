@@ -5,7 +5,7 @@ import { db } from '../db/database';
 
 interface RowData {
   nome: string;
-  disciplina: string;
+  disciplina?: string;
   nota1?: number | null;
   faltas1?: number | null;
   nota2?: number | null;
@@ -27,9 +27,10 @@ function parseNumber(val: unknown): number | null {
   return isNaN(n) ? null : n;
 }
 
-async function saveToDb(rows: RowData[], turmaId: number, isIntegrado: boolean): Promise<void> {
+async function saveToDb(rows: RowData[], turmaId: number, isIntegrado: boolean, fixedDisciplinaId?: number): Promise<void> {
   for (const row of rows) {
-    if (!row.nome || !row.disciplina) continue;
+    if (!row.nome) continue;
+    if (!fixedDisciplinaId && !row.disciplina) continue;
 
     // 1. Resolve Aluno
     let alunoId: number;
@@ -50,21 +51,25 @@ async function saveToDb(rows: RowData[], turmaId: number, isIntegrado: boolean):
 
     // 2. Resolve Disciplina
     let disciplinaId: number;
-    const existingDisc = await db.disciplinas
-      .where('turmaId')
-      .equals(turmaId)
-      .filter((d) => d.nome.toLowerCase() === row.disciplina.toLowerCase())
-      .first();
-
-    if (existingDisc?.id !== undefined) {
-      disciplinaId = existingDisc.id;
+    if (fixedDisciplinaId) {
+      disciplinaId = fixedDisciplinaId;
     } else {
-      disciplinaId = await db.disciplinas.add({
-        turmaId: turmaId,
-        nome: row.disciplina,
-        chAula: 0,
-        chRelogio: 0
-      });
+      const existingDisc = await db.disciplinas
+        .where('turmaId')
+        .equals(turmaId)
+        .filter((d) => d.nome.toLowerCase() === (row.disciplina || '').toLowerCase())
+        .first();
+
+      if (existingDisc?.id !== undefined) {
+        disciplinaId = existingDisc.id;
+      } else {
+        disciplinaId = await db.disciplinas.add({
+          turmaId: turmaId,
+          nome: row.disciplina || 'Sem Nome',
+          chAula: 0,
+          chRelogio: 0
+        });
+      }
     }
 
     // 3. Clear existing notas and avaliacoes for this student+discipline
@@ -119,9 +124,10 @@ async function saveToDb(rows: RowData[], turmaId: number, isIntegrado: boolean):
 
 interface Props {
   turmaId: number;
+  disciplinaId?: number;
 }
 
-export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
+export const SuapImporter: React.FC<Props> = ({ turmaId, disciplinaId }) => {
   const [status, setStatus] = useState<ImportStatus>('idle');
   const [rows, setRows] = useState<RowData[]>([]);
   const [errorMsg, setErrorMsg] = useState('');
@@ -143,12 +149,26 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
     loadInfo();
   }, [turmaId]);
 
-  const handleDownloadTemplate = () => {
-    const headers = isIntegrado 
-      ? ['Nome do Aluno', 'Disciplina', 'Nota Etapa 1', 'Faltas Etapa 1', 'Nota Etapa 2', 'Faltas Etapa 2', 'Nota Etapa 3', 'Faltas Etapa 3', 'Nota Etapa 4', 'Faltas Etapa 4', 'Prova Final']
-      : ['Nome do Aluno', 'Disciplina', 'Nota Etapa 1', 'Faltas Etapa 1', 'Nota Etapa 2', 'Faltas Etapa 2', 'Prova Final'];
+  const handleDownloadTemplate = async () => {
+    let headers: string[];
+    let data: any[][] = [];
     
-    const ws = XLSX.utils.aoa_to_sheet([headers]);
+    if (disciplinaId) {
+       headers = isIntegrado 
+        ? ['Nome do Aluno', 'Nota Etapa 1', 'Faltas Etapa 1', 'Nota Etapa 2', 'Faltas Etapa 2', 'Nota Etapa 3', 'Faltas Etapa 3', 'Nota Etapa 4', 'Faltas Etapa 4', 'Prova Final']
+        : ['Nome do Aluno', 'Nota Etapa 1', 'Faltas Etapa 1', 'Nota Etapa 2', 'Faltas Etapa 2', 'Prova Final'];
+        
+       const alunos = await db.alunos.where('turmaId').equals(turmaId).toArray();
+       alunos.sort((a, b) => a.nome.localeCompare(b.nome));
+       
+       data = alunos.map(a => [a.nome]); // Outras colunas ficam vazias automaticamente
+    } else {
+       headers = isIntegrado 
+        ? ['Nome do Aluno', 'Disciplina', 'Nota Etapa 1', 'Faltas Etapa 1', 'Nota Etapa 2', 'Faltas Etapa 2', 'Nota Etapa 3', 'Faltas Etapa 3', 'Nota Etapa 4', 'Faltas Etapa 4', 'Prova Final']
+        : ['Nome do Aluno', 'Disciplina', 'Nota Etapa 1', 'Faltas Etapa 1', 'Nota Etapa 2', 'Faltas Etapa 2', 'Prova Final'];
+    }
+    
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Template');
     XLSX.writeFile(wb, `Template_Importacao_${isIntegrado ? 'Integrado' : 'Subsequente'}.xlsx`);
@@ -232,7 +252,7 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
   const handleSave = async () => {
     setStatus('saving');
     try {
-      await saveToDb(rows, turmaId, isIntegrado);
+      await saveToDb(rows, turmaId, isIntegrado, disciplinaId);
       setSavedCount(rows.length);
       setStatus('success');
     } catch (err) {
