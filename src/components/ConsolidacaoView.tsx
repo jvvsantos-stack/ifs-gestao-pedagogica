@@ -48,7 +48,7 @@ export const ConsolidacaoView: React.FC = () => {
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100 tracking-tight">Painel de Inteligência Acadêmica</h2>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-200 tracking-tight">Painel de Inteligência Acadêmica</h2>
                 <p className="text-gray-500 dark:text-slate-400 text-sm font-medium">Selecione uma turma para acessar o painel de consolidação</p>
               </div>
             </div>
@@ -64,7 +64,7 @@ export const ConsolidacaoView: React.FC = () => {
                   setSelectedCursoId(e.target.value);
                   setSelectedPeriodo('');
                 }}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               >
                 <option value="">Todos os Cursos</option>
                 {cursosDisponiveis.map(c => (
@@ -108,7 +108,7 @@ export const ConsolidacaoView: React.FC = () => {
                         <Users className="w-5 h-5 text-indigo-600" />
                       </div>
                       <div className="flex flex-col">
-                        <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100 leading-tight">{turma.nome}</h3>
+                        <h3 className="text-lg font-bold text-gray-800 dark:text-slate-200 leading-tight">{turma.nome}</h3>
                       </div>
                     </div>
                     <span className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap shrink-0 border border-indigo-100">
@@ -460,7 +460,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
             Voltar
           </button>
           <span className="text-gray-300">|</span>
-          <h1 className="text-gray-800 dark:text-slate-100 font-semibold text-lg">Painel de Inteligência Acadêmica</h1>
+          <h1 className="text-gray-800 dark:text-slate-200 font-semibold text-lg">Painel de Inteligência Acadêmica</h1>
           <span className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 text-xs px-2 py-1 rounded font-bold ml-2">
             {turma.codigo}
           </span>
@@ -531,19 +531,19 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
               <tbody className="divide-y divide-gray-100">
                 {alunosProcessed.map(item => (
                   <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-100 align-middle border-r sticky left-0 bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900">
+                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle border-r sticky left-0 bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900">
                       {item.aluno.nome}
                     </td>
                     <td className="px-4 py-3 text-center align-middle border-r sticky left-[200px] bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900 font-bold dark:text-slate-100">
-                      <span className={`px-2 py-1 rounded text-xs font-bold inline-block ${item.isPeDeMeiaApto ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
+                      <span className={`px-2 py-1 rounded text-xs font-bold inline-block ${item.isPeDeMeiaApto ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border dark:border-emerald-800' : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 dark:border dark:border-red-800'}`}>
                         {item.isPeDeMeiaApto ? 'Apto' : 'Não Apto'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-center align-middle border-r sticky left-[350px] bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900 font-bold dark:text-slate-100">
                       <span className={`px-2 py-1 rounded text-xs font-bold inline-block
                         ${item.statusText.includes('Aprovado') ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800' :
-                          item.statusText.includes('Retido') || item.statusText.includes('Reprovado') ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-100'
+                          item.statusText.includes('Retido') || item.statusText.includes('Reprovado') ? 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 dark:border dark:border-red-800' :
+                          'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-200'
                         }`}>
                         {item.statusText}
                       </span>
@@ -605,7 +605,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
               <tbody className="divide-y divide-gray-100">
                 {conselhoAlunos.map(item => (
                   <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-100 align-middle">
+                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
                       {item.aluno.nome}
                     </td>
                     <td className="px-4 py-3 align-middle">
@@ -642,7 +642,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                           </button>
                           <button 
                             onClick={() => handleDecisaoConselho(item.aluno.id!, item.pendencias, 'reprovado')}
-                            className="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-3 rounded-lg text-sm shadow-sm transition-colors"
+                            className="bg-red-600 hover:bg-red-700 text-white dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-900/60 dark:border dark:border-red-800 font-bold py-1.5 px-3 rounded-lg text-sm shadow-sm transition-colors"
                           >
                             Reprovar
                           </button>
@@ -678,7 +678,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                 <Users className="w-6 h-6" />
               </div>
               <h3 className="text-gray-500 dark:text-slate-400 font-medium text-sm mb-1">Total de Alunos</h3>
-              <p className="text-3xl font-bold text-gray-800 dark:text-slate-100">{alunos.length}</p>
+              <p className="text-3xl font-bold text-gray-800 dark:text-slate-200">{alunos.length}</p>
             </div>
             
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 flex flex-col justify-center items-center text-center dark:text-slate-100">
@@ -686,18 +686,18 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                 <BarChart2 className="w-6 h-6" />
               </div>
               <h3 className="text-gray-500 dark:text-slate-400 font-medium text-sm mb-1">Taxa de Sucesso (Notas Azuis)</h3>
-              <p className="text-3xl font-bold text-gray-800 dark:text-slate-100">
+              <p className="text-3xl font-bold text-gray-800 dark:text-slate-200">
                 {taxaSucesso.toFixed(1)}%
               </p>
               <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Das notas fechadas</p>
             </div>
 
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 flex flex-col justify-center items-center text-center dark:text-slate-100">
-              <div className="w-12 h-12 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-full flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mb-4">
                 <Scale className="w-6 h-6" />
               </div>
               <h3 className="text-gray-500 dark:text-slate-400 font-medium text-sm mb-1">Disciplina Crítica</h3>
-              <p className="text-xl font-bold text-gray-800 dark:text-slate-100 line-clamp-2">
+              <p className="text-xl font-bold text-gray-800 dark:text-slate-200 line-clamp-2">
                 {discCriticaName}
               </p>
               <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">Menor média da turma</p>
@@ -724,13 +724,13 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
               <tbody className="divide-y divide-gray-100">
                 {alunosRisco.map(item => (
                   <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-100 align-middle">
+                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
                       {item.aluno.nome}
                     </td>
                     <td className="px-4 py-3 align-middle">
                       <div className="flex flex-col gap-1">
                         {item.disciplinasRisco.map(d => (
-                          <div key={d.disc.id} className="flex justify-between items-center text-sm bg-red-50 dark:bg-red-900/20 border border-red-100 rounded px-2 py-1">
+                          <div key={d.disc.id} className="flex justify-between items-center text-sm bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 rounded px-2 py-1">
                             <span className="text-red-800 truncate mr-2 font-medium">{d.disc.nome}</span>
                             <span className={`font-bold ${d.percent >= 1.0 ? 'text-red-700' : 'text-red-500'}`}>
                               {d.faltasTot} faltas
@@ -741,7 +741,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                     </td>
                     <td className="px-4 py-3 text-center align-middle font-bold">
                       {item.nivelRisco === 'Muito Alto' ? (
-                        <span className="text-red-600 bg-red-100 px-3 py-1 rounded-full flex items-center justify-center gap-1 w-fit mx-auto">
+                        <span className="text-red-600 bg-red-100 dark:bg-red-900/40 dark:text-red-300 px-3 py-1 rounded-full flex items-center justify-center gap-1 w-fit mx-auto">
                           <AlertTriangle className="w-4 h-4" /> Muito Alto
                         </span>
                       ) : (
@@ -771,7 +771,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
               <select
                 value={monitoriaDiscId}
                 onChange={e => setMonitoriaDiscId(e.target.value ? Number(e.target.value) : '')}
-                className="block w-64 rounded-md border-gray-300 dark:border-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-3 border"
+                className="block w-64 rounded-md border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-3 border"
               >
                 <option value="">-- Selecione uma Disciplina --</option>
                 {disciplinas.map(d => (
@@ -816,7 +816,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                             <span className="font-bold text-gray-500 dark:text-slate-400">{index + 1}º</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-100 align-middle">
+                        <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
                           {item.aluno.nome}
                         </td>
                         <td className="px-4 py-3 text-center align-middle font-bold text-green-600">
@@ -884,7 +884,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                         <span className="text-gray-300">-</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-100 align-middle">
+                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
                       {item.aluno.nome}
                     </td>
                     <td className="px-4 py-3 text-center align-middle font-bold text-indigo-600">

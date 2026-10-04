@@ -34,7 +34,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <div className={`mx-auto w-12 h-12 ${iconBg} rounded-full flex items-center justify-center mb-4`}>
           <Icon className={`w-6 h-6 ${iconColor}`} />
         </div>
-        <h3 className="text-xl font-bold text-gray-800 dark:text-slate-100 mb-2">{title}</h3>
+        <h3 className="text-xl font-bold text-gray-800 dark:text-slate-200 mb-2">{title}</h3>
         <p className="text-gray-600 dark:text-slate-300 mb-6 whitespace-pre-wrap">{message}</p>
         <div className="flex justify-center gap-3">
           {onCancel && (

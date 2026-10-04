@@ -68,7 +68,7 @@ export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearIni
               <Users className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100 tracking-tight">Gestão de Turmas</h2>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-200 tracking-tight">Gestão de Turmas</h2>
               <p className="text-gray-500 dark:text-slate-400 text-sm font-medium">Acesso rápido a diários e controle de alunos</p>
             </div>
           </div>
@@ -89,7 +89,7 @@ export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearIni
                 setSelectedCursoId(e.target.value);
                 setSelectedPeriodo('todos');
               }} 
-              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent outline-none cursor-pointer max-w-[200px] truncate"
+              className="text-sm font-bold text-gray-800 dark:text-slate-200 bg-transparent outline-none cursor-pointer max-w-[200px] truncate"
             >
               <option value="todos">Todos os Cursos</option>
               {cursos.map(c => (
@@ -103,7 +103,7 @@ export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearIni
             <select 
               value={selectedPeriodo} 
               onChange={e => setSelectedPeriodo(e.target.value)} 
-              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent outline-none cursor-pointer"
+              className="text-sm font-bold text-gray-800 dark:text-slate-200 bg-transparent outline-none cursor-pointer"
             >
               <option value="todos">Todos os Períodos</option>
               {periodosDisponiveis.map(p => (
@@ -154,7 +154,7 @@ export const TurmasView: React.FC<Props> = ({ initialOpenTurmaAlunosId, clearIni
                       <Users className="w-5 h-5 text-indigo-600" />
                     </div>
                     <div className="flex flex-col">
-                      <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100 leading-tight">{t.nome}</h3>
+                      <h3 className="text-lg font-bold text-gray-800 dark:text-slate-200 leading-tight">{t.nome}</h3>
                       <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-1">{curso?.nome || 'Curso Desconhecido'}</p>
                     </div>
                   </div>
@@ -251,7 +251,7 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
             Voltar
           </button>
           <span className="text-gray-300">|</span>
-          <h1 className="text-gray-800 dark:text-slate-100 font-semibold text-lg">{turma.nome}</h1>
+          <h1 className="text-gray-800 dark:text-slate-200 font-semibold text-lg">{turma.nome}</h1>
           <span className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 text-xs px-2 py-1 rounded font-bold ml-2">
             {turma.codigo}
           </span>
@@ -260,7 +260,7 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
 
       <main className="flex-1 p-6">
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">Disciplinas da Turma</h2>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200">Disciplinas da Turma</h2>
           <p className="text-gray-500 dark:text-slate-400 text-sm">Selecione uma etapa para iniciar o lançamento de notas</p>
         </div>
 
@@ -323,7 +323,7 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
                 <div className={`${iconBgClass} p-2 rounded-lg`}>
                   <BookOpen className={`w-5 h-5 ${iconTextClass}`} />
                 </div>
-                <h3 className="font-bold text-gray-800 dark:text-slate-100 text-lg flex-1 truncate" title={d.nome}>{d.nome}</h3>
+                <h3 className="font-bold text-gray-800 dark:text-slate-200 text-lg flex-1 truncate" title={d.nome}>{d.nome}</h3>
               </div>
               <p className="text-xs text-gray-500 dark:text-slate-400 mb-4 flex justify-between">
                 <span>Carga Horária: {d.chAula}h</span>
@@ -537,7 +537,7 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col dark:text-slate-100">
         <div className="flex justify-between items-center p-5 border-b border-gray-200 dark:border-slate-700">
           <div>
-            <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">Gerenciar Alunos da Turma</h2>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200">Gerenciar Alunos da Turma</h2>
             <p className="text-gray-500 dark:text-slate-400 text-sm">{turma.nome}</p>
           </div>
           <button onClick={onClose} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full p-2 transition-colors">
@@ -548,7 +548,7 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
         <div className="p-4 border-b border-gray-100 bg-gray-50 dark:bg-slate-900 flex gap-3">
           <button
             onClick={handleAddManual}
-            className="flex-1 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 hover:border-indigo-400 hover:text-indigo-600 text-gray-700 dark:text-slate-300 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 text-sm transition-colors shadow-sm"
+            className="flex-1 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 dark:text-slate-100 dark:focus:ring-slate-600 hover:border-indigo-400 hover:text-indigo-600 text-gray-700 dark:text-slate-300 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 text-sm transition-colors shadow-sm"
           >
             <UserPlus className="w-4 h-4" />
             Adicionar Manualmente
@@ -573,7 +573,7 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
           <input 
             type="file" 
             accept=".xlsx, .csv" 
-            className="hidden" 
+            className="className="hidden dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" 
             ref={fileInputRef}
             onChange={handleImportFile}
           />
@@ -595,7 +595,7 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
               <tbody className="divide-y divide-gray-100">
                 {alunosSorted.map(aluno => (
                   <tr key={aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 group">
-                    <td className="py-2 font-medium text-gray-800 dark:text-slate-100">{aluno.nome}</td>
+                    <td className="py-2 font-medium text-gray-800 dark:text-slate-200">{aluno.nome}</td>
                     <td className="py-2 text-right">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
@@ -632,13 +632,13 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
       {alunoModal.isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6 dark:text-slate-100">
-            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100 mb-4">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-200 mb-4">
               {alunoModal.mode === 'add' ? 'Adicionar Novo Aluno' : 'Editar Aluno'}
             </h3>
             <input
               type="text"
               autoFocus
-              className="w-full border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 mb-6"
+              className="w-full border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded-lg p-2.5 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 mb-6"
               placeholder="Nome completo do aluno"
               value={alunoModal.nome}
               onChange={e => setAlunoModal({ ...alunoModal, nome: e.target.value })}
@@ -899,7 +899,7 @@ const DiarioDisciplina: React.FC<{
             Voltar para Turma
           </button>
           <span className="text-gray-300">|</span>
-          <h1 className="text-gray-800 dark:text-slate-100 font-semibold text-lg">{disciplina.nome}</h1>
+          <h1 className="text-gray-800 dark:text-slate-200 font-semibold text-lg">{disciplina.nome}</h1>
           <span className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 text-xs px-2 py-1 rounded font-bold ml-2">
             {turma.codigo}
           </span>
@@ -955,9 +955,9 @@ const DiarioDisciplina: React.FC<{
                       <th key={etapa} className="px-2 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-l border-gray-200 dark:border-slate-700 w-16" title={`Nota ${etapa}`}>N{etapa}</th>
                     ))}
                     <th className="px-2 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-l border-gray-200 dark:border-slate-700 w-24">Faltas (Tot)</th>
-                    <th className="px-2 py-3 text-center font-bold text-gray-800 dark:text-slate-100 border-b border-l border-gray-200 dark:border-slate-700 w-24 bg-gray-200 dark:bg-slate-700">M. Parcial</th>
+                    <th className="px-2 py-3 text-center font-bold text-gray-800 dark:text-slate-200 border-b border-l border-gray-200 dark:border-slate-700 w-24 bg-gray-200 dark:bg-slate-700">M. Parcial</th>
                     <th className="px-2 py-3 text-center font-semibold text-blue-700 border-b border-l border-gray-200 dark:border-slate-700 w-24 bg-blue-50 dark:bg-blue-900/20">Prova Final</th>
-                    <th className="px-2 py-3 text-center font-bold text-gray-800 dark:text-slate-100 border-b border-l border-gray-200 dark:border-slate-700 w-24 bg-gray-200 dark:bg-slate-700">M. Final</th>
+                    <th className="px-2 py-3 text-center font-bold text-gray-800 dark:text-slate-200 border-b border-l border-gray-200 dark:border-slate-700 w-24 bg-gray-200 dark:bg-slate-700">M. Final</th>
                     <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 border-b border-l border-gray-200 dark:border-slate-700 min-w-[150px]">Situação</th>
                   </>
                 )}
@@ -971,7 +971,7 @@ const DiarioDisciplina: React.FC<{
                 
                 return (
                   <tr key={aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
-                    <td className="px-4 py-2 font-medium text-gray-800 dark:text-slate-100 sticky left-0 bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900 z-10 shadow-[1px_0_0_0_#f3f4f6]">
+                    <td className="px-4 py-2 font-medium text-gray-800 dark:text-slate-200 sticky left-0 bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900 z-10 shadow-[1px_0_0_0_#f3f4f6]">
                       <div className="truncate flex items-center gap-2">
                         <span>{aluno.nome}</span>
                       </div>
@@ -984,7 +984,7 @@ const DiarioDisciplina: React.FC<{
                           <input 
                             id={`nota-${index}`}
                             type="text"
-                            className="w-full bg-transparent outline-none text-center font-medium" 
+                            className="className="w-full bg-transparent outline-none text-center font-medium dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" 
                             defaultValue={notas[currentEtapa]?.nota !== undefined && notas[currentEtapa]?.nota !== null ? Number(notas[currentEtapa].nota).toFixed(1).replace('.', ',') : ''}
                             onChange={(e) => {
                               let val = e.target.value.replace(/\D/g, '');
@@ -1012,7 +1012,7 @@ const DiarioDisciplina: React.FC<{
                             id={`faltas-${index}`}
                             type="number" 
                             step="1" min="0"
-                            className="w-full bg-transparent outline-none text-center" 
+                            className="className="w-full bg-transparent outline-none text-center dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" 
                             defaultValue={notas[currentEtapa]?.faltas !== undefined && notas[currentEtapa]?.faltas !== null ? notas[currentEtapa].faltas : ''}
                             onBlur={(e) => handleSaveNota(aluno.id!, currentEtapa, 'faltas', e.target.value, e)}
                             onKeyDown={(e) => handleKeyDown(e, 'faltas', index)}
@@ -1034,13 +1034,13 @@ const DiarioDisciplina: React.FC<{
                           <td className={`px-2 py-2 border-l border-gray-100 text-center font-medium ${sit.totalFaltas > (disciplina.chAula * 0.25) ? 'text-red-600' : 'text-gray-700 dark:text-slate-300'}`}>
                             {sit.totalFaltas}
                           </td>
-                          <td className="px-2 py-2 border-l border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-center font-bold text-gray-800 dark:text-slate-100">
+                          <td className="px-2 py-2 border-l border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-center font-bold text-gray-800 dark:text-slate-200">
                             {sit.mediaParcial}
                           </td>
                           <td className="px-2 py-2 border-l border-gray-100 bg-blue-50 dark:bg-blue-900/20/50">
                             <input 
                               type="text"
-                              className="w-full bg-transparent outline-none text-center text-blue-800 font-medium placeholder-blue-300" 
+                              className="className="w-full bg-transparent outline-none text-center text-blue-800 font-medium placeholder-blue-300 dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" 
                               placeholder="-"
                               defaultValue={av.provaFinal !== undefined && av.provaFinal !== null ? Number(av.provaFinal).toFixed(1).replace('.', ',') : ''}
                               onChange={(e) => {
@@ -1063,7 +1063,7 @@ const DiarioDisciplina: React.FC<{
                               }}
                             />
                           </td>
-                          <td className="px-2 py-2 border-l border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-center font-bold text-gray-900 dark:text-slate-100">
+                          <td className="px-2 py-2 border-l border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-center font-bold text-gray-900 dark:text-slate-200">
                             {sit.isAprovadoConselho ? (
                                <div className="flex flex-col items-center justify-center">
                                   <span className="text-blue-600 font-semibold">{sit.mediaFinal}</span>

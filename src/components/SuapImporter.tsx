@@ -237,7 +237,7 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
           <FileSpreadsheet className="w-6 h-6 text-indigo-600" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">Importador SUAP</h2>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200">Importador SUAP</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400">
             Importe planilhas CSV/XLSX exportadas do SUAP
           </p>
@@ -261,7 +261,7 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
               id="file-upload"
               type="file"
               accept=".csv,.xlsx,.xls"
-              className="hidden"
+              className="className="hidden dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800""
               onChange={handleFileInput}
             />
             <label htmlFor="file-upload" className="cursor-pointer block">
@@ -332,7 +332,7 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
                       const sit = SITUACAO_LABELS[r.situacao];
                       return (
                         <tr key={i} className="hover:bg-gray-50 dark:hover:bg-slate-900">
-                          <td className="px-4 py-2 font-medium text-gray-800 dark:text-slate-100 whitespace-nowrap">{r.nome}</td>
+                          <td className="px-4 py-2 font-medium text-gray-800 dark:text-slate-200 whitespace-nowrap">{r.nome}</td>
                           <td className="px-4 py-2 text-gray-500 dark:text-slate-400">{r.matricula}</td>
                           <td className="px-4 py-2 text-gray-500 dark:text-slate-400 whitespace-nowrap">{r.turma}</td>
                           <td className="px-4 py-2 text-gray-600 dark:text-slate-300 whitespace-nowrap">{r.disciplina}</td>
@@ -389,7 +389,7 @@ export const SuapImporter: React.FC<Props> = ({ turmaId }) => {
             <CheckCircle className="w-12 h-12 text-green-600" />
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-gray-800 dark:text-slate-100">Importação concluída!</p>
+            <p className="text-xl font-bold text-gray-800 dark:text-slate-200">Importação concluída!</p>
             <p className="text-gray-500 dark:text-slate-400 mt-1">
               {savedCount} registros foram salvos com sucesso no banco local.
             </p>

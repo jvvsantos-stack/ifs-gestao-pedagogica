@@ -86,7 +86,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
         
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 dark:bg-slate-900/50">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
             <Search className="w-5 h-5 text-indigo-600" />
             Busca de Aluno (Raio-X)
           </h2>
@@ -107,7 +107,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                   type="text" 
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
                   placeholder="Digite o nome do aluno (opcional)..."
                 />
               </div>
@@ -124,7 +124,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                 <select 
                   value={selectedCursoId}
                   onChange={e => setSelectedCursoId(e.target.value ? Number(e.target.value) : '')}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-800 dark:text-slate-100"
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 outline-none bg-white dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="">Todos os Cursos</option>
                   {cursosAll.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
@@ -137,7 +137,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                   value={selectedPeriodo}
                   onChange={e => setSelectedPeriodo(e.target.value)}
                   disabled={!selectedCursoId}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-800 disabled:bg-gray-100 disabled:dark:bg-slate-800 dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 dark:text-slate-500 disabled:cursor-not-allowed"
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 outline-none bg-white dark:bg-slate-800 dark:text-slate-100 disabled:bg-gray-100 disabled:dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 disabled:cursor-not-allowed"
                 >
                   <option value="">Todos os Períodos</option>
                   {periodosDisponiveis.map(p => <option key={p} value={p}>{p}</option>)}
@@ -150,7 +150,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                   value={selectedTurmaId}
                   onChange={e => setSelectedTurmaId(e.target.value ? Number(e.target.value) : '')}
                   disabled={!selectedPeriodo}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-800 disabled:bg-gray-100 disabled:dark:bg-slate-800 dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 dark:text-slate-500 disabled:cursor-not-allowed"
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 outline-none bg-white dark:bg-slate-800 dark:text-slate-100 disabled:bg-gray-100 disabled:dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 disabled:cursor-not-allowed"
                 >
                   <option value="">Todas as Turmas</option>
                   {turmasDisponiveis.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -163,7 +163,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                   value={selectedAlunoId}
                   onChange={e => setSelectedAlunoId(e.target.value ? Number(e.target.value) : '')}
                   disabled={!selectedTurmaId}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-800 disabled:bg-gray-100 disabled:dark:bg-slate-800 dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 dark:text-slate-500 disabled:cursor-not-allowed"
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 outline-none bg-white dark:bg-slate-800 dark:text-slate-100 disabled:bg-gray-100 disabled:dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 disabled:cursor-not-allowed"
                 >
                   <option value="">Todos os Alunos</option>
                   {alunosDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
@@ -290,7 +290,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                     <div className="bg-indigo-50 dark:bg-indigo-900/30/50 p-6 border-b border-gray-200 dark:border-slate-700">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="text-xl font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2">
+                          <h3 className="text-xl font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
                             <GraduationCap className="w-6 h-6 text-indigo-600" />
                             {aluno.nome}
                           </h3>
@@ -340,7 +340,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                         <tbody className="divide-y divide-gray-100">
                           {boletim.map((b, i) => (
                             <tr key={i} className="hover:bg-gray-50 dark:hover:bg-slate-900">
-                              <td className="px-6 py-3 font-medium text-gray-800 dark:text-slate-100">{b.disc.nome}</td>
+                              <td className="px-6 py-3 font-medium text-gray-800 dark:text-slate-200">{b.disc.nome}</td>
                               {b.notasEtapas.map((n, idx) => (
                                 <td key={idx} className="px-4 py-3 text-center text-gray-600 dark:text-slate-300">
                                   {n !== null ? n.toFixed(1) : '-'}
@@ -349,7 +349,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                               <td className="px-4 py-3 text-center text-gray-600 dark:text-slate-300">
                                 {b.af?.provaFinal !== undefined && b.af.provaFinal !== null ? Number(b.af.provaFinal).toFixed(1) : '-'}
                               </td>
-                              <td className="px-4 py-3 text-center font-bold text-gray-800 dark:text-slate-100">
+                              <td className="px-4 py-3 text-center font-bold text-gray-800 dark:text-slate-200">
                                 {b.mediaFinal !== null ? (
                                    b.isAprovadoConselho ? (
                                       <div className="flex flex-col items-center justify-center">
@@ -371,7 +371,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                                   <span className={`px-2 py-1 rounded text-xs font-bold inline-block
                                     ${b.situacao === 'Cursando' ? 'bg-blue-100 text-blue-800' : 
                                       b.situacao.includes('Aprovado') ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800' : 
-                                      'bg-red-100 text-red-800'}`}>
+                                      'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 dark:border dark:border-red-800'}`}>
                                     {b.situacao}
                                   </span>
                                   {b.faltasExcedidas && (
@@ -389,7 +389,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                     <div className="bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 p-6 grid grid-cols-1 md:grid-cols-3 gap-6 dark:text-slate-100">
                       {/* Estágio */}
                       <div className="bg-gray-50 dark:bg-slate-900 rounded-xl p-4 border border-gray-200 dark:border-slate-700">
-                        <h4 className="text-md font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center gap-2">
+                        <h4 className="text-md font-bold text-gray-800 dark:text-slate-200 mb-3 flex items-center gap-2">
                           <Briefcase className="w-5 h-5 text-indigo-600" />
                           Estágio
                         </h4>
@@ -409,12 +409,12 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
 
                       {/* Conselho de Classe */}
                       <div className="bg-gray-50 dark:bg-slate-900 rounded-xl p-4 border border-gray-200 dark:border-slate-700">
-                        <h4 className="text-md font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center gap-2">
+                        <h4 className="text-md font-bold text-gray-800 dark:text-slate-200 mb-3 flex items-center gap-2">
                           <Gavel className="w-5 h-5 text-indigo-600" />
                           Conselho de Classe
                         </h4>
                         {conselhoGlobal ? (
-                          <div className={`text-sm font-semibold p-3 rounded-lg border ${conselhoGlobal.includes('Aprovado') ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 border-emerald-200' : 'bg-red-100 text-red-800 border-red-200'}`}>
+                          <div className={`text-sm font-semibold p-3 rounded-lg border ${conselhoGlobal.includes('Aprovado') ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 border-emerald-200' : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 dark:border dark:border-red-800 border-red-200'}`}>
                             {conselhoGlobal}
                           </div>
                         ) : (
@@ -424,11 +424,11 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
 
                       {/* Programa Pé de Meia */}
                       <div className="bg-gray-50 dark:bg-slate-900 rounded-xl p-4 border border-gray-200 dark:border-slate-700">
-                        <h4 className="text-md font-bold text-gray-800 dark:text-slate-100 mb-3 flex items-center gap-2">
+                        <h4 className="text-md font-bold text-gray-800 dark:text-slate-200 mb-3 flex items-center gap-2">
                           <Wallet className="w-5 h-5 text-emerald-600" />
                           Programa Pé de Meia
                         </h4>
-                        <div className={`text-sm font-semibold p-3 rounded-lg border ${isPeDeMeiaApto ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 border-emerald-200' : 'bg-red-100 text-red-800 border-red-200'}`}>
+                        <div className={`text-sm font-semibold p-3 rounded-lg border ${isPeDeMeiaApto ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 border-emerald-200' : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 dark:border dark:border-red-800 border-red-200'}`}>
                           {isPeDeMeiaApto ? '✅ Habilitado' : '❌ Não Habilitado'} ({freqGlobal.toFixed(1)}%)
                         </div>
                       </div>
@@ -436,7 +436,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
 
                     {/* Ocorrências Section */}
                     <div className="bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 p-6">
-                      <h4 className="text-lg font-bold text-gray-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                      <h4 className="text-lg font-bold text-gray-800 dark:text-slate-200 mb-4 flex items-center gap-2">
                         <ClipboardList className="w-5 h-5 text-gray-600 dark:text-slate-300" />
                         Histórico de Ocorrências
                       </h4>
@@ -446,7 +446,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                         <div className="space-y-4">
                           {ocorrenciasDoAluno.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).map(oc => {
                             const isAlerta = oc.tipo.toLowerCase().includes('suspensão') || oc.tipo.toLowerCase().includes('indisciplina') || oc.tipo.toLowerCase().includes('advertência');
-                            const badgeColor = isAlerta ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800';
+                            const badgeColor = isAlerta ? 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 dark:border dark:border-red-800' : 'bg-blue-100 text-blue-800';
                             
                             return (
                               <div key={oc.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex flex-col gap-2 dark:text-slate-100">

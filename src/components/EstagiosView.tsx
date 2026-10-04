@@ -193,7 +193,7 @@ export const EstagiosView: React.FC = () => {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-200 flex items-center gap-2">
             <Briefcase className="w-8 h-8 text-indigo-600" />
             Gestão de Estágios
           </h1>
@@ -207,7 +207,7 @@ export const EstagiosView: React.FC = () => {
           <select
             value={selectedCursoId}
             onChange={(e) => setSelectedCursoId(e.target.value ? Number(e.target.value) : '')}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">Selecione o Curso...</option>
             {cursos.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
@@ -255,7 +255,7 @@ export const EstagiosView: React.FC = () => {
       </div>
       <div>
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">Estágios Cadastrados</h2>
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-200">Estágios Cadastrados</h2>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
             <div className="relative w-full sm:w-80">
@@ -308,7 +308,7 @@ export const EstagiosView: React.FC = () => {
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <div className="flex flex-col mb-1.5">
-                        <span className="font-bold text-lg text-gray-900 dark:text-slate-100">{getAlunoNome(estagio.alunoId)}</span>
+                        <span className="font-bold text-lg text-gray-900 dark:text-slate-200">{getAlunoNome(estagio.alunoId)}</span>
                         {(curso || turma) && (
                           <span className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
                             {[curso?.nome, turma?.nome, turma?.anoLetivo].filter(Boolean).join(' • ')}
@@ -328,7 +328,7 @@ export const EstagiosView: React.FC = () => {
                           <span>Término: {new Date(estagio.dadosFinalizacao.termino + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
                         )}
                         {estagio.status === 'Finalizado' && estagio.dadosFinalizacao?.nota && (
-                          <span className="font-medium text-gray-900 dark:text-slate-100">Nota: {estagio.dadosFinalizacao.nota}</span>
+                          <span className="font-medium text-gray-900 dark:text-slate-200">Nota: {estagio.dadosFinalizacao.nota}</span>
                         )}
                         {estagio.status === 'Não Finalizado' && estagio.dadosFinalizacao?.motivoNaoFinalizado && (
                           <span className="font-medium text-orange-600">Motivo: {estagio.dadosFinalizacao.motivoNaoFinalizado}</span>
@@ -338,7 +338,7 @@ export const EstagiosView: React.FC = () => {
                     <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
                       estagio.status === 'Finalizado' ? 'bg-green-100 dark:bg-green-900/40 text-green-800' :
                       estagio.status === 'Não Finalizado' ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-800' :
-                      estagio.status === 'Arquivado' ? 'bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-slate-100' :
+                      estagio.status === 'Arquivado' ? 'bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-slate-200' :
                       'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800'
                     }`}>
                       {estagio.status}
@@ -409,7 +409,7 @@ export const EstagiosView: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col dark:text-slate-100">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-900 rounded-t-xl shrink-0">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-slate-200">
                 {currentEstagio.id ? 'Editar Estágio' : 'Cadastrar Novo Estágio'}
               </h2>
               <button onClick={() => setShowForm(false)} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300">
@@ -438,37 +438,37 @@ export const EstagiosView: React.FC = () => {
               <section>
                 <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 border-b pb-2 mb-4">Dados da Empresa</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Nome/Razão Social</label><input required className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEmpresa?.nome || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, nome: e.target.value}})} /></div>
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Ramo de Atividade</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEmpresa?.ramo || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, ramo: e.target.value}})} /></div>
-                  <div className="md:col-span-2"><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Endereço</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEmpresa?.endereco || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, endereco: e.target.value}})} /></div>
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Telefone</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEmpresa?.telefone || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, telefone: e.target.value}})} /></div>
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Bairro/Cidade</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEmpresa?.bairroCidade || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, bairroCidade: e.target.value}})} /></div>
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">CEP</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEmpresa?.cep || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, cep: e.target.value}})} /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Nome/Razão Social</label><input required className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEmpresa?.nome || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, nome: e.target.value}})} /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Ramo de Atividade</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEmpresa?.ramo || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, ramo: e.target.value}})} /></div>
+                  <div className="md:col-span-2"><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Endereço</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEmpresa?.endereco || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, endereco: e.target.value}})} /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Telefone</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEmpresa?.telefone || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, telefone: e.target.value}})} /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Bairro/Cidade</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEmpresa?.bairroCidade || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, bairroCidade: e.target.value}})} /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">CEP</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEmpresa?.cep || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEmpresa: {...currentEstagio.dadosEmpresa!, cep: e.target.value}})} /></div>
                 </div>
               </section>
 
               <section>
                 <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 border-b pb-2 mb-4">Supervisor</h3>
-                <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Nome do Supervisor na Empresa</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.supervisor?.nome || ''} onChange={e => setCurrentEstagio({...currentEstagio, supervisor: {...currentEstagio.supervisor!, nome: e.target.value}})} /></div>
+                <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Nome do Supervisor na Empresa</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.supervisor?.nome || ''} onChange={e => setCurrentEstagio({...currentEstagio, supervisor: {...currentEstagio.supervisor!, nome: e.target.value}})} /></div>
               </section>
 
               <section>
                 <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 border-b pb-2 mb-4">Dados do Estagiário</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Ano de Conclusão</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.anoConclusao || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, anoConclusao: e.target.value}})} /></div>
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Telefone</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.telefone || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, telefone: e.target.value}})} /></div>
-                  <div className="md:col-span-2"><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Endereço</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.endereco || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, endereco: e.target.value}})} /></div>
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Bairro/Cidade</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.bairroCidade || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, bairroCidade: e.target.value}})} /></div>
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">CEP</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagiario?.cep || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, cep: e.target.value}})} /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Ano de Conclusão</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEstagiario?.anoConclusao || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, anoConclusao: e.target.value}})} /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Telefone</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEstagiario?.telefone || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, telefone: e.target.value}})} /></div>
+                  <div className="md:col-span-2"><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Endereço</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEstagiario?.endereco || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, endereco: e.target.value}})} /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Bairro/Cidade</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEstagiario?.bairroCidade || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, bairroCidade: e.target.value}})} /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">CEP</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEstagiario?.cep || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagiario: {...currentEstagio.dadosEstagiario!, cep: e.target.value}})} /></div>
                 </div>
               </section>
 
               <section>
                 <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 border-b pb-2 mb-4">Dados do Estágio</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Data de Início</label><input type="date" className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagio?.inicio || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagio: {...currentEstagio.dadosEstagio!, inicio: e.target.value}})} /></div>
-                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Carga Horária Diária</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagio?.chDiaria || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagio: {...currentEstagio.dadosEstagio!, chDiaria: e.target.value}})} /></div>
-                  <div className="md:col-span-2"><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Função Principal</label><input className="mt-1 w-full p-2 border rounded" value={currentEstagio.dadosEstagio?.funcaoPrincipal || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagio: {...currentEstagio.dadosEstagio!, funcaoPrincipal: e.target.value}})} /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Data de Início</label><input type="date" className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEstagio?.inicio || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagio: {...currentEstagio.dadosEstagio!, inicio: e.target.value}})} /></div>
+                  <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Carga Horária Diária</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEstagio?.chDiaria || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagio: {...currentEstagio.dadosEstagio!, chDiaria: e.target.value}})} /></div>
+                  <div className="md:col-span-2"><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Função Principal</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={currentEstagio.dadosEstagio?.funcaoPrincipal || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagio: {...currentEstagio.dadosEstagio!, funcaoPrincipal: e.target.value}})} /></div>
                   <div className="md:col-span-2"><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Áreas de Atuação</label><textarea className="mt-1 w-full p-2 border rounded" rows={2} value={currentEstagio.dadosEstagio?.areasAtuacao || ''} onChange={e => setCurrentEstagio({...currentEstagio, dadosEstagio: {...currentEstagio.dadosEstagio!, areasAtuacao: e.target.value}})} /></div>
                 </div>
               </section>
@@ -489,13 +489,13 @@ export const EstagiosView: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-lg dark:text-slate-100">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">Finalizar Estágio</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-slate-200">Finalizar Estágio</h2>
               <button onClick={() => setShowFinalizar(false)} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"><X className="w-6 h-6" /></button>
             </div>
             <div className="p-6 space-y-4">
-              <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Data de Término</label><input type="date" className="mt-1 w-full p-2 border rounded" value={finalizarData.termino} onChange={e => setFinalizarData({...finalizarData, termino: e.target.value})} /></div>
-              <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Carga Horária Total</label><input className="mt-1 w-full p-2 border rounded" value={finalizarData.chTotal} onChange={e => setFinalizarData({...finalizarData, chTotal: e.target.value})} /></div>
-              <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Nota Final</label><input type="number" step="0.1" className="mt-1 w-full p-2 border rounded" value={finalizarData.nota} onChange={e => setFinalizarData({...finalizarData, nota: e.target.value})} /></div>
+              <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Data de Término</label><input type="date" className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={finalizarData.termino} onChange={e => setFinalizarData({...finalizarData, termino: e.target.value})} /></div>
+              <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Carga Horária Total</label><input className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={finalizarData.chTotal} onChange={e => setFinalizarData({...finalizarData, chTotal: e.target.value})} /></div>
+              <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Nota Final</label><input type="number" step="0.1" className="className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800"" value={finalizarData.nota} onChange={e => setFinalizarData({...finalizarData, nota: e.target.value})} /></div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Avaliação</label>
@@ -513,7 +513,7 @@ export const EstagiosView: React.FC = () => {
 
               <div className="flex justify-end gap-3 pt-4 border-t">
                 <button onClick={() => setShowFinalizar(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-900">Cancelar</button>
-                <button onClick={handleSaveFinalizar} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2">
+                <button onClick={handleSaveFinalizar} className="px-4 py-2 bg-green-600 text-white dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800 border border-transparent rounded-lg hover:bg-green-700 flex items-center gap-2">
                   <CheckCircle className="w-4 h-4" /> Confirmar Término
                 </button>
               </div>
@@ -527,7 +527,7 @@ export const EstagiosView: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md dark:text-slate-100">
             <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100">Estágio Não Finalizado</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-slate-200">Estágio Não Finalizado</h2>
               <button onClick={() => setShowNaoFinalizado(false)} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"><X className="w-6 h-6" /></button>
             </div>
             <div className="p-6 space-y-4">
@@ -546,7 +546,7 @@ export const EstagiosView: React.FC = () => {
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t">
                 <button onClick={() => setShowNaoFinalizado(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-900">Cancelar</button>
-                <button onClick={handleSaveNaoFinalizado} disabled={!motivoNaoFinalizado} className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50">
+                <button onClick={handleSaveNaoFinalizado} disabled={!motivoNaoFinalizado} className="px-4 py-2 bg-orange-600 text-white dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800 border border-transparent rounded-lg hover:bg-orange-700 disabled:opacity-50">
                   Confirmar
                 </button>
               </div>

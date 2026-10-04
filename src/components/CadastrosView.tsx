@@ -427,7 +427,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
   return (
     <div className="p-6 bg-gray-50 dark:bg-slate-900 min-h-full space-y-8">
       <header className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100">Estrutura Acadêmica</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-200">Estrutura Acadêmica</h1>
         <p className="text-gray-500 dark:text-slate-400 text-sm">Gerenciamento de cursos, disciplinas e períodos letivos</p>
       </header>
 
@@ -436,7 +436,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         {/* ============ SEÇÃO 1: CURSOS ============ */}
         <section className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 flex flex-col w-full dark:text-slate-100">
           <div className="p-4 border-b border-gray-100 bg-indigo-50 dark:bg-indigo-900/30/30">
-            <h2 className="text-lg font-bold text-gray-800 dark:text-slate-100">1. Cursos</h2>
+            <h2 className="text-lg font-bold text-gray-800 dark:text-slate-200">1. Cursos</h2>
             <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Selecione um curso do PPC para inserir ou adicione um novo manualmente.</p>
           </div>
 
@@ -458,7 +458,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   // Reseta o select visualmente
                   e.target.value = '';
                 }}
-                className="flex-1 text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                className="flex-1 text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
               >
                 <option value="" disabled>Selecione um curso para inserir...</option>
                 {cursosPPC.map((c, i) => (
@@ -487,7 +487,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                     autoFocus
                     value={cursoNome}
                     onChange={e => setCursoNome(e.target.value)}
-                    className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                     placeholder="Ex: Técnico em Automação"
                   />
                 </div>
@@ -543,7 +543,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
-                        <div className={`font-semibold text-lg truncate ${isSelected ? 'text-indigo-800' : 'text-gray-800 dark:text-slate-100'}`}>
+                        <div className={`font-semibold text-lg truncate ${isSelected ? 'text-indigo-800' : 'text-gray-800 dark:text-slate-200'}`}>
                           {c.nome}
                         </div>
                         <div className="flex items-center gap-3 mt-2">
@@ -590,7 +590,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
         <section className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 flex flex-col w-full dark:text-slate-100">
           <div className="p-4 border-b border-gray-100 bg-indigo-50 dark:bg-indigo-900/30/30 flex justify-between items-center">
             <div>
-              <h2 className="text-lg font-bold text-gray-800 dark:text-slate-100">2. Turmas</h2>
+              <h2 className="text-lg font-bold text-gray-800 dark:text-slate-200">2. Turmas</h2>
               {cursoSelecionadoId && (
                 <p className="text-xs text-indigo-600 mt-0.5 font-medium">
                   Filtrando: {cursos.find(c => c.id === cursoSelecionadoId)?.nome}
@@ -626,7 +626,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                         setTurmaAnoLetivo(c.modalidade?.includes('Subsequente') ? `${anoCorrente}.1` : anoCorrente);
                       }
                     }}
-                    className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                   >
                     <option value="" disabled>Selecione...</option>
                     {cursos.map(c => (
@@ -658,7 +658,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                                 }
                               }
                             }}
-                            className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                            className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                           >
                             <option value="" disabled>Selecione a turma...</option>
                             {cPPC.turmas.map(t => (
@@ -677,7 +677,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                           required
                           value={turmaCodigo === 'outro_manual_trigger' ? '' : turmaCodigo}
                           onChange={e => setTurmaCodigo(e.target.value)}
-                          className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                          className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                           placeholder="Ex: 1IELN.M"
                           autoFocus={turmaCodigo === 'outro_manual_trigger'}
                         />
@@ -704,7 +704,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                     required
                     value={turmaNome}
                     onChange={e => setTurmaNome(e.target.value)}
-                    className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                     placeholder="Ex: 1ª Série"
                   />
                 </div>
@@ -715,7 +715,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                     required
                     value={turmaAnoLetivo}
                     onChange={e => setTurmaAnoLetivo(e.target.value)}
-                    className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                     placeholder={cursos.find(c => c.id === Number(turmaCursoId))?.modalidade?.includes('Subsequente') ? "Ex: 2026.1" : "Ex: 2026"}
                   />
                 </div>
@@ -785,7 +785,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   <div key={t.id} className="bg-white dark:bg-slate-800 p-4 border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm flex flex-col gap-3 group dark:text-slate-100">
                     {/* Cabeçalho */}
                     <div>
-                      <div className="font-bold text-gray-800 dark:text-slate-100 text-lg leading-tight">{t.nome}</div>
+                      <div className="font-bold text-gray-800 dark:text-slate-200 text-lg leading-tight">{t.nome}</div>
                       <div className="flex flex-wrap gap-2 mt-1.5">
                         <span className="text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1 rounded text-xs font-bold">{t.codigo}</span>
                         {t.anoLetivo && (
@@ -924,7 +924,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
       {editingDisciplina && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
           <div className="bg-white dark:bg-slate-800 rounded-lg p-5 w-full max-w-sm shadow-xl dark:text-slate-100">
-            <h3 className="text-sm font-bold text-gray-800 dark:text-slate-100 mb-3">Editar Disciplina</h3>
+            <h3 className="text-sm font-bold text-gray-800 dark:text-slate-200 mb-3">Editar Disciplina</h3>
             <form onSubmit={handleSaveDisciplinaEdit} className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Nome</label>
@@ -933,7 +933,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   required
                   value={editDiscNome}
                   onChange={e => setEditDiscNome(e.target.value)}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                 />
               </div>
               <div>
@@ -944,7 +944,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   min="1"
                   value={editDiscChAula}
                   onChange={e => setEditDiscChAula(e.target.value)}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                 />
               </div>
               <div className="flex gap-2 justify-end mt-4">
@@ -971,7 +971,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
       {ofertaModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
           <div className="bg-white dark:bg-slate-800 rounded-lg p-5 w-full max-w-sm shadow-xl dark:text-slate-100">
-            <h3 className="text-sm font-bold text-gray-800 dark:text-slate-100 mb-2">Gerar Turmas do PPC</h3>
+            <h3 className="text-sm font-bold text-gray-800 dark:text-slate-200 mb-2">Gerar Turmas do PPC</h3>
             <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">
               Para qual Período Letivo deseja gerar as turmas?
             </p>
@@ -984,7 +984,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                   autoFocus
                   value={ofertaAnoLetivo}
                   onChange={e => setOfertaAnoLetivo(e.target.value)}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                 />
               </div>
               <div className="flex gap-2 justify-end mt-4">
@@ -1011,7 +1011,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
       {gerarDiscModalOpen && gerarDiscTurmaSelecionada && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
           <div className="bg-white dark:bg-slate-800 rounded-lg p-5 w-full max-w-sm shadow-xl dark:text-slate-100">
-            <h3 className="text-sm font-bold text-gray-800 dark:text-slate-100 mb-2">Configurar Período Letivo</h3>
+            <h3 className="text-sm font-bold text-gray-800 dark:text-slate-200 mb-2">Configurar Período Letivo</h3>
             <p className="text-xs text-gray-500 dark:text-slate-400 mb-4">
               Defina o período para as novas disciplinas desta turma.
             </p>
@@ -1027,7 +1027,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                       maxLength={4}
                       value={gerarDiscAno}
                       onChange={e => setGerarDiscAno(e.target.value)}
-                      className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                      className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                     />
                   </div>
                   <div>
@@ -1036,7 +1036,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                       required
                       value={gerarDiscSemestre}
                       onChange={e => setGerarDiscSemestre(e.target.value)}
-                      className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                      className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                     >
                       <option value="1">1</option>
                       <option value="2">2</option>
@@ -1053,7 +1053,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
                     maxLength={4}
                     value={gerarDiscAno}
                     onChange={e => setGerarDiscAno(e.target.value)}
-                    className="w-full text-sm border border-gray-300 dark:border-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded p-2 focus:ring-1 focus:ring-indigo-500 outline-none"
                   />
                 </div>
               )}

@@ -44,7 +44,7 @@ export const LoginSyncScreen: React.FC<Props> = ({ onLoginSuccess }) => {
           <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
             <User className="text-blue-600 w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100">Perfil e Sincronização</h2>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-200">Perfil e Sincronização</h2>
           <p className="text-gray-500 dark:text-slate-400 mt-1">Gerencie sua conta e sincronize dados</p>
         </div>
 
@@ -94,7 +94,7 @@ export const LoginSyncScreen: React.FC<Props> = ({ onLoginSuccess }) => {
 
             <button
               onClick={handleLogout}
-              className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-900 text-gray-700 dark:text-slate-300 font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+              className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 dark:text-slate-100 dark:focus:ring-slate-600 hover:bg-gray-50 dark:hover:bg-slate-900 text-gray-700 dark:text-slate-300 font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
             >
               <LogOut className="w-5 h-5" />
               Sair da Conta

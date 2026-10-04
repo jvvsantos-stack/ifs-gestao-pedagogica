@@ -26,7 +26,7 @@ const KPICard = ({ title, value, icon, trendText, trendDir, trendColor, iconBg }
       </div>
     </div>
     <div>
-      <h3 className="text-2xl font-black text-gray-800 dark:text-slate-100">{value}</h3>
+      <h3 className="text-2xl font-black text-gray-800 dark:text-slate-200">{value}</h3>
       <p className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mt-0.5">{title}</p>
     </div>
   </div>
@@ -269,7 +269,7 @@ export const AnalisesView: React.FC = () => {
               <BarChart3 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100 tracking-tight">Inteligência Pedagógica</h2>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-200 tracking-tight">Inteligência Pedagógica</h2>
               <p className="text-gray-500 dark:text-slate-400 text-sm font-medium">Painel de Monitoramento Acadêmico Inteligente</p>
             </div>
           </div>
@@ -292,7 +292,7 @@ export const AnalisesView: React.FC = () => {
                 setPeriodoFiltro('todos');
                 setTurmaFiltro('todas');
               }} 
-              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent outline-none cursor-pointer max-w-[150px] truncate"
+              className="text-sm font-bold text-gray-800 dark:text-slate-200 bg-transparent dark:bg-slate-800 dark:border-slate-700 dark:focus:ring-slate-600 outline-none cursor-pointer max-w-[150px] truncate"
             >
               <option value="todos">Todos</option>
               {analisesData.cursosDisponiveis.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
@@ -309,7 +309,7 @@ export const AnalisesView: React.FC = () => {
                 setTurmaFiltro('todas');
               }} 
               disabled={!!analisesData.lockedModalidade}
-              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent outline-none cursor-pointer disabled:opacity-60"
+              className="text-sm font-bold text-gray-800 dark:text-slate-200 bg-transparent dark:bg-slate-800 dark:border-slate-700 dark:focus:ring-slate-600 outline-none cursor-pointer disabled:opacity-60"
             >
               <option value="todas">Todas</option>
               {analisesData.modalidadesDisponiveis.map(m => <option key={m} value={m}>{m}</option>)}
@@ -324,7 +324,7 @@ export const AnalisesView: React.FC = () => {
                 setPeriodoFiltro(e.target.value);
                 setTurmaFiltro('todas');
               }} 
-              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent outline-none cursor-pointer"
+              className="text-sm font-bold text-gray-800 dark:text-slate-200 bg-transparent dark:bg-slate-800 dark:border-slate-700 dark:focus:ring-slate-600 outline-none cursor-pointer"
             >
               <option value="todos">Todos</option>
               {analisesData.periodosDisponiveis.map(p => <option key={p} value={p}>{p}</option>)}
@@ -336,7 +336,7 @@ export const AnalisesView: React.FC = () => {
             <select 
               value={turmaFiltro} 
               onChange={e => setTurmaFiltro(e.target.value)} 
-              className="text-sm font-bold text-gray-800 dark:text-slate-100 bg-transparent outline-none cursor-pointer max-w-[120px] truncate"
+              className="text-sm font-bold text-gray-800 dark:text-slate-200 bg-transparent dark:bg-slate-800 dark:border-slate-700 dark:focus:ring-slate-600 outline-none cursor-pointer max-w-[120px] truncate"
             >
               <option value="todas">Todas</option>
               {analisesData.turmasDisponiveis.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -387,7 +387,7 @@ export const AnalisesView: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-500"><TrendingDown className="w-4 h-4"/></div>
-                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-100">Top 5 Gargalos</h3>
+                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-200">Top 5 Gargalos</h3>
               </div>
               <span className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest bg-gray-50 dark:bg-slate-900 px-2 py-1 rounded">Menores Médias</span>
             </div>
@@ -416,7 +416,7 @@ export const AnalisesView: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg text-emerald-500"><TrendingUp className="w-4 h-4"/></div>
-                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-100">Top 5 Melhores</h3>
+                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-200">Top 5 Melhores</h3>
               </div>
               <span className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest bg-gray-50 dark:bg-slate-900 px-2 py-1 rounded">Maiores Médias</span>
             </div>
@@ -445,7 +445,7 @@ export const AnalisesView: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-600"><AlertTriangle className="w-4 h-4"/></div>
-                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-100">Risco Acadêmico</h3>
+                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-200">Risco Acadêmico</h3>
               </div>
             </div>
             <div className="overflow-auto flex-1 pr-1 custom-scrollbar">
@@ -463,7 +463,7 @@ export const AnalisesView: React.FC = () => {
                       <td className="py-2.5 px-3 font-bold text-gray-700 dark:text-slate-300 truncate max-w-[120px]" title={r.nome}>{r.nome.split('(')[0].trim()}</td>
                       <td className="py-2.5 px-3 text-gray-500 dark:text-slate-400 truncate max-w-[80px]">{r.turma}</td>
                       <td className="py-2.5 px-3 text-center">
-                        <span className="bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-full text-[10px]">{r.disciplinasAbaixo}</span>
+                        <span className="bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 dark:border dark:border-red-800 font-bold px-2 py-0.5 rounded-full text-[10px]">{r.disciplinasAbaixo}</span>
                       </td>
                     </tr>
                   ))}
@@ -482,7 +482,7 @@ export const AnalisesView: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-500"><Activity className="w-4 h-4"/></div>
-                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-100">Desempenho por Etapa</h3>
+                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-200">Desempenho por Etapa</h3>
               </div>
             </div>
             <div className="flex-1 mt-2">
@@ -511,7 +511,7 @@ export const AnalisesView: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-500"><BarChart3 className="w-4 h-4"/></div>
-                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-100">Distribuição de Notas</h3>
+                <h3 className="text-[15px] font-bold text-gray-800 dark:text-slate-200">Distribuição de Notas</h3>
               </div>
             </div>
             <div className="flex-1 mt-2">

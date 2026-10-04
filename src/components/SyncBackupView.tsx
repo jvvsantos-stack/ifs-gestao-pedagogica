@@ -67,14 +67,14 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
             <Cloud className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100 tracking-tight">Sync e Backup</h2>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-200 tracking-tight">Sync e Backup</h2>
             <p className="text-gray-500 dark:text-slate-400 text-sm">Gerencie sua conta e sincronização de dados</p>
           </div>
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 overflow-hidden dark:text-slate-100">
           <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 dark:bg-slate-900/50 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
               <UserIcon className="w-5 h-5 text-indigo-500" />
               Sua Conta
             </h3>
@@ -90,7 +90,7 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
                   </div>
                 )}
                 <div>
-                  <p className="font-bold text-gray-800 dark:text-slate-100 text-lg leading-tight">{userInfo?.name || 'Utilizador Autenticado'}</p>
+                  <p className="font-bold text-gray-800 dark:text-slate-200 text-lg leading-tight">{userInfo?.name || 'Utilizador Autenticado'}</p>
                   <p className="text-sm text-gray-500 dark:text-slate-400">{userInfo?.email || 'Sessão ativa com o Google'}</p>
                 </div>
               </div>
@@ -107,7 +107,7 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
 
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 overflow-hidden dark:text-slate-100">
           <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 dark:bg-slate-900/50 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
               <Cloud className="w-5 h-5 text-indigo-500" />
               Sincronização Nuvem (Google Drive)
             </h3>
