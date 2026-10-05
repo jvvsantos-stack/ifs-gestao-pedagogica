@@ -84,19 +84,17 @@ export const RelatorioAnaliticoPrint = forwardRef<HTMLDivElement, RelatorioAnali
         <div className="grid grid-cols-2 gap-6 mb-8 print:break-inside-avoid">
           <div className="border border-slate-200 rounded-xl p-4 shadow-sm">
             <h3 className="text-sm font-bold uppercase text-gray-800 mb-4 border-b border-gray-100 pb-2">Distribuição de Notas</h3>
-            <div className="h-[200px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={analisesData.dadosDistribuicao} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                  <Bar dataKey="value" isAnimationActive={false} radius={[4, 4, 0, 0]}>
-                    {analisesData.dadosDistribuicao.map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="flex justify-center mt-4">
+              <BarChart width={320} height={200} data={analisesData.dadosDistribuicao} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
+                <Bar dataKey="value" isAnimationActive={false} radius={[4, 4, 0, 0]}>
+                  {analisesData.dadosDistribuicao.map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
             </div>
           </div>
           <div className="flex flex-col gap-4">
@@ -117,15 +115,13 @@ export const RelatorioAnaliticoPrint = forwardRef<HTMLDivElement, RelatorioAnali
         <div className="grid grid-cols-2 gap-6 mb-8 print:break-inside-avoid">
           <div className="border border-slate-200 rounded-xl p-4 shadow-sm">
             <h3 className="text-sm font-bold uppercase text-gray-800 mb-4 border-b border-gray-100 pb-2">Desempenho por Etapa</h3>
-            <div className="h-[200px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={analisesData.desempenhoEtapas} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="etapa" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} />
-                  <YAxis domain={[0, 10]} axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                  <Line type="monotone" dataKey="media" isAnimationActive={false} stroke="#4f46e5" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} />
-                </LineChart>
-              </ResponsiveContainer>
+            <div className="flex justify-center mt-4">
+              <LineChart width={320} height={200} data={analisesData.desempenhoEtapas} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="etapa" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b', fontWeight: 'bold' }} />
+                <YAxis domain={[0, 10]} axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
+                <Line type="monotone" dataKey="media" isAnimationActive={false} stroke="#4f46e5" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} />
+              </LineChart>
             </div>
           </div>
 
