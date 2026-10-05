@@ -34,11 +34,11 @@ export const RelatorioAnaliticoPrint = forwardRef<HTMLDivElement, RelatorioAnali
     const outrosTextos = paragrafos.filter(p => !classificados.includes(p)).join('\n\n');
 
     return (
-      <div ref={ref} className="p-12 bg-white text-black" style={{ fontFamily: 'Arial, sans-serif' }}>
+      <div ref={ref} className="p-12 print:p-2 bg-white text-black" style={{ fontFamily: 'Arial, sans-serif' }}>
         {/* CSS para Impressão */}
         <style type="text/css" media="print">
           {`
-            @page { size: A4; margin: 0; }
+            @page { size: A4; margin: 1.5cm; }
             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white; }
           `}
         </style>
