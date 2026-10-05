@@ -195,7 +195,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
     let gradesByDisc: Record<number, number | null> = {};
     let gradesOrigByDisc: Record<number, number | null> = {};
     let isConselhoAprovadoByDisc: Record<number, boolean> = {};
-    let disciplinasRisco: { disc: Disciplina, faltasTot: number, limite: number, percent: number }[] = [];
+    let disciplinasRisco: { disc: Disciplina, faltasTot: number, limite: number, percent: number, isRiscoFalta?: boolean, isRiscoMedia?: boolean, media?: number }[] = [];
 
     let cargaHorariaTotal = 0;
     let faltasGlobaisTotais = 0;
@@ -219,18 +219,18 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
 
       faltasGlobaisTotais += faltasTot;
 
-      if (faltasTot > 0) {
-        const percent = faltasTot / limiteFaltas;
-        if (percent >= 0.8) {
-           disciplinasRisco.push({ disc, faltasTot, limite: limiteFaltas, percent });
-        }
-      }
+      const percent = faltasTot / (limiteFaltas || 1);
+      const isRiscoFalta = faltasTot > 0 && percent >= 0.8;
 
       if (notasPreenchidas.length === 0) {
         gradesByDisc[disc.id!] = null;
         gradesOrigByDisc[disc.id!] = null;
         isConselhoAprovadoByDisc[disc.id!] = false;
         cursandoCount++;
+        
+        if (isRiscoFalta) {
+          disciplinasRisco.push({ disc, faltasTot, limite: limiteFaltas, percent, isRiscoFalta: true, isRiscoMedia: false });
+        }
         return;
       }
 
@@ -246,6 +246,20 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
       const notaProvaFinal = av?.provaFinal;
       if (notaProvaFinal !== undefined && notaProvaFinal !== null && String(notaProvaFinal) !== '') {
           finalMediaOrig = (mediaParcialNum + Number(notaProvaFinal)) / 2;
+      }
+      
+      const isRiscoMedia = finalMediaOrig < 6.0;
+      
+      if (isRiscoFalta || isRiscoMedia) {
+          disciplinasRisco.push({ 
+             disc, 
+             faltasTot, 
+             limite: limiteFaltas, 
+             percent, 
+             isRiscoFalta, 
+             isRiscoMedia, 
+             media: finalMediaOrig 
+          });
       }
 
       let finalMedia = finalMediaOrig;
@@ -329,8 +343,8 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
 
   const conselhoAlunos = alunosProcessed.filter(a => !a.alreadyApprovedAll);
 
-  const alunosRisco = alunosProcessed.filter(a => a.disciplinasRisco.length >= 2).map(a => {
-     const isMuitoAlto = a.disciplinasRisco.some(d => d.percent >= 1.0);
+  const alunosRisco = alunosProcessed.filter(a => a.disciplinasRisco.length > 0).map(a => {
+     const isMuitoAlto = a.disciplinasRisco.some(d => (d.percent && d.percent >= 1.0) || (d.media !== undefined && d.media < 4.0));
      return { ...a, nivelRisco: isMuitoAlto ? 'Muito Alto' : 'Alto' };
   }).sort((a) => (a.nivelRisco === 'Muito Alto' ? -1 : 1));
 
@@ -734,10 +748,19 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                       <div className="flex flex-col gap-1">
                         {item.disciplinasRisco.map(d => (
                           <div key={d.disc.id} className="flex justify-between items-center text-sm bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 rounded px-2 py-1">
-                            <span className="text-red-800 truncate mr-2 font-medium">{d.disc.nome}</span>
-                            <span className={`font-bold ${d.percent >= 1.0 ? 'text-red-700' : 'text-red-500'}`}>
-                              {d.faltasTot} faltas
-                            </span>
+                            <span className="text-red-800 dark:text-red-300 truncate mr-2 font-medium">{d.disc.nome}</span>
+                            <div className="flex gap-2 shrink-0">
+                              {d.isRiscoFalta && (
+                                <span className={`px-2 py-0.5 rounded font-bold text-xs ${d.percent && d.percent >= 1.0 ? 'bg-red-200 text-red-800 dark:bg-red-900/60 dark:text-red-200' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'}`}>
+                                  {d.faltasTot} faltas
+                                </span>
+                              )}
+                              {d.isRiscoMedia && d.media !== undefined && (
+                                <span className={`px-2 py-0.5 rounded font-bold text-xs ${d.media < 4.0 ? 'bg-red-200 text-red-800 dark:bg-red-900/60 dark:text-red-200' : 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300'}`}>
+                                  Média: {d.media.toFixed(1)}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -758,7 +781,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                 {alunosRisco.length === 0 && (
                   <tr>
                     <td colSpan={3} className="py-12 text-center text-gray-500 dark:text-slate-400">
-                      Nenhum aluno em situação crítica de faltas simultâneas nesta turma.
+                      Nenhum aluno em situação de risco nesta turma.
                     </td>
                   </tr>
                 )}
