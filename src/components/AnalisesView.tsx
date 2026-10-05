@@ -79,7 +79,7 @@ export const AnalisesView: React.FC = () => {
 
   const reportPrintRef = React.useRef<HTMLDivElement>(null);
   const handlePrintReport = useReactToPrint({
-    content: () => reportPrintRef.current,
+    contentRef: reportPrintRef,
     documentTitle: 'Relatorio_Analise_Pedagogica',
   });
 
