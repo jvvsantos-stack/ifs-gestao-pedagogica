@@ -38,13 +38,20 @@ export const AnalisesView: React.FC = () => {
   const [periodoFiltro, setPeriodoFiltro] = useState<string>('todos');
   const [turmaFiltro, setTurmaFiltro] = useState<string>('todas');
 
-  const analisesData = useLiveQuery(async () => {
+  const rawData = useLiveQuery(async () => {
     const turmasAll = await db.turmas.toArray();
     const cursosAll = await db.cursos.toArray();
     const alunosAll = await db.alunos.toArray();
     const disciplinasAll = await db.disciplinas.toArray();
     const notasAll = await db.notas.toArray();
     const avaliacoesAll = await db.avaliacoes_finais.toArray();
+
+    return { turmasAll, cursosAll, alunosAll, disciplinasAll, notasAll, avaliacoesAll };
+  });
+
+  const analisesData = React.useMemo(() => {
+    if (!rawData) return null;
+    const { turmasAll, cursosAll, alunosAll, disciplinasAll, notasAll, avaliacoesAll } = rawData;
 
     const cursosDisponiveis = cursosAll.filter(c => !c.arquivado);
     const turmasAtivas = turmasAll.filter(t => !t.arquivado);
@@ -111,7 +118,7 @@ export const AnalisesView: React.FC = () => {
     const disciplinasStats: Record<string, { soma: number, count: number, reprovados: number, totalFechados: number }> = {};
     const alunosRisk: Record<number, { nome: string, disciplinasAbaixo: number, turma: string }> = {};
     const etapasStats: Record<number, { soma: number, count: number }> = { 1: {soma:0, count:0}, 2: {soma:0, count:0}, 3: {soma:0, count:0}, 4: {soma:0, count:0} };
-    const distribuicaoNotas = { critico: 0, recuperacao: 0, naMedia: 0, excelente: 0 };
+    const alunosGlobalStats: Record<number, { somaMedias: number, countMedias: number }> = {};
 
     for (const disc of disciplinasFiltradas) {
       if (!disciplinasStats[disc.nome]) disciplinasStats[disc.nome] = { soma: 0, count: 0, reprovados: 0, totalFechados: 0 };
@@ -157,10 +164,9 @@ export const AnalisesView: React.FC = () => {
 
           if (mediaFinal < 6.0) alunosRisk[aluno.id!].disciplinasAbaixo++;
 
-          if (mediaFinal < 4.0) distribuicaoNotas.critico++;
-          else if (mediaFinal < 6.0) distribuicaoNotas.recuperacao++;
-          else if (mediaFinal < 9.0) distribuicaoNotas.naMedia++;
-          else distribuicaoNotas.excelente++;
+          if (!alunosGlobalStats[aluno.id!]) alunosGlobalStats[aluno.id!] = { somaMedias: 0, countMedias: 0 };
+          alunosGlobalStats[aluno.id!].somaMedias += mediaFinal;
+          alunosGlobalStats[aluno.id!].countMedias++;
 
           somaGeralNotas += mediaFinal;
           countGeralNotas++;
@@ -188,6 +194,15 @@ export const AnalisesView: React.FC = () => {
         }
       }
     }
+
+    const distribuicaoNotas = { critico: 0, recuperacao: 0, naMedia: 0, excelente: 0 };
+    Object.values(alunosGlobalStats).forEach(stat => {
+      const globalAvg = stat.somaMedias / stat.countMedias;
+      if (globalAvg < 4.0) distribuicaoNotas.critico++;
+      else if (globalAvg < 6.0) distribuicaoNotas.recuperacao++;
+      else if (globalAvg < 9.0) distribuicaoNotas.naMedia++;
+      else distribuicaoNotas.excelente++;
+    });
 
     const mediaGeral = countGeralNotas > 0 ? somaGeralNotas / countGeralNotas : 0;
     const taxaAprovacao = totalFechados > 0 ? (totalAprovados / totalFechados) * 100 : 0;
@@ -246,7 +261,7 @@ export const AnalisesView: React.FC = () => {
       desempenhoEtapas,
       dadosDistribuicao
     };
-  }, [periodoFiltro, cursoFiltro, modalidadeFiltro, turmaFiltro]);
+  }, [rawData, periodoFiltro, cursoFiltro, modalidadeFiltro, turmaFiltro]);
 
   if (!analisesData) {
     return (
