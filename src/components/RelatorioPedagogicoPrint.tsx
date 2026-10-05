@@ -1,4 +1,5 @@
 import React from 'react';
+import logoIFS from '../assets/logo-ifs.png';
 
 export interface RelatorioPedagogicoPrintProps {
   aluno: any;
@@ -73,7 +74,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
 
         {/* Cabeçalho */}
         <div className="flex flex-col items-center gap-4 pb-4 mb-6 border-b-4 border-black">
-          <img src="/Campus Aracaju - Assinatura horizontal cor.png" alt="Logo IFS" className="w-64 object-contain" />
+          <img src={logoIFS} alt="Logo IFS" className="w-48 object-contain" />
           <div className="text-center w-full">
             <h1 className="text-2xl font-extrabold uppercase text-center" style={{ color: 'black' }}>RELATÓRIO PEDAGÓGICO</h1>
             {curso && <p className="text-sm font-semibold mt-1 text-center" style={{ color: 'black' }}>Curso: {curso.nome}</p>}
