@@ -57,10 +57,10 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
               color: black !important; 
               padding: 15mm; 
             }
-            .badge-aprovado { background-color: #166534 !important; color: white !important; border: 1px solid #14532d !important; }
-            .badge-reprovado { background-color: #991b1b !important; color: white !important; border: 1px solid #7f1d1d !important; }
-            .badge-cursando { background-color: #1e40af !important; color: white !important; border: 1px solid #1e3a8a !important; }
-            .badge-alerta { background-color: #fef3c7 !important; color: #92400e !important; border: 1px solid #d97706 !important; }
+            .badge-aprovado { background-color: #dcfce7 !important; color: black !important; border: 1px solid #bbf7d0 !important; }
+            .badge-reprovado { background-color: #fee2e2 !important; color: black !important; border: 1px solid #fecaca !important; }
+            .badge-cursando { background-color: #eff6ff !important; color: black !important; border: 1px solid #dbeafe !important; }
+            .badge-alerta { background-color: #fef3c7 !important; color: black !important; border: 1px solid #fde68a !important; }
             
             table { border-collapse: collapse; width: 100%; table-layout: fixed; }
             th, td { border: 1px solid #d1d5db; padding: 2px 4px; text-align: center; font-size: 10px; word-wrap: break-word; }
@@ -73,7 +73,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
 
         {/* Cabeçalho */}
         <div className="flex items-center gap-6 pb-4 mb-6 border-b-4 border-black">
-          <img src="/Campus Aracaju - Assinatura vertical cor.png" alt="Logo IFS" className="w-32 object-contain" />
+          <img src="/logo-ifs.png" alt="Logo IFS" className="w-32 object-contain" />
           <div className="flex-1 text-center pr-12">
             <h1 className="text-2xl font-extrabold uppercase tracking-widest text-center" style={{ color: 'black' }}>INSTITUTO FEDERAL DE SERGIPE</h1>
             <h2 className="text-lg font-bold mt-1 uppercase text-center" style={{ color: 'black' }}>Relatório Pedagógico</h2>
@@ -143,7 +143,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
                   </td>
                   <td className={b.faltasExcedidas ? "font-bold text-red-700" : "text-black"}>{b.faltas}</td>
                   <td className="whitespace-nowrap">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-black ${
                       b.situacao === 'Cursando' ? 'badge-cursando' : 
                       b.situacao.includes('Aprovado') ? 'badge-aprovado' : 
                       'badge-reprovado'
