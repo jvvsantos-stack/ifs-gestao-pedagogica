@@ -216,7 +216,6 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
     documentTitle: `Relatorio_Pedagogico_${aluno.nome.replace(/\s+/g, '_')}`,
-    onBeforeGetContent: () => new Promise((resolve) => setTimeout(resolve, 300)),
   });
 
   const turma = turmasAll.find((t: any) => t.id === aluno.turmaId);
