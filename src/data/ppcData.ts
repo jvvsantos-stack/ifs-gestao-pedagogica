@@ -196,5 +196,57 @@ export const cursosPPC = [
         ]
       }
     ]
+  },
+  {
+    nome: "Técnico em Química Integrado",
+    modalidade: "Integrado",
+    turmas: [
+      {
+        nomeExibicao: "1ª Série",
+        codigo: "1QUIM",
+        disciplinas: [
+          { nome: "Língua Portuguesa I", horasAula: 160 }, { nome: "Artes", horasAula: 40 },
+          { nome: "Língua Inglesa I", horasAula: 80 }, { nome: "Educação Física I", horasAula: 80 },
+          { nome: "Matemática I", horasAula: 160 }, { nome: "Química I", horasAula: 160 },
+          { nome: "Física I", horasAula: 80 }, { nome: "Biologia I", horasAula: 80 },
+          { nome: "Geografia I", horasAula: 80 }, { nome: "História I", horasAula: 80 },
+          { nome: "Sociologia I", horasAula: 40 }, { nome: "Filosofia I", horasAula: 40 },
+          { nome: "Informática Aplicada", horasAula: 80 }, { nome: "Saúde, Meio Ambiente e Segurança no Trabalho", horasAula: 40 },
+          { nome: "Técnicas Básicas de Laboratório de Química", horasAula: 120 }, { nome: "Química Ambiental e Desenvolvimento Sustentável", horasAula: 40 },
+          { nome: "Princípios Básicos da Indústria Química", horasAula: 80 }
+        ]
+      },
+      {
+        nomeExibicao: "2ª Série",
+        codigo: "2QUIM",
+        disciplinas: [
+          { nome: "Língua Portuguesa II", horasAula: 120 }, { nome: "Língua Inglesa II", horasAula: 80 },
+          { nome: "Educação Física II", horasAula: 40 }, { nome: "Matemática II", horasAula: 120 },
+          { nome: "Química II", horasAula: 120 }, { nome: "Física II", horasAula: 80 },
+          { nome: "Biologia II", horasAula: 80 }, { nome: "Geografia II", horasAula: 80 },
+          { nome: "História II", horasAula: 80 }, { nome: "Sociologia II", horasAula: 40 },
+          { nome: "Filosofia II", horasAula: 40 }, { nome: "Processos Físico-Químicos Experimental", horasAula: 80 },
+          { nome: "Técnicas de Química Analítica", horasAula: 80 }, { nome: "Bioquímica", horasAula: 40 },
+          { nome: "Microbiologia", horasAula: 80 }, { nome: "Estatística Aplicada", horasAula: 80 },
+          { nome: "Corrosão", horasAula: 80 }, { nome: "Tecnologia Inorgânica", horasAula: 80 },
+          { nome: "Operações Unitárias", horasAula: 80 }
+        ]
+      },
+      {
+        nomeExibicao: "3ª Série",
+        codigo: "3QUIM",
+        disciplinas: [
+          { nome: "Língua Portuguesa III", horasAula: 120 }, { nome: "Língua Espanhola", horasAula: 80 },
+          { nome: "Educação Física III", horasAula: 40 }, { nome: "Matemática III", horasAula: 120 },
+          { nome: "Química III", horasAula: 80 }, { nome: "Física III", horasAula: 80 },
+          { nome: "Biologia III", horasAula: 80 }, { nome: "Geografia III", horasAula: 80 },
+          { nome: "História III", horasAula: 80 }, { nome: "Sociologia III", horasAula: 40 },
+          { nome: "Filosofia III", horasAula: 40 }, { nome: "Processos Analítico Experimental", horasAula: 120 },
+          { nome: "Processo Orgânico Experimental", horasAula: 120 }, { nome: "Métodos Ópticos", horasAula: 80 },
+          { nome: "Métodos Eletroanalíticos", horasAula: 80 }, { nome: "Tecnologia de Petróleo e Gás", horasAula: 80 },
+          { nome: "Tecnologia Orgânica", horasAula: 80 }
+        ]
+      }
+    ]
   }
 ];
