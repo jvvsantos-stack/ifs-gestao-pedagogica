@@ -148,5 +148,53 @@ export const cursosPPC = [
         ]
       }
     ]
+  },
+  {
+    nome: "Técnico em Edificações Integrado",
+    modalidade: "Integrado",
+    turmas: [
+      {
+        nomeExibicao: "1ª Série",
+        codigo: "1EDF",
+        disciplinas: [
+          { nome: "Língua Portuguesa I", horasAula: 120 }, { nome: "Artes", horasAula: 80 },
+          { nome: "Língua Inglesa I", horasAula: 80 }, { nome: "Educação Física I", horasAula: 80 },
+          { nome: "Matemática I", horasAula: 160 }, { nome: "Química I", horasAula: 80 },
+          { nome: "Física I", horasAula: 120 }, { nome: "Biologia I", horasAula: 80 },
+          { nome: "Geografia I", horasAula: 80 }, { nome: "História I", horasAula: 80 },
+          { nome: "Sociologia I", horasAula: 40 }, { nome: "Filosofia I", horasAula: 40 },
+          { nome: "Informática Básica", horasAula: 40 }, { nome: "Desenho Geométrico e Técnico", horasAula: 120 },
+          { nome: "Desenho de Projeto Arquitetônico", horasAula: 120 }
+        ]
+      },
+      {
+        nomeExibicao: "2ª Série",
+        codigo: "2EDF",
+        disciplinas: [
+          { nome: "Língua Portuguesa II", horasAula: 120 }, { nome: "Língua Inglesa II", horasAula: 80 },
+          { nome: "Educação Física II", horasAula: 80 }, { nome: "Matemática II", horasAula: 120 },
+          { nome: "Química II", horasAula: 80 }, { nome: "Física II", horasAula: 120 },
+          { nome: "Biologia II", horasAula: 80 }, { nome: "Geografia II", horasAula: 80 },
+          { nome: "História II", horasAula: 80 }, { nome: "Sociologia II", horasAula: 40 },
+          { nome: "Filosofia II", horasAula: 40 }, { nome: "Topografia", horasAula: 120 },
+          { nome: "Mecânica dos Solos", horasAula: 120 }, { nome: "Materiais de Construção e Controle Tecnológico do Concreto", horasAula: 120 },
+          { nome: "Desenho Assistido por Computador", horasAula: 120 }, { nome: "Resistencia dos Materiais", horasAula: 80 }
+        ]
+      },
+      {
+        nomeExibicao: "3ª Série",
+        codigo: "3EDF",
+        disciplinas: [
+          { nome: "Língua Portuguesa III", horasAula: 80 }, { nome: "Língua Espanhola", horasAula: 80 },
+          { nome: "Matemática III", horasAula: 120 }, { nome: "Química III", horasAula: 80 },
+          { nome: "Física III", horasAula: 120 }, { nome: "Biologia III", horasAula: 80 },
+          { nome: "Geografia III", horasAula: 80 }, { nome: "História III", horasAula: 80 },
+          { nome: "Sociologia III", horasAula: 40 }, { nome: "Filosofia III", horasAula: 40 },
+          { nome: "Tecnologia das Construções", horasAula: 120 }, { nome: "Estrutura e Desenho Estrutural", horasAula: 160 },
+          { nome: "Projeto e Pratica de Instalações Elétricas Residenciais", horasAula: 120 }, { nome: "Projeto e Pratica de Instalações Hidrossanitarias", horasAula: 120 },
+          { nome: "Planejamento, Gerenciamento e Qualidade nas Construções", horasAula: 160 }, { nome: "Práticas Profissionais", horasAula: 80 }
+        ]
+      }
+    ]
   }
 ];
