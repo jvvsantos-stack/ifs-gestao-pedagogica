@@ -72,12 +72,11 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
         </style>
 
         {/* Cabeçalho */}
-        <div className="flex items-center gap-6 pb-4 mb-6 border-b-4 border-black">
+        <div className="flex flex-col items-center gap-4 pb-4 mb-6 border-b-4 border-black">
           <img src="/Campus Aracaju - Assinatura horizontal cor.png" alt="Logo IFS" className="w-64 object-contain" />
-          <div className="flex-1 text-center pr-12">
-            <h1 className="text-2xl font-extrabold uppercase tracking-widest text-center" style={{ color: 'black' }}>INSTITUTO FEDERAL DE SERGIPE</h1>
-            <h2 className="text-lg font-bold mt-1 uppercase text-center" style={{ color: 'black' }}>Relatório Pedagógico</h2>
-            {curso && <p className="text-xs font-semibold mt-2 text-center" style={{ color: 'black' }}>Curso: {curso.nome}</p>}
+          <div className="text-center w-full">
+            <h1 className="text-2xl font-extrabold uppercase text-center" style={{ color: 'black' }}>RELATÓRIO PEDAGÓGICO</h1>
+            {curso && <p className="text-sm font-semibold mt-1 text-center" style={{ color: 'black' }}>Curso: {curso.nome}</p>}
           </div>
         </div>
 
@@ -160,7 +159,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
         <hr className="my-6 border-slate-300" />
 
         {/* Resumo Estágio e Conselho */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-4 mb-6 print:break-inside-avoid">
           <div className="p-3 border border-gray-300 rounded text-sm text-black break-inside-avoid print:break-inside-avoid">
             <h4 className="font-bold mb-2 uppercase" style={{ color: 'black' }}>Estágio</h4>
             {estagio ? (
@@ -190,7 +189,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
 
         {/* Ocorrências */}
         {ocorrencias.length > 0 && (
-          <>
+          <div className="print:break-inside-avoid">
             <hr className="my-6 border-slate-300" />
             <div className="mb-6">
               <h3 className="text-md font-bold mb-2 uppercase" style={{ color: 'black' }}>Histórico de Ocorrências</h3>
@@ -206,7 +205,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
                 ))}
               </div>
             </div>
-          </>
+          </div>
         )}
 
         {/* Assinaturas */}
