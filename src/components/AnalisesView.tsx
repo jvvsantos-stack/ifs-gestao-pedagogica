@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
-import { BarChart3, TrendingDown, TrendingUp, Users, GraduationCap, Percent, AlertTriangle, Activity, ArrowUpRight, ArrowDownRight, Filter } from 'lucide-react';
+import { BarChart3, TrendingDown, TrendingUp, Users, GraduationCap, Percent, AlertTriangle, Activity, ArrowUpRight, ArrowDownRight, Filter, FileText, Printer, X } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar, Cell } from 'recharts';
+import { useReactToPrint } from 'react-to-print';
+import { RelatorioAnaliticoPrint } from './RelatorioAnaliticoPrint';
 
 interface KPICardProps {
   title: string;
@@ -32,11 +34,54 @@ const KPICard = ({ title, value, icon, trendText, trendDir, trendColor, iconBg }
   </div>
 );
 
+const generateAutomatedInsights = (analisesData: any) => {
+  const paragrafos: string[] = [];
+
+  // Regra 1 (Gargalo)
+  if (analisesData.gargalos && analisesData.gargalos.length > 0) {
+    const pior = analisesData.gargalos[0];
+    paragrafos.push(`A disciplina ${pior.nome} apresenta o menor rendimento médio (${pior.media.toFixed(1)}), configurando o principal gargalo acadêmico deste recorte.`);
+  }
+
+  // Regra 2 (Saúde da Turma)
+  if (analisesData.taxaAprovacao < 60) {
+    paragrafos.push(`Atenção: Apenas ${analisesData.taxaAprovacao.toFixed(1)}% dos alunos estão com a situação regularizada (aprovados). Recomenda-se acompanhamento pedagógico imediato.`);
+  } else if (analisesData.taxaAprovacao >= 80) {
+    paragrafos.push(`O desempenho global é satisfatório, com ${analisesData.taxaAprovacao.toFixed(1)}% de alunos regularizados (aprovados).`);
+  } else {
+    paragrafos.push(`O percentual de aprovação atual é de ${analisesData.taxaAprovacao.toFixed(1)}%, indicando um cenário de regularidade com espaço para intervenções focais.`);
+  }
+
+  // Regra 3 (Destaque)
+  if (analisesData.melhoresDisciplinas && analisesData.melhoresDisciplinas.length > 0) {
+    const melhor = analisesData.melhoresDisciplinas[0];
+    paragrafos.push(`O destaque positivo fica para a disciplina ${melhor.nome}, que atingiu a maior média consolidada (${melhor.media.toFixed(1)}).`);
+  }
+
+  // Complemento (Distribuição)
+  const criticos = analisesData.dadosDistribuicao.find((d: any) => d.name === 'Crítico')?.value || 0;
+  if (criticos > 0) {
+    const percentCritico = analisesData.totalAlunos > 0 ? ((criticos / analisesData.totalAlunos) * 100).toFixed(1) : "0";
+    paragrafos.push(`Há um grupo de ${criticos} alunos (${percentCritico}%) em situação crítica de notas (média global < 4.0), que demanda atenção redobrada do conselho de classe.`);
+  }
+
+  return paragrafos.join('\n\n');
+};
+
 export const AnalisesView: React.FC = () => {
   const [cursoFiltro, setCursoFiltro] = useState<string>('todos');
   const [modalidadeFiltro, setModalidadeFiltro] = useState<string>('todas');
   const [periodoFiltro, setPeriodoFiltro] = useState<string>('todos');
   const [turmaFiltro, setTurmaFiltro] = useState<string>('todas');
+
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [parecerEditavel, setParecerEditavel] = useState('');
+
+  const reportPrintRef = React.useRef<HTMLDivElement>(null);
+  const handlePrintReport = useReactToPrint({
+    content: () => reportPrintRef.current,
+    documentTitle: 'Relatorio_Analise_Pedagogica',
+  });
 
   const rawData = useLiveQuery(async () => {
     const turmasAll = await db.turmas.toArray();
@@ -288,6 +333,16 @@ export const AnalisesView: React.FC = () => {
               <p className="text-gray-500 dark:text-slate-400 text-sm font-medium">Painel de Monitoramento Acadêmico Inteligente</p>
             </div>
           </div>
+          <button 
+            onClick={() => {
+              setParecerEditavel(generateAutomatedInsights(analisesData));
+              setIsReportModalOpen(true);
+            }}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm shadow-sm transition-colors"
+          >
+            <FileText className="w-4 h-4" />
+            Gerar Relatório Executivo (PDF)
+          </button>
         </div>
 
         {/* Barra de Filtros Global */}
@@ -553,6 +608,72 @@ export const AnalisesView: React.FC = () => {
           </div>
 
         </div>
+
+      {/* Modal Relatório */}
+      {isReportModalOpen && analisesData && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
+            <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-slate-700">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                Relatório Executivo Automático
+              </h2>
+              <button onClick={() => setIsReportModalOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
+              <div className="mb-4">
+                <label className="block text-sm font-bold text-gray-700 dark:text-slate-300 mb-2">Parecer Pedagógico Editável</label>
+                <textarea 
+                  className="w-full h-64 p-4 border border-gray-300 dark:border-slate-600 rounded-xl bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-slate-100 text-sm leading-relaxed focus:ring-2 focus:ring-indigo-500 focus:outline-none custom-scrollbar"
+                  value={parecerEditavel}
+                  onChange={(e) => setParecerEditavel(e.target.value)}
+                />
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-2">Você pode revisar e adicionar anotações humanas antes de gerar o PDF. Este texto será incluído no documento final.</p>
+              </div>
+
+              {/* Componente Invisível para Impressão */}
+              <div style={{ display: 'none' }}>
+                <RelatorioAnaliticoPrint 
+                  ref={reportPrintRef}
+                  filtros={{
+                    curso: cursoFiltro === 'todos' ? 'Todos os Cursos' : analisesData.cursosDisponiveis.find(c => c.id === Number(cursoFiltro))?.nome || '',
+                    modalidade: analisesData.lockedModalidade || modalidadeFiltro,
+                    periodo: periodoFiltro,
+                    turma: turmaFiltro === 'todas' ? 'Todas as Turmas' : analisesData.turmasDisponiveis.find(t => t.id === Number(turmaFiltro))?.nome || ''
+                  }}
+                  kpis={{
+                    totalAlunos: analisesData.totalAlunos,
+                    mediaGeral: analisesData.mediaGeral,
+                    taxaAprovacao: analisesData.taxaAprovacao,
+                    taxaEvasao: analisesData.taxaEvasao
+                  }}
+                  parecerTexto={parecerEditavel}
+                />
+              </div>
+
+            </div>
+
+            <div className="p-6 border-t border-gray-100 dark:border-slate-700 flex justify-end gap-3 bg-gray-50 dark:bg-slate-800/50 rounded-b-2xl">
+              <button 
+                onClick={() => setIsReportModalOpen(false)}
+                className="px-5 py-2.5 text-sm font-bold text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-xl transition-colors"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={handlePrintReport as any}
+                className="px-6 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition-colors flex items-center gap-2"
+              >
+                <Printer className="w-4 h-4" />
+                Imprimir / Salvar PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       </main>
     </div>
