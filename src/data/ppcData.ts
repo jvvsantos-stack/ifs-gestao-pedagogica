@@ -98,5 +98,55 @@ export const cursosPPC = [
         ]
       }
     ]
+  },
+  {
+    nome: "Técnico em Eletrotécnica Integrado",
+    modalidade: "Integrado",
+    turmas: [
+      {
+        nomeExibicao: "1ª Série",
+        codigo: "1IELT",
+        disciplinas: [
+          { nome: "Língua Portuguesa I", horasAula: 120 }, { nome: "Artes", horasAula: 40 },
+          { nome: "Língua Inglesa I", horasAula: 80 }, { nome: "Matemática I", horasAula: 160 },
+          { nome: "Química I", horasAula: 80 }, { nome: "Física I", horasAula: 120 },
+          { nome: "Educação Física I", horasAula: 80 }, { nome: "História I", horasAula: 80 },
+          { nome: "Sociologia I", horasAula: 40 }, { nome: "Filosofia I", horasAula: 40 },
+          { nome: "Biologia I", horasAula: 80 }, { nome: "Geografia I", horasAula: 80 },
+          { nome: "Informática Básica e Aplicada", horasAula: 80 }, { nome: "Desenho Geométrico e Técnico", horasAula: 120 },
+          { nome: "Eletricidade I", horasAula: 120 }
+        ]
+      },
+      {
+        nomeExibicao: "2ª Série",
+        codigo: "2IELT",
+        disciplinas: [
+          { nome: "Língua Portuguesa II", horasAula: 120 }, { nome: "Língua Inglesa II", horasAula: 80 },
+          { nome: "Matemática II", horasAula: 120 }, { nome: "Química II", horasAula: 80 },
+          { nome: "Física II", horasAula: 160 }, { nome: "Educação Física II", horasAula: 80 },
+          { nome: "História II", horasAula: 80 }, { nome: "Sociologia II", horasAula: 40 },
+          { nome: "Filosofia II", horasAula: 40 }, { nome: "Biologia II", horasAula: 80 },
+          { nome: "Geografia II", horasAula: 80 }, { nome: "Língua Espanhola", horasAula: 80 },
+          { nome: "Eletricidade Experimental", horasAula: 80 }, { nome: "Eletricidade II", horasAula: 120 },
+          { nome: "Instalações Elétricas", horasAula: 80 }, { nome: "Eletrônica Analógica e Digital", horasAula: 80 },
+          { nome: "Desenho Assistido por Computador", horasAula: 80 }, { nome: "Projetos Residenciais, Prediais e Luminotécnica", horasAula: 120 }
+        ]
+      },
+      {
+        nomeExibicao: "3ª Série",
+        codigo: "3IELT",
+        disciplinas: [
+          { nome: "Língua Portuguesa III", horasAula: 80 }, { nome: "Matemática III", horasAula: 120 },
+          { nome: "Química III", horasAula: 80 }, { nome: "Física III", horasAula: 120 },
+          { nome: "Educação Física III", horasAula: 40 }, { nome: "Sociologia III", horasAula: 40 },
+          { nome: "Biologia III", horasAula: 80 }, { nome: "Projetos Elétricos Industriais e Subestação", horasAula: 120 },
+          { nome: "Projetos de Linhas e Redes e Materiais Elétricos", horasAula: 120 }, { nome: "Máquinas Elétricas", horasAula: 120 },
+          { nome: "Eletrônica de Potência", horasAula: 80 }, { nome: "Fontes Alternativas de Energia e Conservação e Eficiência Energética", horasAula: 80 },
+          { nome: "Manutenção Elétrica", horasAula: 80 }, { nome: "Acionamentos Elétricos e Automação", horasAula: 120 },
+          { nome: "Instrumentação Industrial", horasAula: 80 }, { nome: "Saúde, Meio Ambiente e Segurança do Trabalho", horasAula: 120 },
+          { nome: "Empreendedorismo", horasAula: 40 }, { nome: "Sistemas de Potência", horasAula: 80 }
+        ]
+      }
+    ]
   }
 ];
