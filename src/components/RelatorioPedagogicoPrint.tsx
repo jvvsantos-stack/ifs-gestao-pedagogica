@@ -63,7 +63,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
             .badge-alerta { background-color: #fef3c7 !important; color: #92400e !important; border: 1px solid #d97706 !important; }
             
             table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-            th, td { border: 1px solid #d1d5db; padding: 6px; text-align: center; font-size: 11px; word-wrap: break-word; }
+            th, td { border: 1px solid #d1d5db; padding: 2px 4px; text-align: center; font-size: 10px; word-wrap: break-word; }
             th { background-color: #f3f4f6 !important; font-weight: bold; }
             tr { display: table-row !important; page-break-inside: avoid; }
             tr:nth-child(even) { background-color: #f8fafc !important; }
@@ -72,10 +72,13 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
         </style>
 
         {/* Cabeçalho */}
-        <div className="flex flex-col justify-center items-center pb-4 mb-6 border-b-4 border-black">
-          <h1 className="text-3xl font-extrabold uppercase tracking-widest text-center" style={{ color: 'black' }}>INSTITUTO FEDERAL DE SERGIPE</h1>
-          <h2 className="text-xl font-bold mt-1 uppercase text-center" style={{ color: 'black' }}>Relatório Pedagógico</h2>
-          {curso && <p className="text-sm font-semibold mt-2 text-center" style={{ color: 'black' }}>Curso: {curso.nome}</p>}
+        <div className="flex items-center gap-6 pb-4 mb-6 border-b-4 border-black">
+          <img src="/Campus Aracaju - Assinatura vertical cor.png" alt="Logo IFS" className="w-32 object-contain" />
+          <div className="flex-1 text-center pr-12">
+            <h1 className="text-2xl font-extrabold uppercase tracking-widest text-center" style={{ color: 'black' }}>INSTITUTO FEDERAL DE SERGIPE</h1>
+            <h2 className="text-lg font-bold mt-1 uppercase text-center" style={{ color: 'black' }}>Relatório Pedagógico</h2>
+            {curso && <p className="text-xs font-semibold mt-2 text-center" style={{ color: 'black' }}>Curso: {curso.nome}</p>}
+          </div>
         </div>
 
         {/* Informações do Aluno */}
@@ -114,11 +117,11 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
                 <th>Final</th>
                 <th>Média</th>
                 <th>Faltas</th>
-                <th>Situação</th>
+                <th style={{ width: '15%' }}>Situação</th>
               </tr>
             </thead>
             <tbody>
-              {boletim.map((b, i) => (
+              {[...boletim].sort((a, b) => a.disc.nome.localeCompare(b.disc.nome, 'pt-BR')).map((b, i) => (
                 <tr key={i}>
                   <td className="text-left font-medium text-black">{b.disc.nome}</td>
                   {b.notasEtapas.map((n: number | null, idx: number) => (
@@ -139,8 +142,8 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
                     ) : '-'}
                   </td>
                   <td className={b.faltasExcedidas ? "font-bold text-red-700" : "text-black"}>{b.faltas}</td>
-                  <td>
-                    <span className={`px-2 py-1 rounded font-bold ${
+                  <td className="whitespace-nowrap">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                       b.situacao === 'Cursando' ? 'badge-cursando' : 
                       b.situacao.includes('Aprovado') ? 'badge-aprovado' : 
                       'badge-reprovado'
