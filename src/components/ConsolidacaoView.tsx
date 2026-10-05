@@ -170,7 +170,10 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
   const numEtapas = isSubsequente ? 2 : 4;
 
   const alunos = useLiveQuery(() => db.alunos.where('turmaId').equals(turma.id!).toArray()) || [];
-  const disciplinas = useLiveQuery(() => db.disciplinas.where('turmaId').equals(turma.id!).toArray()) || [];
+  const disciplinasRaw = useLiveQuery(() => db.disciplinas.where('turmaId').equals(turma.id!).toArray()) || [];
+  const disciplinas = React.useMemo(() => {
+    return [...disciplinasRaw].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  }, [disciplinasRaw]);
   
   const notas = useLiveQuery(() => {
     if (disciplinas.length === 0) return [];

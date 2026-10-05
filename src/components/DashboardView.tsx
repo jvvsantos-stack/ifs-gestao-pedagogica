@@ -281,7 +281,9 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
                         <div>
                           <p className="font-semibold mb-2">Falta de lançamento (notas em branco parcial):</p>
                           <ul className="list-disc list-inside space-y-1 text-sm text-red-700">
-                            {dashboardData.diariosPendentesDisciplinas.map((d, i) => (
+                            {[...dashboardData.diariosPendentesDisciplinas]
+                              .sort((a, b) => a.disciplina.localeCompare(b.disciplina, 'pt-BR'))
+                              .map((d, i) => (
                               <li key={i}><strong>{d.disciplina}</strong> (Turma {d.turma})</li>
                             ))}
                           </ul>
