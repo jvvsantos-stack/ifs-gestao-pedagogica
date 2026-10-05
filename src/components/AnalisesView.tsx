@@ -651,6 +651,7 @@ export const AnalisesView: React.FC = () => {
                     taxaEvasao: analisesData.taxaEvasao
                   }}
                   parecerTexto={parecerEditavel}
+                  analisesData={analisesData}
                 />
               </div>
 
