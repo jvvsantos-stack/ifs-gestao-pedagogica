@@ -40,42 +40,54 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
     const dataHoraEmissao = new Date().toLocaleString('pt-BR');
 
     return (
-      <div ref={ref} className="print-container bg-white text-black p-8" style={{ width: '210mm', minHeight: '297mm', boxSizing: 'border-box' }}>
+      <div ref={ref} className="print-container bg-white text-black" style={{ width: '210mm', minHeight: '297mm', boxSizing: 'border-box' }}>
         <style type="text/css" media="print">
           {`
-            @page { size: A4; margin: 10mm; }
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
-            .print-container { background-color: white !important; color: black !important; }
-            .badge-aprovado { background-color: #d1fae5 !important; color: #065f46 !important; border: 1px solid #059669 !important; }
-            .badge-reprovado { background-color: #fee2e2 !important; color: #991b1b !important; border: 1px solid #dc2626 !important; }
-            .badge-cursando { background-color: #dbeafe !important; color: #1e40af !important; border: 1px solid #2563eb !important; }
+            @page { 
+              size: A4; 
+              margin: 0mm; /* Hide browser headers/footers */
+            }
+            body { 
+              -webkit-print-color-adjust: exact !important; 
+              print-color-adjust: exact !important; 
+              background-color: white !important; 
+            }
+            .print-container { 
+              background-color: white !important; 
+              color: black !important; 
+              padding: 15mm; 
+            }
+            .badge-aprovado { background-color: #166534 !important; color: white !important; border: 1px solid #14532d !important; }
+            .badge-reprovado { background-color: #991b1b !important; color: white !important; border: 1px solid #7f1d1d !important; }
+            .badge-cursando { background-color: #1e40af !important; color: white !important; border: 1px solid #1e3a8a !important; }
             .badge-alerta { background-color: #fef3c7 !important; color: #92400e !important; border: 1px solid #d97706 !important; }
-            table { border-collapse: collapse; width: 100%; }
-            th, td { border: 1px solid #d1d5db; padding: 6px; text-align: center; font-size: 11px; }
+            
+            table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+            th, td { border: 1px solid #d1d5db; padding: 6px; text-align: center; font-size: 11px; word-wrap: break-word; }
             th { background-color: #f3f4f6 !important; font-weight: bold; }
+            tr { display: table-row !important; page-break-inside: avoid; }
+            tr:nth-child(even) { background-color: #f8fafc !important; }
             .text-left { text-align: left; }
           `}
         </style>
 
         {/* Cabeçalho */}
-        <div className="flex justify-between items-center border-b-2 border-gray-800 pb-4 mb-6">
-          <div className="flex-1 text-center">
-            <h1 className="text-2xl font-bold uppercase tracking-wider" style={{ color: 'black' }}>INSTITUTO FEDERAL DE SERGIPE</h1>
-            <h2 className="text-lg font-semibold mt-1 uppercase" style={{ color: 'black' }}>Relatório Pedagógico</h2>
-            {curso && <p className="text-sm font-medium mt-1" style={{ color: 'black' }}>Curso: {curso.nome}</p>}
-          </div>
+        <div className="flex flex-col justify-center items-center pb-4 mb-6 border-b-4 border-black">
+          <h1 className="text-3xl font-extrabold uppercase tracking-widest text-center" style={{ color: 'black' }}>INSTITUTO FEDERAL DE SERGIPE</h1>
+          <h2 className="text-xl font-bold mt-1 uppercase text-center" style={{ color: 'black' }}>Relatório Pedagógico</h2>
+          {curso && <p className="text-sm font-semibold mt-2 text-center" style={{ color: 'black' }}>Curso: {curso.nome}</p>}
         </div>
 
         {/* Informações do Aluno */}
-        <div className="mb-6 p-4 border border-gray-300 rounded bg-gray-50">
-          <h3 className="text-lg font-bold mb-2 uppercase" style={{ color: 'black' }}>Dados do Aluno</h3>
-          <div className="grid grid-cols-2 gap-2 text-sm">
+        <div className="mb-6 p-4 border border-gray-300 rounded bg-slate-50">
+          <h3 className="text-lg font-bold mb-3 uppercase border-b border-gray-300 pb-1" style={{ color: 'black' }}>Dados do Aluno</h3>
+          <div className="grid grid-cols-2 gap-4 text-sm mb-3 text-black">
             <p><strong>Nome:</strong> {aluno.nome}</p>
-            <p><strong>Matrícula/ID:</strong> {aluno.id}</p>
             <p><strong>Turma:</strong> {turma?.nome}</p>
+            <p><strong>Matrícula/ID:</strong> {aluno.id}</p>
             <p><strong>Ano Letivo:</strong> {turma?.anoLetivo}</p>
           </div>
-          <div className="grid grid-cols-3 gap-2 text-sm mt-3 pt-3 border-t border-gray-200">
+          <div className="grid grid-cols-3 gap-2 text-sm pt-3 border-t border-gray-200 text-black">
             <p><strong>Média Geral:</strong> {mediaGeral}</p>
             <p><strong>Pendências:</strong> <span className={pendenciasCount > 0 ? "text-red-700 font-bold" : ""}>{pendenciasCount}</span></p>
             <p><strong>Freq. Global:</strong> {freqGlobal.toFixed(1)}%</p>
@@ -87,13 +99,15 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
           )}
         </div>
 
+        <hr className="my-6 border-slate-300" />
+
         {/* Boletim */}
         <div className="mb-6">
           <h3 className="text-md font-bold mb-2 uppercase" style={{ color: 'black' }}>Desempenho Acadêmico</h3>
           <table>
             <thead>
               <tr>
-                <th className="text-left">Disciplina</th>
+                <th className="text-left" style={{ width: '30%' }}>Disciplina</th>
                 {[...Array(numEtapas)].map((_, i) => (
                   <th key={i}>Etapa {i + 1}</th>
                 ))}
@@ -106,12 +120,12 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
             <tbody>
               {boletim.map((b, i) => (
                 <tr key={i}>
-                  <td className="text-left font-medium">{b.disc.nome}</td>
+                  <td className="text-left font-medium text-black">{b.disc.nome}</td>
                   {b.notasEtapas.map((n: number | null, idx: number) => (
-                    <td key={idx}>{n !== null ? n.toFixed(1) : '-'}</td>
+                    <td key={idx} className="text-black">{(n !== null && n !== undefined && String(n).trim() !== '') ? Number(n).toFixed(1) : '-'}</td>
                   ))}
-                  <td>{b.af?.provaFinal !== undefined && b.af.provaFinal !== null ? Number(b.af.provaFinal).toFixed(1) : '-'}</td>
-                  <td className="font-bold">
+                  <td className="text-black">{(b.af?.provaFinal !== undefined && b.af.provaFinal !== null && String(b.af.provaFinal).trim() !== '') ? Number(b.af.provaFinal).toFixed(1) : '-'}</td>
+                  <td className="font-bold text-black">
                     {b.mediaFinal !== null ? (
                        b.isAprovadoConselho ? (
                           <div>
@@ -124,7 +138,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
                        )
                     ) : '-'}
                   </td>
-                  <td className={b.faltasExcedidas ? "font-bold text-red-700" : ""}>{b.faltas}</td>
+                  <td className={b.faltasExcedidas ? "font-bold text-red-700" : "text-black"}>{b.faltas}</td>
                   <td>
                     <span className={`px-2 py-1 rounded font-bold ${
                       b.situacao === 'Cursando' ? 'badge-cursando' : 
@@ -140,9 +154,11 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
           </table>
         </div>
 
+        <hr className="my-6 border-slate-300" />
+
         {/* Resumo Estágio e Conselho */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="p-3 border border-gray-300 rounded text-sm">
+          <div className="p-3 border border-gray-300 rounded text-sm text-black">
             <h4 className="font-bold mb-2 uppercase" style={{ color: 'black' }}>Estágio</h4>
             {estagio ? (
               <div>
@@ -154,7 +170,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
               <p>Nenhum estágio registrado.</p>
             )}
           </div>
-          <div className="p-3 border border-gray-300 rounded text-sm">
+          <div className="p-3 border border-gray-300 rounded text-sm text-black">
             <h4 className="font-bold mb-2 uppercase" style={{ color: 'black' }}>Conselho de Classe</h4>
             {conselhoGlobal ? (
               <p className="font-bold">{conselhoGlobal}</p>
@@ -171,37 +187,40 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
 
         {/* Ocorrências */}
         {ocorrencias.length > 0 && (
-          <div className="mb-6">
-            <h3 className="text-md font-bold mb-2 uppercase" style={{ color: 'black' }}>Histórico de Ocorrências</h3>
-            <div className="space-y-2">
-              {ocorrencias.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).map(oc => (
-                <div key={oc.id} className="p-3 border border-gray-300 rounded text-sm">
-                  <div className="flex justify-between font-bold mb-1">
-                    <span>{oc.tipo}</span>
-                    <span>{new Date(oc.data + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
+          <>
+            <hr className="my-6 border-slate-300" />
+            <div className="mb-6">
+              <h3 className="text-md font-bold mb-2 uppercase" style={{ color: 'black' }}>Histórico de Ocorrências</h3>
+              <div className="space-y-2">
+                {ocorrencias.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).map(oc => (
+                  <div key={oc.id} className="p-3 border border-gray-300 rounded text-sm text-black">
+                    <div className="flex justify-between font-bold mb-1">
+                      <span>{oc.tipo}</span>
+                      <span>{new Date(oc.data + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
+                    </div>
+                    <p className="whitespace-pre-wrap">{oc.descricao}</p>
                   </div>
-                  <p className="whitespace-pre-wrap">{oc.descricao}</p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Assinaturas */}
         <div className="mt-16 pt-8 break-inside-avoid">
-          <div className="grid grid-cols-2 gap-8 text-center">
-            <div>
-              <div className="border-t border-black w-3/4 mx-auto mb-2"></div>
-              <p className="font-bold text-sm">{responsavelNome}</p>
-              <p className="text-xs">Responsável pelo Relatório</p>
+          <div className="flex justify-center items-center gap-16 text-center">
+            <div className="flex-1 max-w-xs">
+              <div className="border-t-2 border-black w-full mb-2"></div>
+              <p className="font-bold text-sm" style={{ color: 'black' }}>{responsavelNome}</p>
+              <p className="text-xs" style={{ color: 'black' }}>Responsável pelo Relatório</p>
             </div>
-            <div>
-              <div className="border-t border-black w-3/4 mx-auto mb-2"></div>
-              <p className="font-bold text-sm">Ciente do Responsável / Aluno</p>
-              <p className="text-xs">Assinatura</p>
+            <div className="flex-1 max-w-xs">
+              <div className="border-t-2 border-black w-full mb-2"></div>
+              <p className="font-bold text-sm" style={{ color: 'black' }}>Ciente do Responsável / Aluno</p>
+              <p className="text-xs" style={{ color: 'black' }}>Assinatura</p>
             </div>
           </div>
-          <div className="text-center mt-8 text-xs text-gray-500">
+          <div className="text-center mt-12 text-xs text-gray-500">
             Documento gerado em {dataHoraEmissao}
           </div>
         </div>
