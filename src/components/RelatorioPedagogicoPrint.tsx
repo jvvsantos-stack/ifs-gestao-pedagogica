@@ -73,7 +73,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
 
         {/* Cabeçalho */}
         <div className="flex items-center gap-6 pb-4 mb-6 border-b-4 border-black">
-          <img src="/logo-ifs.png" alt="Logo IFS" className="w-32 object-contain" />
+          <img src="/Campus Aracaju - Assinatura horizontal cor.png" alt="Logo IFS" className="w-64 object-contain" />
           <div className="flex-1 text-center pr-12">
             <h1 className="text-2xl font-extrabold uppercase tracking-widest text-center" style={{ color: 'black' }}>INSTITUTO FEDERAL DE SERGIPE</h1>
             <h2 className="text-lg font-bold mt-1 uppercase text-center" style={{ color: 'black' }}>Relatório Pedagógico</h2>
@@ -122,7 +122,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
             </thead>
             <tbody>
               {[...boletim].sort((a, b) => a.disc.nome.localeCompare(b.disc.nome, 'pt-BR')).map((b, i) => (
-                <tr key={i}>
+                <tr key={i} className="break-inside-avoid print:break-inside-avoid">
                   <td className="text-left font-medium text-black">{b.disc.nome}</td>
                   {b.notasEtapas.map((n: number | null, idx: number) => (
                     <td key={idx} className="text-black">{(n !== null && n !== undefined && String(n).trim() !== '') ? Number(n).toFixed(1) : '-'}</td>
@@ -161,7 +161,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
 
         {/* Resumo Estágio e Conselho */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="p-3 border border-gray-300 rounded text-sm text-black">
+          <div className="p-3 border border-gray-300 rounded text-sm text-black break-inside-avoid print:break-inside-avoid">
             <h4 className="font-bold mb-2 uppercase" style={{ color: 'black' }}>Estágio</h4>
             {estagio ? (
               <div>
@@ -173,7 +173,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
               <p>Nenhum estágio registrado.</p>
             )}
           </div>
-          <div className="p-3 border border-gray-300 rounded text-sm text-black">
+          <div className="p-3 border border-gray-300 rounded text-sm text-black break-inside-avoid print:break-inside-avoid">
             <h4 className="font-bold mb-2 uppercase" style={{ color: 'black' }}>Conselho de Classe</h4>
             {conselhoGlobal ? (
               <p className="font-bold">{conselhoGlobal}</p>
@@ -196,7 +196,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
               <h3 className="text-md font-bold mb-2 uppercase" style={{ color: 'black' }}>Histórico de Ocorrências</h3>
               <div className="space-y-2">
                 {ocorrencias.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()).map(oc => (
-                  <div key={oc.id} className="p-3 border border-gray-300 rounded text-sm text-black">
+                  <div key={oc.id} className="p-3 border border-gray-300 rounded text-sm text-black break-inside-avoid print:break-inside-avoid">
                     <div className="flex justify-between font-bold mb-1">
                       <span>{oc.tipo}</span>
                       <span>{new Date(oc.data + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
@@ -210,7 +210,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
         )}
 
         {/* Assinaturas */}
-        <div className="mt-16 pt-8 break-inside-avoid">
+        <div className="mt-16 pt-8 break-inside-avoid print:break-inside-avoid">
           <div className="flex justify-center items-center gap-16 text-center">
             <div className="flex-1 max-w-xs">
               <div className="border-t-2 border-black w-full mb-2"></div>
