@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import logoIFS from '../assets/logo-ifs.png';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, BarChart, Bar, Cell } from 'recharts';
 
 interface RelatorioAnaliticoPrintProps {
   filtros: {
