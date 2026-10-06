@@ -5,7 +5,6 @@ import type { Turma } from '../db/database';
 import { LayoutDashboard, Users, BookOpen, FolderOpen, AlertTriangle, ChevronRight, CheckCircle2, Search } from 'lucide-react';
 import type { TabId } from './MainLayout';
 import { BuscaAlunoModal } from './BuscaAlunoModal';
-import { seedDatabase } from '../utils/seedDatabase';
 
 interface DashboardProps {
   setActiveTab: (tab: TabId) => void;
@@ -200,19 +199,6 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
             </div>
           </div>
           <div className="flex gap-2">
-            <button 
-              onClick={async () => {
-                if (window.confirm('ATENÇÃO: Isto irá APAGAR todas as turmas, alunos e notas atuais e gerar dados fictícios. Tem certeza?')) {
-                  await seedDatabase();
-                  alert('Dados gerados com sucesso!');
-                  window.location.reload();
-                }
-              }}
-              className="bg-amber-100 hover:bg-amber-200 text-amber-700 border border-amber-200 shadow-sm font-semibold py-2.5 px-4 rounded-xl transition-all flex items-center gap-2"
-              title="Gera uma base de testes rigorosa com 5 perfis de alunos"
-            >
-              Gerar Dados de Teste
-            </button>
             <button 
               onClick={() => setShowBuscaAluno(true)}
               className="bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-900 text-indigo-600 border border-indigo-200 shadow-sm font-semibold py-2.5 px-6 rounded-xl transition-all flex items-center gap-2 hover:shadow-md hover:border-indigo-300 dark:text-slate-100"
