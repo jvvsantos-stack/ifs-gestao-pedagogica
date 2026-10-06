@@ -248,5 +248,53 @@ export const cursosPPC = [
         ]
       }
     ]
+  },
+  {
+    nome: "Técnico em Informática Integrado",
+    modalidade: "Integrado",
+    turmas: [
+      {
+        nomeExibicao: "1ª Série",
+        codigo: "1INFO",
+        disciplinas: [
+          { nome: "Língua Portuguesa I", horasAula: 120 }, { nome: "Língua Inglesa I", horasAula: 40 },
+          { nome: "Educação Física I", horasAula: 80 }, { nome: "Matemática I", horasAula: 160 },
+          { nome: "Biologia I", horasAula: 80 }, { nome: "Física I", horasAula: 120 },
+          { nome: "Química I", horasAula: 80 }, { nome: "História I", horasAula: 80 },
+          { nome: "Geografia I", horasAula: 80 }, { nome: "Filosofia I", horasAula: 80 },
+          { nome: "Sociologia I", horasAula: 80 }, { nome: "Língua Espanhola", horasAula: 80 },
+          { nome: "Informática Básica", horasAula: 80 }, { nome: "Programação I", horasAula: 240 },
+          { nome: "Organização de Computadores e Sistemas Operacionais", horasAula: 120 }, { nome: "Empreendedorismo", horasAula: 80 }
+        ]
+      },
+      {
+        nomeExibicao: "2ª Série",
+        codigo: "2INFO",
+        disciplinas: [
+          { nome: "Língua Portuguesa II", horasAula: 120 }, { nome: "Língua Inglesa II", horasAula: 80 },
+          { nome: "Educação Física II", horasAula: 80 }, { nome: "Matemática II", horasAula: 160 },
+          { nome: "Biologia II", horasAula: 80 }, { nome: "Física II", horasAula: 120 },
+          { nome: "Química II", horasAula: 80 }, { nome: "História II", horasAula: 80 },
+          { nome: "Geografia II", horasAula: 80 }, { nome: "Filosofia II", horasAula: 40 },
+          { nome: "Sociologia II", horasAula: 40 }, { nome: "Segurança do Trabalho", horasAula: 80 },
+          { nome: "Programação II", horasAula: 160 }, { nome: "Banco de Dados", horasAula: 120 },
+          { nome: "Redes de Computadores", horasAula: 80 }, { nome: "Noções de Engenharia de Software", horasAula: 80 }
+        ]
+      },
+      {
+        nomeExibicao: "3ª Série",
+        codigo: "3INFO",
+        disciplinas: [
+          { nome: "Língua Portuguesa III", horasAula: 120 }, { nome: "Língua Inglesa III", horasAula: 80 },
+          { nome: "Arte", horasAula: 80 }, { nome: "Educação Física III", horasAula: 40 },
+          { nome: "Matemática III", horasAula: 120 }, { nome: "Biologia III", horasAula: 80 },
+          { nome: "Física III", horasAula: 120 }, { nome: "Química III", horasAula: 80 },
+          { nome: "História III", horasAula: 80 }, { nome: "Geografia III", horasAula: 80 },
+          { nome: "Filosofia III", horasAula: 40 }, { nome: "Sociologia III", horasAula: 40 },
+          { nome: "Programação III", horasAula: 160 }, { nome: "Construção de Sites", horasAula: 80 },
+          { nome: "Trabalho de Conclusão de Curso (TCC)", horasAula: 120 }
+        ]
+      }
+    ]
   }
 ];
