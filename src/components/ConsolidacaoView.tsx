@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
 import type { Turma, Disciplina } from '../db/database';
-import { ArrowLeft, Users, Scale, Activity, BarChart2, AlertTriangle, Award } from 'lucide-react';
+import { ArrowLeft, Users, Scale, Activity, BarChart2, AlertTriangle, Award, Printer } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
+import { useReactToPrint } from 'react-to-print';
+import { RelatorioRiscoPrint } from './RelatorioRiscoPrint';
 
 export const ConsolidacaoView: React.FC = () => {
   const [selectedTurma, setSelectedTurma] = useState<Turma | null>(null);
@@ -164,6 +166,12 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
   const [activeTab, setActiveTab] = useState<'mapa' | 'conselho' | 'estatisticas' | 'risco' | 'monitoria' | 'ranking'>('mapa');
   const [monitoriaDiscId, setMonitoriaDiscId] = useState<number | ''>('');
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+  
+  const printRiscoRef = useRef<HTMLDivElement>(null);
+  const handlePrintRisco = useReactToPrint({
+    contentRef: printRiscoRef,
+    documentTitle: `Alerta_Risco_${turma.codigo}`
+  });
   
   const curso = useLiveQuery(() => db.cursos.get(turma.cursoId));
   const isSubsequente = curso?.modalidade?.includes('Subsequente');
@@ -723,8 +731,19 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
         )}
 
         {activeTab === 'risco' && (
-          <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm flex-1 overflow-auto dark:text-slate-100">
-            <table className="w-full text-sm border-collapse">
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex justify-between items-center mb-4 shrink-0">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-slate-200">Painel de Alerta de Risco</h2>
+              <button
+                onClick={() => handlePrintRisco()}
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
+              >
+                <Printer className="w-4 h-4" />
+                Exportar Relatório (PDF)
+              </button>
+            </div>
+            <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm flex-1 overflow-auto dark:text-slate-100 relative">
+              <table className="w-full text-sm border-collapse">
               <thead className="bg-gray-100 dark:bg-slate-800 sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-1/4">
@@ -742,7 +761,14 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                 {alunosRisco.map(item => (
                   <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
                     <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
-                      {item.aluno.nome}
+                      <div className="flex items-center gap-2">
+                        <span>{item.aluno.nome}</span>
+                        {item.freqGlobal < 80 ? (
+                          <span className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-red-200 dark:border-red-800 whitespace-nowrap" title={`Frequência: ${item.freqGlobal.toFixed(1)}%`}>Pé de Meia: Perdido</span>
+                        ) : item.freqGlobal <= 85 ? (
+                          <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-yellow-200 dark:border-yellow-800 whitespace-nowrap" title={`Frequência: ${item.freqGlobal.toFixed(1)}%`}>Pé de Meia: Risco</span>
+                        ) : null}
+                      </div>
                     </td>
                     <td className="px-4 py-3 align-middle">
                       <div className="flex flex-col gap-1">
@@ -788,6 +814,19 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
               </tbody>
             </table>
           </div>
+          <div className="hidden">
+            <RelatorioRiscoPrint
+              ref={printRiscoRef}
+              filtros={{
+                curso: curso?.nome || 'Não definido',
+                modalidade: curso?.modalidade || 'Não definida',
+                periodo: turma.anoLetivo || 'Não definido',
+                turma: turma.codigo
+              }}
+              alunosRisco={alunosRisco}
+            />
+          </div>
+        </div>
         )}
 
         {activeTab === 'monitoria' && (
