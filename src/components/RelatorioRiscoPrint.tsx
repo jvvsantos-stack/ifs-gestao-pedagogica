@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import logoIFS from '../assets/logo-ifs.png';
 import type { Disciplina } from '../db/database';
 
