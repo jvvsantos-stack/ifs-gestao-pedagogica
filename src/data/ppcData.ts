@@ -42,7 +42,7 @@ export const cursosPPC = [
           { nome: "Infraestrutura de Hardware e Software", horasAula: 80 }, { nome: "Linguagem de Programação", horasAula: 120 },
           { nome: "Sistemas Programáveis", horasAula: 120 }, { nome: "Sistemas Digitais", horasAula: 120 },
           { nome: "Sistemas de Automação", horasAula: 160 }, { nome: "Telecomunicações", horasAula: 120 },
-          { nome: "Artes", horasAula: 80 }, { nome: "Língua Espanhola", horasAula: 80 },
+          { nome: "Língua Espanhola", horasAula: 80 },
           { nome: "Eletrônica de Potência", horasAula: 80 }
         ]
       }
