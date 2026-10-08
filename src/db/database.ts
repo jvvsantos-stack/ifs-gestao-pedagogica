@@ -93,7 +93,6 @@ export interface Estagio {
   };
   dadosFinalizacao?: {
     termino: string;
-    nota: string;
     chTotal: string;
     avaliacao: 'Fraco' | 'Regular' | 'Bom' | 'Ótimo' | '';
     comentarios: string;

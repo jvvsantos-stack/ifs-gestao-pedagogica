@@ -24,7 +24,7 @@ export const EstagiosView: React.FC = () => {
   const [showFinalizar, setShowFinalizar] = useState(false);
   const [showNaoFinalizado, setShowNaoFinalizado] = useState(false);
   
-  const [finalizarData, setFinalizarData] = useState({ termino: '', nota: '', chTotal: '', avaliacao: '', comentarios: '' });
+  const [finalizarData, setFinalizarData] = useState({ termino: '', chTotal: '', avaliacao: '', comentarios: '' });
   const [motivoNaoFinalizado, setMotivoNaoFinalizado] = useState('');
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
 
@@ -141,7 +141,7 @@ export const EstagiosView: React.FC = () => {
     });
     setShowFinalizar(false);
     setCurrentEstagio(null);
-    setFinalizarData({ termino: '', nota: '', chTotal: '', avaliacao: '', comentarios: '' });
+    setFinalizarData({ termino: '', chTotal: '', avaliacao: '', comentarios: '' });
   };
 
   const handleSaveNaoFinalizado = async () => {
@@ -150,7 +150,6 @@ export const EstagiosView: React.FC = () => {
       status: 'Não Finalizado',
       dadosFinalizacao: {
         termino: new Date().toISOString().split('T')[0],
-        nota: '',
         chTotal: '',
         avaliacao: '',
         comentarios: '',
@@ -495,7 +494,6 @@ export const EstagiosView: React.FC = () => {
             <div className="p-6 space-y-4">
               <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Data de Término</label><input type="date" className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800" value={finalizarData.termino} onChange={e => setFinalizarData({...finalizarData, termino: e.target.value})} /></div>
               <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Carga Horária Total</label><input className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800" value={finalizarData.chTotal} onChange={e => setFinalizarData({...finalizarData, chTotal: e.target.value})} /></div>
-              <div><label className="block text-sm font-medium text-gray-700 dark:text-slate-300">Nota Final</label><input type="number" step="0.1" className="mt-1 w-full p-2 border rounded dark:focus:ring-slate-600 dark:border-slate-700 dark:text-slate-100 dark:bg-slate-800" value={finalizarData.nota} onChange={e => setFinalizarData({...finalizarData, nota: e.target.value})} /></div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Avaliação</label>
