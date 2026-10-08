@@ -479,7 +479,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 dark:text-slate-300 hover:text-indigo-600 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-300 bg-gray-50 text-gray-700 font-medium hover:bg-gray-100 hover:text-gray-900 transition-colors dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100 text-sm shadow-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             Voltar
