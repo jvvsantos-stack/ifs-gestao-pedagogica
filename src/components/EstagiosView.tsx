@@ -326,9 +326,7 @@ export const EstagiosView: React.FC = () => {
                         {estagio.dadosFinalizacao?.termino && (
                           <span>Término: {new Date(estagio.dadosFinalizacao.termino + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
                         )}
-                        {estagio.status === 'Finalizado' && estagio.dadosFinalizacao?.nota && (
-                          <span className="font-medium text-gray-900 dark:text-slate-200">Nota: {estagio.dadosFinalizacao.nota}</span>
-                        )}
+
                         {estagio.status === 'Não Finalizado' && estagio.dadosFinalizacao?.motivoNaoFinalizado && (
                           <span className="font-medium text-orange-600">Motivo: {estagio.dadosFinalizacao.motivoNaoFinalizado}</span>
                         )}
