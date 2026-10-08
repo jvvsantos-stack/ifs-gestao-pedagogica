@@ -260,9 +260,9 @@ const DiarioTurma: React.FC<{ turma: Turma, onBack: () => void }> = ({ turma, on
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-300 bg-gray-50 text-gray-700 font-medium hover:bg-gray-100 hover:text-gray-900 transition-colors dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100 text-sm shadow-sm"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg flex items-center gap-2 text-sm transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 text-white" />
             Voltar
           </button>
           <span className="text-gray-300">|</span>
@@ -974,9 +974,9 @@ const DiarioDisciplina: React.FC<{
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-300 bg-gray-50 text-gray-700 font-medium hover:bg-gray-100 hover:text-gray-900 transition-colors dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100 text-sm shadow-sm"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg flex items-center gap-2 text-sm transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 text-white" />
             Voltar para Turma
           </button>
           <span className="text-gray-300">|</span>
