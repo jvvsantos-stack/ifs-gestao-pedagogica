@@ -52,6 +52,7 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
   const [gerarDiscSemestre, setGerarDiscSemestre] = useState('1');
   // --- Tabs de visualização de turmas ---
   const [viewTurmas, setViewTurmas] = useState<'ativas' | 'arquivadas'>('ativas');
+  const [viewDisciplinasArquivadas, setViewDisciplinasArquivadas] = useState<Record<number, boolean>>({});
 
   // --- Modal de confirmação genérico ---
   const [confirmModal, setConfirmModal] = useState<{
@@ -812,33 +813,52 @@ export const CadastrosView: React.FC<Props> = ({ onTurmaCriada }) => {
 
                     {/* Lista de Disciplinas renderizadas */}
                     {status !== null && status.cadastradas > 0 && (
-                      <div className="mt-1 mb-2 flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
-                        {disciplinasAll.filter(d => d.turmaId === t.id && (viewTurmas === 'ativas' ? !d.arquivado : d.arquivado)).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')).map(d => {
-                          const turmaPPC = getCursoPPCParaTurma(t);
-                          const isPPC = turmaPPC?.disciplinas.some(dp => dp.nome === d.nome) || false;
-                          return (
-                            <div key={d.id} className="text-sm bg-gray-50 dark:bg-slate-900 border border-gray-100 rounded p-2 flex justify-between items-center group/disc">
-                              <div className="flex-1 min-w-0 pr-2">
-                                <div className="font-semibold text-base text-gray-700 dark:text-slate-300 truncate" title={d.nome}>
-                                  {d.periodoLetivo && <span className="mr-1 text-indigo-600 bg-indigo-100 dark:bg-indigo-900/40 px-1 rounded text-sm">[ {d.periodoLetivo} ]</span>}
-                                  {d.nome}
+                      <div className="mt-2 flex flex-col gap-1.5">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-xs font-bold text-gray-500">Disciplinas:</span>
+                          <div className="flex bg-gray-100 dark:bg-slate-700/50 rounded p-0.5">
+                            <button
+                              onClick={() => setViewDisciplinasArquivadas(prev => ({ ...prev, [t.id!]: false }))}
+                              className={`text-[10px] px-2 py-0.5 rounded font-bold transition-colors ${!viewDisciplinasArquivadas[t.id!] ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500'}`}
+                            >
+                              Ativas
+                            </button>
+                            <button
+                              onClick={() => setViewDisciplinasArquivadas(prev => ({ ...prev, [t.id!]: true }))}
+                              className={`text-[10px] px-2 py-0.5 rounded font-bold transition-colors ${viewDisciplinasArquivadas[t.id!] ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-500'}`}
+                            >
+                              Arquivadas
+                            </button>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
+                          {disciplinasAll.filter(d => d.turmaId === t.id && (viewDisciplinasArquivadas[t.id!] ? d.arquivado : !d.arquivado)).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')).map(d => {
+                            const turmaPPC = getCursoPPCParaTurma(t);
+                            const isPPC = turmaPPC?.disciplinas.some(dp => dp.nome === d.nome) || false;
+                            return (
+                              <div key={d.id} className="text-sm bg-gray-50 dark:bg-slate-900 border border-gray-100 rounded p-2 flex justify-between items-center group/disc">
+                                <div className="flex-1 min-w-0 pr-2">
+                                  <div className="font-semibold text-base text-gray-700 dark:text-slate-300 truncate" title={d.nome}>
+                                    {d.periodoLetivo && <span className="mr-1 text-indigo-600 bg-indigo-100 dark:bg-indigo-900/40 px-1 rounded text-sm">[ {d.periodoLetivo} ]</span>}
+                                    {d.nome}
+                                  </div>
+                                  <div className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{d.chAula} aulas / {d.chRelogio}h</div>
                                 </div>
-                                <div className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{d.chAula} aulas / {d.chRelogio}h</div>
+                                <div className="flex gap-1 opacity-0 group-hover/disc:opacity-100 transition-opacity">
+                                  <button onClick={() => handleEditDisciplinaClick(d)} className="text-indigo-500 hover:text-indigo-700 p-0.5" title="Editar"><Edit className="w-3 h-3" /></button>
+                                  {viewDisciplinasArquivadas[t.id!] ? (
+                                    <button onClick={() => handleArchiveDisciplina(d.id!, false)} className="text-green-500 hover:text-green-700 p-0.5" title="Desarquivar"><ArchiveRestore className="w-3 h-3" /></button>
+                                  ) : (
+                                    <button onClick={() => handleArchiveDisciplina(d.id!, true)} className="text-orange-500 hover:text-orange-700 p-0.5" title="Arquivar"><Archive className="w-3 h-3" /></button>
+                                  )}
+                                  {!isPPC && (
+                                    <button onClick={() => handleDeleteDisciplina(d.id!)} className="text-red-500 hover:text-red-700 p-0.5" title="Excluir"><Trash2 className="w-3 h-3" /></button>
+                                  )}
+                                </div>
                               </div>
-                              <div className="flex gap-1 opacity-0 group-hover/disc:opacity-100 transition-opacity">
-                                <button onClick={() => handleEditDisciplinaClick(d)} className="text-indigo-500 hover:text-indigo-700 p-0.5" title="Editar"><Edit className="w-3 h-3" /></button>
-                                {viewTurmas === 'ativas' ? (
-                                  <button onClick={() => handleArchiveDisciplina(d.id!, true)} className="text-orange-500 hover:text-orange-700 p-0.5" title="Arquivar"><Archive className="w-3 h-3" /></button>
-                                ) : (
-                                  <button onClick={() => handleArchiveDisciplina(d.id!, false)} className="text-green-500 hover:text-green-700 p-0.5" title="Restaurar"><ArchiveRestore className="w-3 h-3" /></button>
-                                )}
-                                {!isPPC && (
-                                  <button onClick={() => handleDeleteDisciplina(d.id!)} className="text-red-500 hover:text-red-700 p-0.5" title="Excluir"><Trash2 className="w-3 h-3" /></button>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
 
