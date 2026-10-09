@@ -27,8 +27,8 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
     const turmasIds = turmasAtivas.map(t => t.id!);
     const alunosAtivos = await db.alunos.where('turmaId').anyOf(turmasIds).toArray();
 
-    const alertasConselho: { turma: Turma, alunos: string[] }[] = [];
-    const alertasEvasaoMap = new Map<number, { alunoNome: string, turmaNome: string, disciplinas: string[], freqGlobal?: number }>();
+    const alertasConselho: { turma: Turma, alunos: {nome: string, isRepetente?: boolean}[] }[] = [];
+    const alertasEvasaoMap = new Map<number, { alunoNome: string, isRepetente?: boolean, turmaNome: string, disciplinas: string[], freqGlobal?: number }>();
     const diariosPendentesDisciplinas: { disciplina: string, turma: string }[] = [];
 
     // Lógica de Pendências do Conselho
@@ -40,7 +40,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
       const alunosTurma = alunosAtivos.filter(a => a.turmaId === turma.id);
       const disciplinasTurma = disciplinasAtivas.filter(d => d.turmaId === turma.id);
       
-      const aguardandoConselhoAlunos: string[] = [];
+      const aguardandoConselhoAlunos: {nome: string, isRepetente?: boolean}[] = [];
 
       for (const disc of disciplinasTurma) {
         const discNotas = notas.filter(n => n.disciplinaId === disc.id);
@@ -88,7 +88,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
         
         if (freqGlobal <= 84) {
           if (!alertasEvasaoMap.has(aluno.id!)) {
-            alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome + (aluno.isRepetente ? ' (REPT)' : ''), turmaNome: turma.nome, disciplinas: [], freqGlobal });
+            alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome, isRepetente: aluno.isRepetente, turmaNome: turma.nome, disciplinas: [], freqGlobal });
           }
         }
       }
@@ -156,7 +156,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
         const isEligible = cursandoCount === 0 && !hasReprovacaoPorFalta && qtdReprovacoes > 0 && qtdReprovacoes <= 2 && pendencias.every(p => p.eligible);
         
         if (isEligible && !conselhoDecision) {
-          aguardandoConselhoAlunos.push(aluno.nome + (aluno.isRepetente ? ' (REPT)' : ''));
+          aguardandoConselhoAlunos.push({ nome: aluno.nome, isRepetente: aluno.isRepetente });
         }
       }
 
@@ -294,8 +294,11 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
                             ⚠️ <strong>{alerta.alunos.length} aluno(s)</strong> aguardando decisão de Conselho na turma <strong>{alerta.turma.nome} ({alerta.turma.codigo})</strong>:
                           </p>
                           <ul className="list-disc list-inside space-y-1 text-sm text-amber-700 ml-1">
-                            {alerta.alunos.map((alunoNome, i) => (
-                              <li key={i}>{alunoNome}</li>
+                            {alerta.alunos.map((alunoObj, i) => (
+                              <li key={i}>
+                                {alunoObj.nome}
+                                {alunoObj.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}
+                              </li>
                             ))}
                           </ul>
                         </div>
@@ -341,7 +344,11 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
                     <div className="flex items-start gap-3">
                       <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${alerta.freqGlobal !== undefined && alerta.freqGlobal < 75 ? 'text-red-500' : 'text-amber-500'}`} />
                       <div>
-                        <p className="font-bold text-base mb-1">{alerta.alunoNome} <span className="font-normal text-sm text-red-600">(Turma {alerta.turmaNome})</span></p>
+                        <p className="font-bold text-base mb-1">
+                          {alerta.alunoNome}
+                          {alerta.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}
+                          <span className="font-normal text-sm text-red-600 ml-1">(Turma {alerta.turmaNome})</span>
+                        </p>
                         {alerta.freqGlobal !== undefined && alerta.freqGlobal < 75 ? (
                           <p className="text-sm text-red-700 font-semibold">Reprovado por Faltas</p>
                         ) : (

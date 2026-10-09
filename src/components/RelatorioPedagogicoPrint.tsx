@@ -85,7 +85,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
         <div className="mb-6 p-4 border border-gray-300 rounded bg-slate-50">
           <h3 className="text-lg font-bold mb-3 uppercase border-b border-gray-300 pb-1" style={{ color: 'black' }}>Dados do Aluno</h3>
           <div className="grid grid-cols-2 gap-4 text-sm mb-3 text-black">
-            <p><strong>Nome:</strong> {aluno.nome}{aluno.isRepetente ? ' (REPT)' : ''}</p>
+            <p><strong>Nome:</strong> {aluno.nome}{aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}</p>
             <p><strong>Turma:</strong> {turma?.nome}</p>
             <p><strong>Matrícula/ID:</strong> {aluno.id}</p>
             <p><strong>Ano Letivo:</strong> {turma?.anoLetivo}</p>

@@ -79,7 +79,7 @@ export const RelatorioRiscoPrint = forwardRef<HTMLDivElement, RelatorioRiscoPrin
                 {alunosRisco.map((item, index) => (
                   <tr key={item.aluno.id || index} className="print:break-inside-avoid">
                     <td className="px-4 py-3 align-top border-r border-gray-100">
-                      <div className="font-bold text-gray-800 mb-2">{item.aluno.nome}{item.aluno.isRepetente ? ' (REPT)' : ''}</div>
+                      <div className="font-bold text-gray-800 mb-2">{item.aluno.nome}{item.aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}</div>
                       
                       {/* Badge Pé de Meia */}
                       <div className="inline-block">

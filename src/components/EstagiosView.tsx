@@ -95,7 +95,10 @@ export const EstagiosView: React.FC = () => {
 
   const getAlunoNome = (id: number) => {
     const a = alunosAll.find(x => x.id === id);
-    return a ? a.nome + (a.isRepetente ? ' (REPT)' : '') : 'Aluno não encontrado';
+    return a ? a.nome : 'Aluno não encontrado';
+  };
+  const isAlunoRepetente = (id: number) => {
+    return alunosAll.find(x => x.id === id)?.isRepetente || false;
   };
 
   const handleSaveEstagio = async (e: React.FormEvent) => {
@@ -310,7 +313,10 @@ export const EstagiosView: React.FC = () => {
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <div className="flex flex-col mb-1.5">
-                        <span className="font-bold text-lg text-gray-900 dark:text-slate-200">{getAlunoNome(estagio.alunoId)}</span>
+                        <span className="font-bold text-lg text-gray-900 dark:text-slate-200">
+                          {getAlunoNome(estagio.alunoId)}
+                          {isAlunoRepetente(estagio.alunoId) && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}
+                        </span>
                         {(curso || turma) && (
                           <span className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
                             {[curso?.nome, turma?.nome, turma?.anoLetivo].filter(Boolean).join(' • ')}

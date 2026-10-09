@@ -684,7 +684,7 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
               <tbody className="divide-y divide-gray-100">
                 {alunosSorted.map(aluno => (
                   <tr key={aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 group">
-                    <td className="py-2 font-medium text-gray-800 dark:text-slate-200">{aluno.nome}{aluno.isRepetente ? ' (REPT)' : ''}</td>
+                    <td className="py-2 font-medium text-gray-800 dark:text-slate-200">{aluno.nome}{aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}</td>
                     <td className="py-2 text-right">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <label className="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-gray-500 dark:text-slate-400 mr-2 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
@@ -1086,7 +1086,7 @@ const DiarioDisciplina: React.FC<{
                   <tr key={aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
                     <td className="px-4 py-2 font-medium text-gray-800 dark:text-slate-200 sticky left-0 bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900 z-10 shadow-[1px_0_0_0_#f3f4f6]">
                       <div className="truncate flex items-center gap-2">
-                        <span>{aluno.nome}{aluno.isRepetente ? ' (REPT)' : ''}</span>
+                        <span>{aluno.nome}{aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}</span>
                       </div>
                     </td>
 

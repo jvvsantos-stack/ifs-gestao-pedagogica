@@ -557,7 +557,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                 {alunosProcessed.map(item => (
                   <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
                     <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle border-r sticky left-0 bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900">
-                      {item.aluno.nome}{item.aluno.isRepetente ? ' (REPT)' : ''}
+                      {item.aluno.nome}{item.aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}
                     </td>
                     <td className="px-4 py-3 text-center align-middle border-r sticky left-[200px] bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900 font-bold dark:text-slate-100">
                       <span className={`px-2 py-1 rounded text-xs font-bold inline-block ${item.isPeDeMeiaApto ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border dark:border-emerald-800' : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 dark:border dark:border-red-800'}`}>
@@ -631,7 +631,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                 {conselhoAlunos.map(item => (
                   <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
                     <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
-                      {item.aluno.nome}{item.aluno.isRepetente ? ' (REPT)' : ''}
+                      {item.aluno.nome}{item.aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}
                     </td>
                     <td className="px-4 py-3 align-middle">
                       {item.pendencias.length > 0 ? (
@@ -762,7 +762,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                   <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
                     <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
                       <div className="flex items-center gap-2">
-                        <span>{item.aluno.nome}{item.aluno.isRepetente ? ' (REPT)' : ''}</span>
+                        <span>{item.aluno.nome}{item.aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}</span>
                         {item.freqGlobal < 80 ? (
                           <span className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-red-200 dark:border-red-800 whitespace-nowrap" title={`Frequência: ${item.freqGlobal.toFixed(1)}%`}>Pé de Meia: Perdido</span>
                         ) : item.freqGlobal <= 85 ? (
@@ -882,7 +882,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                           )}
                         </td>
                         <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
-                          {item.aluno.nome}{item.aluno.isRepetente ? ' (REPT)' : ''}
+                          {item.aluno.nome}{item.aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}
                         </td>
                         <td className="px-4 py-3 text-center align-middle font-bold text-green-600 dark:text-green-400">
                           {item.nota.toFixed(1)}
@@ -950,7 +950,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                       )}
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
-                      {item.aluno.nome}{item.aluno.isRepetente ? ' (REPT)' : ''}
+                      {item.aluno.nome}{item.aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}
                     </td>
                     <td className="px-4 py-3 text-center align-middle font-bold text-indigo-600 dark:text-indigo-400">
                       {item.mediaGeral !== null ? item.mediaGeral.toFixed(2) : (

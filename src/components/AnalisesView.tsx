@@ -161,7 +161,7 @@ export const AnalisesView: React.FC = () => {
     let totalReprovadosFalta = 0;
 
     const disciplinasStats: Record<string, { soma: number, count: number, reprovados: number, totalFechados: number }> = {};
-    const alunosRisk: Record<number, { nome: string, disciplinasAbaixo: number, turma: string }> = {};
+    const alunosRisk: Record<number, { nome: string, isRepetente?: boolean, disciplinasAbaixo: number, turma: string }> = {};
     const etapasStats: Record<number, { soma: number, count: number }> = { 1: {soma:0, count:0}, 2: {soma:0, count:0}, 3: {soma:0, count:0}, 4: {soma:0, count:0} };
     const alunosGlobalStats: Record<number, { somaMedias: number, countMedias: number }> = {};
 
@@ -178,7 +178,7 @@ export const AnalisesView: React.FC = () => {
       const discAlunos = alunosFiltrados.filter(a => a.turmaId === disc.turmaId);
 
       for (const aluno of discAlunos) {
-        if (!alunosRisk[aluno.id!]) alunosRisk[aluno.id!] = { nome: aluno.nome + (aluno.isRepetente ? ' (REPT)' : ''), disciplinasAbaixo: 0, turma: turma?.nome || '' };
+        if (!alunosRisk[aluno.id!]) alunosRisk[aluno.id!] = { nome: aluno.nome, isRepetente: aluno.isRepetente, disciplinasAbaixo: 0, turma: turma?.nome || '' };
 
         const alunoNotas = discNotas.filter(n => n.alunoId === aluno.id);
         const avaliacao = avaliacoesAll.find(a => a.alunoId === aluno.id && a.disciplinaId === disc.id);
@@ -530,7 +530,10 @@ export const AnalisesView: React.FC = () => {
                 <tbody className="divide-y divide-gray-50">
                   {analisesData.riscoList.map(r => (
                     <tr key={r.nome} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
-                      <td className="py-2.5 px-3 font-bold text-gray-900 dark:text-slate-100 truncate max-w-[120px]" title={r.nome}>{r.nome.split('(')[0].trim()}</td>
+                      <td className="py-2.5 px-3 font-bold text-gray-900 dark:text-slate-100 truncate max-w-[120px]" title={r.nome}>
+                        {r.nome}
+                        {r.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}
+                      </td>
                       <td className="py-2.5 px-3 font-medium text-gray-800 dark:text-slate-200 truncate max-w-[80px]">{r.turma}</td>
                       <td className="py-2.5 px-3 text-center">
                         <span className="bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 dark:border dark:border-red-800 font-bold px-2 py-0.5 rounded-full text-[10px]">{r.disciplinasAbaixo}</span>

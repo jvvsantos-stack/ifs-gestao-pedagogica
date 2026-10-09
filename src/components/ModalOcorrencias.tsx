@@ -119,7 +119,7 @@ export const ModalOcorrencias: React.FC<Props> = ({ aluno, onClose }) => {
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col dark:text-slate-100">
         <div className="flex justify-between items-center p-5 border-b border-gray-200 dark:border-slate-700">
           <div>
-            <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200">Ocorrências: {aluno.nome}{aluno.isRepetente ? ' (REPT)' : ''}</h2>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200">Ocorrências: {aluno.nome}{aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}</h2>
           </div>
           <button onClick={onClose} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full p-2 transition-colors">
             <X className="w-5 h-5" />
