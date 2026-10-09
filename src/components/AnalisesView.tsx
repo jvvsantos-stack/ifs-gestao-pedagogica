@@ -178,7 +178,7 @@ export const AnalisesView: React.FC = () => {
       const discAlunos = alunosFiltrados.filter(a => a.turmaId === disc.turmaId);
 
       for (const aluno of discAlunos) {
-        if (!alunosRisk[aluno.id!]) alunosRisk[aluno.id!] = { nome: aluno.nome, disciplinasAbaixo: 0, turma: turma?.nome || '' };
+        if (!alunosRisk[aluno.id!]) alunosRisk[aluno.id!] = { nome: aluno.nome + (aluno.isRepetente ? ' (REPT)' : ''), disciplinasAbaixo: 0, turma: turma?.nome || '' };
 
         const alunoNotas = discNotas.filter(n => n.alunoId === aluno.id);
         const avaliacao = avaliacoesAll.find(a => a.alunoId === aluno.id && a.disciplinaId === disc.id);

@@ -93,7 +93,10 @@ export const EstagiosView: React.FC = () => {
     });
   }, [estagios, searchTerm, alunosAll]);
 
-  const getAlunoNome = (id: number) => alunosAll.find(a => a.id === id)?.nome || 'Aluno não encontrado';
+  const getAlunoNome = (id: number) => {
+    const a = alunosAll.find(x => x.id === id);
+    return a ? a.nome + (a.isRepetente ? ' (REPT)' : '') : 'Aluno não encontrado';
+  };
 
   const handleSaveEstagio = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -248,7 +251,7 @@ export const EstagiosView: React.FC = () => {
             className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:dark:bg-slate-800 dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 dark:text-slate-500 disabled:cursor-not-allowed"
           >
             <option value="">Todos os Alunos...</option>
-            {alunosDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
+            {alunosDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}{a.isRepetente ? ' (REPT)' : ''}</option>)}
           </select>
         </div>
       </div>
@@ -427,7 +430,7 @@ export const EstagiosView: React.FC = () => {
                     className="mt-1 w-full p-2 border border-gray-300 dark:border-slate-600 rounded"
                   >
                     <option value="">Selecione o Aluno...</option>
-                    {alunosDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
+                    {alunosDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}{a.isRepetente ? ' (REPT)' : ''}</option>)}
                   </select>
                 </div>
               </section>

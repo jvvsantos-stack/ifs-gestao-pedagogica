@@ -88,7 +88,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
         
         if (freqGlobal <= 84) {
           if (!alertasEvasaoMap.has(aluno.id!)) {
-            alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome, turmaNome: turma.nome, disciplinas: [], freqGlobal });
+            alertasEvasaoMap.set(aluno.id!, { alunoNome: aluno.nome + (aluno.isRepetente ? ' (REPT)' : ''), turmaNome: turma.nome, disciplinas: [], freqGlobal });
           }
         }
       }
@@ -156,7 +156,7 @@ export const DashboardView: React.FC<DashboardProps> = ({ setActiveTab }) => {
         const isEligible = cursandoCount === 0 && !hasReprovacaoPorFalta && qtdReprovacoes > 0 && qtdReprovacoes <= 2 && pendencias.every(p => p.eligible);
         
         if (isEligible && !conselhoDecision) {
-          aguardandoConselhoAlunos.push(aluno.nome);
+          aguardandoConselhoAlunos.push(aluno.nome + (aluno.isRepetente ? ' (REPT)' : ''));
         }
       }
 

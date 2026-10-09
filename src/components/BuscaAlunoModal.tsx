@@ -346,7 +346,7 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
           <div>
             <h3 className="text-xl font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
               <GraduationCap className="w-6 h-6 text-indigo-600" />
-              {aluno.nome}
+              {aluno.nome}{aluno.isRepetente ? ' (REPT)' : ''}
             </h3>
             <div className="mt-2 text-sm text-gray-600 dark:text-slate-300 flex flex-wrap md:flex-nowrap items-center gap-3 sm:gap-4">
               <span className="whitespace-nowrap"><strong>Turma:</strong> {turma?.nome}</span>

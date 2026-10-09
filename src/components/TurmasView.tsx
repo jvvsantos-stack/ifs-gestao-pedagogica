@@ -450,6 +450,18 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
 
   const handleAddManual = () => setAlunoModal({ isOpen: true, mode: 'add', id: null, nome: '' });
   const handleEdit = (aluno: Aluno) => setAlunoModal({ isOpen: true, mode: 'edit', id: aluno.id!, nome: aluno.nome });
+  
+  const handleToggleRepetente = async (aluno: Aluno) => {
+    try {
+      const isRepetente = !aluno.isRepetente;
+      await db.alunos.update(aluno.id!, { isRepetente });
+      if (currentTurma) {
+        loadAlunos(currentTurma.id!);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar status de repetente:', error);
+    }
+  };
   const handleDelete = (aluno: Aluno) => {
     setConfirmModal({
       isOpen: true,
@@ -675,9 +687,18 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
               <tbody className="divide-y divide-gray-100">
                 {alunosSorted.map(aluno => (
                   <tr key={aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 group">
-                    <td className="py-2 font-medium text-gray-800 dark:text-slate-200">{aluno.nome}</td>
+                    <td className="py-2 font-medium text-gray-800 dark:text-slate-200">{aluno.nome}{aluno.isRepetente ? ' (REPT)' : ''}</td>
                     <td className="py-2 text-right">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <label className="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-gray-500 dark:text-slate-400 mr-2 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
+                          <input 
+                            type="checkbox" 
+                            checked={!!aluno.isRepetente}
+                            onChange={() => handleToggleRepetente(aluno)}
+                            className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 bg-white dark:bg-slate-800 dark:border-slate-600 w-3.5 h-3.5"
+                          />
+                          Repetente
+                        </label>
                         <button 
                           onClick={() => setOcorrenciasModal(aluno)}
                           className="text-orange-500 hover:bg-orange-50 dark:bg-orange-900/20 p-1.5 rounded transition-colors"
@@ -1068,7 +1089,7 @@ const DiarioDisciplina: React.FC<{
                   <tr key={aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
                     <td className="px-4 py-2 font-medium text-gray-800 dark:text-slate-200 sticky left-0 bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:hover:bg-slate-900 z-10 shadow-[1px_0_0_0_#f3f4f6]">
                       <div className="truncate flex items-center gap-2">
-                        <span>{aluno.nome}</span>
+                        <span>{aluno.nome}{aluno.isRepetente ? ' (REPT)' : ''}</span>
                       </div>
                     </td>
 

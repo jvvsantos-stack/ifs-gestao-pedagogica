@@ -31,6 +31,7 @@ export interface Aluno {
   id?: number;
   turmaId: number;
   nome: string;
+  isRepetente?: boolean;
 }
 
 export interface Nota {
