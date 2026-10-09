@@ -567,7 +567,7 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
           const keyNormalized = String(k).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
           norm[keyNormalized] = v;
         }
-        const nome = String(norm['nome do aluno'] || norm['nome'] || norm['aluno'] || '').trim();
+        const nome = String(norm['nome do aluno'] || norm['nome'] || norm['aluno'] || '').trim().toUpperCase();
         if (nome.length > 0) {
           rawNames.push(nome);
         }
