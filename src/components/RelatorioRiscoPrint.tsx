@@ -3,7 +3,7 @@ import logoIFS from '../assets/logo-ifs.png';
 import type { Disciplina } from '../db/database';
 
 interface AlunoRisco {
-  aluno: { id?: number; nome: string; matricula?: string };
+  aluno: { id?: number; nome: string; matricula?: string; isRepetente?: boolean };
   disciplinasRisco: {
     disc: Disciplina;
     faltasTot: number;

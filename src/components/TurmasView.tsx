@@ -455,9 +455,6 @@ const GerenciarAlunosModal: React.FC<{ turma: Turma, onClose: () => void }> = ({
     try {
       const isRepetente = !aluno.isRepetente;
       await db.alunos.update(aluno.id!, { isRepetente });
-      if (currentTurma) {
-        loadAlunos(currentTurma.id!);
-      }
     } catch (error) {
       console.error('Erro ao atualizar status de repetente:', error);
     }
