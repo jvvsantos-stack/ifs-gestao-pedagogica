@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
 import type { Turma, Disciplina } from '../db/database';
@@ -166,12 +166,9 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
   const [activeTab, setActiveTab] = useState<'mapa' | 'conselho' | 'estatisticas' | 'risco' | 'monitoria' | 'ranking'>('mapa');
   const [monitoriaDiscId, setMonitoriaDiscId] = useState<number | ''>('');
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+  const [selectedAlunoRiscoId, setSelectedAlunoRiscoId] = useState<string>('todos');
   
   const printRiscoRef = useRef<HTMLDivElement>(null);
-  const handlePrintRisco = useReactToPrint({
-    contentRef: printRiscoRef,
-    documentTitle: `Alerta_Risco_${turma.codigo}`
-  });
   
   const curso = useLiveQuery(() => db.cursos.get(turma.cursoId));
   const isSubsequente = curso?.modalidade?.includes('Subsequente');
@@ -355,6 +352,42 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
      const isMuitoAlto = a.disciplinasRisco.some(d => (d.percent && d.percent >= 1.0) || (d.media !== undefined && d.media < 4.0));
      return { ...a, nivelRisco: isMuitoAlto ? 'Muito Alto' : 'Alto' };
   }).sort((a) => (a.nivelRisco === 'Muito Alto' ? -1 : 1));
+
+  useEffect(() => {
+    setSelectedAlunoRiscoId('todos');
+  }, [turma.id]);
+
+  useEffect(() => {
+    if (selectedAlunoRiscoId !== 'todos') {
+      const exists = alunosRisco.some(item => String(item.aluno.id ?? item.aluno.nome) === selectedAlunoRiscoId);
+      if (!exists) {
+        setSelectedAlunoRiscoId('todos');
+      }
+    }
+  }, [alunosRisco, selectedAlunoRiscoId]);
+
+  const alunosRiscoFiltrados = useMemo(() => {
+    if (selectedAlunoRiscoId === 'todos') {
+      return alunosRisco;
+    }
+    return alunosRisco.filter(item => String(item.aluno.id ?? item.aluno.nome) === selectedAlunoRiscoId);
+  }, [alunosRisco, selectedAlunoRiscoId]);
+
+  const alunosRiscoDropdown = useMemo(() => {
+    return [...alunosRisco].sort((a, b) => a.aluno.nome.localeCompare(b.aluno.nome, 'pt-BR'));
+  }, [alunosRisco]);
+
+  const alunoRiscoSelecionado = useMemo(() => {
+    if (selectedAlunoRiscoId === 'todos') return null;
+    return alunosRisco.find(item => String(item.aluno.id ?? item.aluno.nome) === selectedAlunoRiscoId);
+  }, [alunosRisco, selectedAlunoRiscoId]);
+
+  const handlePrintRisco = useReactToPrint({
+    contentRef: printRiscoRef,
+    documentTitle: alunoRiscoSelecionado
+      ? `Alerta_Risco_${turma.codigo}_${alunoRiscoSelecionado.aluno.nome.replace(/\s+/g, '_')}`
+      : `Alerta_Risco_${turma.codigo}`
+  });
 
   const rankingMonitoria = monitoriaDiscId 
     ? [...alunosProcessed]
@@ -732,14 +765,34 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
 
         {activeTab === 'risco' && (
           <div className="flex flex-col h-full overflow-hidden">
-            <div className="flex justify-between items-center mb-4 shrink-0">
-              <h2 className="text-lg font-bold text-gray-800 dark:text-slate-200">Painel de Alerta de Risco</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 shrink-0">
+              <div className="flex items-center gap-4 flex-wrap">
+                <h2 className="text-lg font-bold text-gray-800 dark:text-slate-200">Painel de Alerta de Risco</h2>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="filtro-aluno-risco" className="text-sm font-medium text-gray-600 dark:text-slate-400 whitespace-nowrap">
+                    Filtrar Aluno:
+                  </label>
+                  <select
+                    id="filtro-aluno-risco"
+                    value={selectedAlunoRiscoId}
+                    onChange={e => setSelectedAlunoRiscoId(e.target.value)}
+                    className="rounded-lg border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm py-1.5 px-3 border min-w-[200px]"
+                  >
+                    <option value="todos">Todos os Alunos</option>
+                    {alunosRiscoDropdown.map(item => (
+                      <option key={item.aluno.id || item.aluno.nome} value={String(item.aluno.id ?? item.aluno.nome)}>
+                        {item.aluno.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               <button
                 onClick={() => handlePrintRisco()}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors shrink-0"
               >
                 <Printer className="w-4 h-4" />
-                Exportar Relatório (PDF)
+                {selectedAlunoRiscoId === 'todos' ? 'Exportar Relatório (PDF)' : 'Exportar Relatório Individual (PDF)'}
               </button>
             </div>
             <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm flex-1 overflow-auto dark:text-slate-100 relative">
@@ -758,7 +811,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {alunosRisco.map(item => (
+                {alunosRiscoFiltrados.map(item => (
                   <tr key={item.aluno.id} className="hover:bg-gray-50 dark:hover:bg-slate-900 transition-colors">
                     <td className="px-4 py-3 font-medium text-gray-800 dark:text-slate-200 align-middle">
                       <div className="flex items-center gap-2">
@@ -804,10 +857,12 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                     </td>
                   </tr>
                 ))}
-                {alunosRisco.length === 0 && (
+                {alunosRiscoFiltrados.length === 0 && (
                   <tr>
                     <td colSpan={3} className="py-12 text-center text-gray-500 dark:text-slate-400">
-                      Nenhum aluno em situação de risco nesta turma.
+                      {alunosRisco.length === 0
+                        ? 'Nenhum aluno em situação de risco nesta turma.'
+                        : 'Nenhum aluno encontrado para o filtro selecionado.'}
                     </td>
                   </tr>
                 )}
@@ -823,7 +878,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                 periodo: turma.anoLetivo || 'Não definido',
                 turma: turma.codigo
               }}
-              alunosRisco={alunosRisco}
+              alunosRisco={alunosRiscoFiltrados}
             />
           </div>
         </div>
