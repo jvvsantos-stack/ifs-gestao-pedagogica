@@ -342,37 +342,41 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
 
       {/* Card Header */}
       <div className="bg-indigo-50 dark:bg-indigo-900/30/50 p-6 border-b border-gray-200 dark:border-slate-700">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="text-xl font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
-              <GraduationCap className="w-6 h-6 text-indigo-600" />
-              {aluno.nome}{aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}
-            </h3>
-            <div className="mt-2 text-sm text-gray-600 dark:text-slate-300 flex flex-wrap md:flex-nowrap items-center gap-3 sm:gap-4">
-              <span className="whitespace-nowrap"><strong>Turma:</strong> {turma?.nome}</span>
-              <span className="whitespace-nowrap"><strong>Curso:</strong> {curso?.nome}</span>
-              {turma?.anoLetivo && <span className="whitespace-nowrap"><strong>Ano Letivo:</strong> {turma.anoLetivo}</span>}
-            </div>
-            <button
-              onClick={() => handlePrint()}
-              className="mt-4 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm"
-            >
-              <Printer className="w-4 h-4" />
-              Gerar Relatório (PDF)
-            </button>
+        {/* Linha Superior: Nome e Dados Cadastrais */}
+        <div>
+          <h3 className="text-xl font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
+            <GraduationCap className="w-6 h-6 text-indigo-600" />
+            {aluno.nome}{aluno.isRepetente && <span className="text-red-600 font-bold ml-1 print:text-red-600">(REPT)</span>}
+          </h3>
+          <div className="mt-2 text-sm text-gray-600 dark:text-slate-300 flex flex-wrap items-center gap-3 sm:gap-6">
+            <span className="whitespace-nowrap"><strong>Turma:</strong> {turma?.nome}</span>
+            <span className="whitespace-nowrap"><strong>Curso:</strong> {curso?.nome}</span>
+            {turma?.anoLetivo && <span className="whitespace-nowrap"><strong>Ano Letivo:</strong> {turma.anoLetivo}</span>}
           </div>
-          <div className="flex flex-row flex-wrap sm:flex-nowrap gap-2 shrink-0">
-            <div className="text-center px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 min-w-[90px] dark:text-slate-100">
+        </div>
+
+        {/* Linha Inferior: Botão à esquerda e Tags de Estatísticas à direita */}
+        <div className="mt-5 pt-4 border-t border-indigo-100/80 dark:border-slate-700/60 flex flex-wrap gap-4 items-center justify-between w-full">
+          <button
+            onClick={() => handlePrint()}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm"
+          >
+            <Printer className="w-4 h-4" />
+            Gerar Relatório (PDF)
+          </button>
+
+          <div className="flex flex-row flex-wrap sm:flex-nowrap gap-2.5">
+            <div className="text-center px-4 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 min-w-[95px] dark:text-slate-100">
               <div className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Média Geral</div>
               <div className="text-xl font-bold text-indigo-600">{mediaGeral}</div>
             </div>
-            <div className="text-center px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 min-w-[90px] dark:text-slate-100">
+            <div className="text-center px-4 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 min-w-[95px] dark:text-slate-100">
               <div className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Pendências</div>
               <div className={`text-xl font-bold ${pendenciasCount > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
                 {pendenciasCount}
               </div>
             </div>
-            <div className="text-center px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 min-w-[90px] dark:text-slate-100">
+            <div className="text-center px-4 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 min-w-[95px] dark:text-slate-100">
               <div className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Total de Faltas</div>
               <div className={`text-xl font-bold ${hasRiscoFaltas ? 'text-red-600 dark:text-red-400' : totalFaltasGlobal > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                 {totalFaltasGlobal}
