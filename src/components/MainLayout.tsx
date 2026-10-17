@@ -1,6 +1,7 @@
 import React from 'react';
 import { LayoutDashboard, BookOpen, Database, BarChart, Cloud, Layers, Briefcase, Sun, Moon } from 'lucide-react';
 import { useTheme } from './ThemeContext';
+import { APP_VERSION } from '../config';
 
 export type TabId = 'dashboard' | 'turmas' | 'cadastros' | 'estagios' | 'analises' | 'consolidacao' | 'sync';
 
@@ -86,11 +87,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           })}
         </nav>
 
-        {/* Rodapé da Sidebar com Créditos Oficiais */}
+        {/* Rodapé da Sidebar com Versão e Créditos Oficiais */}
         <div className="p-4 border-t border-slate-800/80 text-center">
           <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed font-normal">
             Desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Pedagogo Iracildes Silva Oliveira © 2026
           </p>
+          <div className="mt-2.5 flex items-center justify-center">
+            <span className="text-[10px] font-mono bg-slate-800 text-slate-400 px-2 py-0.5 rounded-md border border-slate-700/60 inline-flex items-center gap-1.5 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              {APP_VERSION}
+            </span>
+          </div>
         </div>
       </aside>
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Cloud, Lock, Loader2 } from 'lucide-react';
+import { APP_VERSION } from '../config';
 
 interface LoginViewProps {
   onLogin: () => void;
@@ -64,6 +65,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
         <p className="text-xs text-slate-400 dark:text-slate-500">
           Desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Pedagogo Iracildes Silva Oliveira © 2026
         </p>
+        <div className="mt-2.5 flex items-center justify-center">
+          <span className="text-[10px] font-mono bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-300 dark:border-slate-700/60 inline-flex items-center gap-1.5 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            {APP_VERSION}
+          </span>
+        </div>
       </div>
     </div>
   );
