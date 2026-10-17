@@ -39,6 +39,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
     ref
   ) => {
     const dataHoraEmissao = new Date().toLocaleString('pt-BR');
+    const totalFaltas = boletim.reduce((acc, b) => acc + (Number(b.faltas) || 0), 0);
 
     return (
       <div ref={ref} className="print-container bg-white text-black" style={{ width: '210mm', minHeight: '297mm', boxSizing: 'border-box' }}>
@@ -69,6 +70,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
             tr { display: table-row !important; page-break-inside: avoid; }
             tr:nth-child(even) { background-color: #f8fafc !important; }
             .text-left { text-align: left; }
+            .break-inside-avoid { break-inside: avoid !important; page-break-inside: avoid !important; }
           `}
         </style>
 
@@ -90,10 +92,11 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
             <p><strong>Matrícula/ID:</strong> {aluno.id}</p>
             <p><strong>Ano Letivo:</strong> {turma?.anoLetivo}</p>
           </div>
-          <div className="grid grid-cols-3 gap-2 text-sm pt-3 border-t border-gray-200 text-black">
+          <div className="grid grid-cols-4 gap-2 text-sm pt-3 border-t border-gray-200 text-black">
             <p><strong>Média Geral:</strong> {mediaGeral}</p>
             <p><strong>Pendências:</strong> <span className={pendenciasCount > 0 ? "text-red-700 font-bold" : ""}>{pendenciasCount}</span></p>
             <p><strong>Freq. Global:</strong> {freqGlobal.toFixed(1)}%</p>
+            <p><strong>Total Faltas:</strong> {totalFaltas}</p>
           </div>
           {hasRiscoFaltas && (
              <div className="mt-3 p-2 border border-red-500 bg-red-50 text-red-800 text-sm font-bold text-center rounded badge-reprovado">
@@ -157,37 +160,6 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
           </table>
         </div>
 
-        <hr className="my-6 border-slate-300" />
-
-        {/* Resumo Estágio e Conselho */}
-        <div className="grid grid-cols-2 gap-4 mb-6 print:break-inside-avoid">
-          <div className="p-3 border border-gray-300 rounded text-sm text-black break-inside-avoid print:break-inside-avoid">
-            <h4 className="font-bold mb-2 uppercase" style={{ color: 'black' }}>Estágio</h4>
-            {estagio ? (
-              <div>
-                <p><strong>Empresa:</strong> {estagio.dadosEmpresa.nome}</p>
-                <p><strong>Status:</strong> {estagio.status}</p>
-                <p><strong>Início:</strong> {new Date(estagio.dadosEstagio.inicio + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
-              </div>
-            ) : (
-              <p>Nenhum estágio registrado.</p>
-            )}
-          </div>
-          <div className="p-3 border border-gray-300 rounded text-sm text-black break-inside-avoid print:break-inside-avoid">
-            <h4 className="font-bold mb-2 uppercase" style={{ color: 'black' }}>Conselho de Classe</h4>
-            {conselhoGlobal ? (
-              <p className="font-bold">{conselhoGlobal}</p>
-            ) : (
-              <p>Sem decisão de conselho.</p>
-            )}
-            
-            <h4 className="font-bold mt-3 mb-1 uppercase" style={{ color: 'black' }}>Pé de Meia</h4>
-            <p className={isPeDeMeiaApto ? "font-bold text-green-700" : "font-bold text-red-700"}>
-              {isPeDeMeiaApto ? 'Habilitado' : 'Não Habilitado'}
-            </p>
-          </div>
-        </div>
-
         {/* Ocorrências */}
         {ocorrencias.length > 0 && (
           <div className="print:break-inside-avoid">
@@ -209,22 +181,59 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
           </div>
         )}
 
-        {/* Assinaturas */}
-        <div className="mt-16 pt-8 break-inside-avoid print:break-inside-avoid">
-          <div className="flex justify-center items-center gap-16 text-center">
-            <div className="flex-1 max-w-xs">
-              <div className="border-t-2 border-black w-full mb-2"></div>
-              <p className="font-bold text-sm" style={{ color: 'black' }}>{responsavelNome}</p>
-              <p className="text-xs" style={{ color: 'black' }}>Responsável pelo Relatório</p>
+        <hr className="my-6 border-slate-300" />
+
+        {/* Contentor de Fecho: Resumo (Estágio, Conselho, Pé de Meia) e Assinaturas Unidos para Prevenir Assinaturas Órfãs */}
+        <div 
+          className="break-inside-avoid print:break-inside-avoid"
+          style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+        >
+          {/* Resumo Estágio e Conselho */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="p-3 border border-gray-300 rounded text-sm text-black break-inside-avoid print:break-inside-avoid">
+              <h4 className="font-bold mb-2 uppercase" style={{ color: 'black' }}>Estágio</h4>
+              {estagio ? (
+                <div>
+                  <p><strong>Empresa:</strong> {estagio.dadosEmpresa.nome}</p>
+                  <p><strong>Status:</strong> {estagio.status}</p>
+                  <p><strong>Início:</strong> {new Date(estagio.dadosEstagio.inicio + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
+                </div>
+              ) : (
+                <p>Nenhum estágio registrado.</p>
+              )}
             </div>
-            <div className="flex-1 max-w-xs">
-              <div className="border-t-2 border-black w-full mb-2"></div>
-              <p className="font-bold text-sm" style={{ color: 'black' }}>Ciente do Responsável / Aluno</p>
-              <p className="text-xs" style={{ color: 'black' }}>Assinatura</p>
+            <div className="p-3 border border-gray-300 rounded text-sm text-black break-inside-avoid print:break-inside-avoid">
+              <h4 className="font-bold mb-2 uppercase" style={{ color: 'black' }}>Conselho de Classe</h4>
+              {conselhoGlobal ? (
+                <p className="font-bold">{conselhoGlobal}</p>
+              ) : (
+                <p>Sem decisão de conselho.</p>
+              )}
+              
+              <h4 className="font-bold mt-3 mb-1 uppercase" style={{ color: 'black' }}>Pé de Meia</h4>
+              <p className={isPeDeMeiaApto ? "font-bold text-green-700" : "font-bold text-red-700"}>
+                {isPeDeMeiaApto ? 'Habilitado' : 'Não Habilitado'}
+              </p>
             </div>
           </div>
-          <div className="text-center mt-12 text-xs text-gray-500">
-            Documento gerado em {dataHoraEmissao}
+
+          {/* Assinaturas */}
+          <div className="mt-12 pt-6">
+            <div className="flex justify-center items-center gap-16 text-center">
+              <div className="flex-1 max-w-xs">
+                <div className="border-t-2 border-black w-full mb-2"></div>
+                <p className="font-bold text-sm" style={{ color: 'black' }}>{responsavelNome}</p>
+                <p className="text-xs" style={{ color: 'black' }}>Responsável pelo Relatório</p>
+              </div>
+              <div className="flex-1 max-w-xs">
+                <div className="border-t-2 border-black w-full mb-2"></div>
+                <p className="font-bold text-sm" style={{ color: 'black' }}>Ciente do Responsável / Aluno</p>
+                <p className="text-xs" style={{ color: 'black' }}>Assinatura</p>
+              </div>
+            </div>
+            <div className="text-center mt-8 text-xs text-gray-500">
+              Documento gerado em {dataHoraEmissao}
+            </div>
           </div>
         </div>
       </div>

@@ -361,15 +361,21 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
               Gerar Relatório (PDF)
             </button>
           </div>
-          <div className="flex flex-col gap-2">
-            <div className="text-center px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:text-slate-100">
+          <div className="flex flex-row flex-wrap sm:flex-nowrap gap-2 shrink-0">
+            <div className="text-center px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 min-w-[90px] dark:text-slate-100">
               <div className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Média Geral</div>
               <div className="text-xl font-bold text-indigo-600">{mediaGeral}</div>
             </div>
-            <div className="text-center px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:text-slate-100">
+            <div className="text-center px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 min-w-[90px] dark:text-slate-100">
               <div className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Pendências</div>
               <div className={`text-xl font-bold ${pendenciasCount > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
                 {pendenciasCount}
+              </div>
+            </div>
+            <div className="text-center px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 min-w-[90px] dark:text-slate-100">
+              <div className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Total de Faltas</div>
+              <div className={`text-xl font-bold ${hasRiscoFaltas ? 'text-red-600 dark:text-red-400' : totalFaltasGlobal > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                {totalFaltasGlobal}
               </div>
             </div>
           </div>
