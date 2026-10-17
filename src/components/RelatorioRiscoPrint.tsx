@@ -41,14 +41,20 @@ export const RelatorioRiscoPrint = forwardRef<HTMLDivElement, RelatorioRiscoPrin
         {/* CSS para Impressão */}
         <style type="text/css" media="print">
           {`
-            @page { size: A4 portrait; margin: 0; }
+            @page {
+              size: A4 portrait;
+              margin-top: 1.5cm;
+              margin-bottom: 1.5cm;
+              margin-left: 1cm;
+              margin-right: 1cm;
+            }
             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white; }
             .break-after-page { page-break-after: always; break-after: page; }
           `}
         </style>
 
         {alunosOrdenados.length === 0 ? (
-          <div className="p-12 print:p-[1.5cm] flex flex-col justify-between box-border">
+          <div className="p-12 print:p-0 flex flex-col justify-between box-border">
             <div>
               {/* Cabeçalho */}
               <div className="flex flex-col items-center border-b-4 border-indigo-600 pb-4 mb-6 print:break-inside-avoid">
@@ -91,7 +97,7 @@ export const RelatorioRiscoPrint = forwardRef<HTMLDivElement, RelatorioRiscoPrin
             return (
               <div
                 key={item.aluno.id || index}
-                className={`p-12 print:p-[1.5cm] flex flex-col justify-between box-border ${
+                className={`p-12 print:p-0 flex flex-col justify-between box-border ${
                   !isLast ? 'break-after-page print:break-after-page' : ''
                 }`}
                 style={{

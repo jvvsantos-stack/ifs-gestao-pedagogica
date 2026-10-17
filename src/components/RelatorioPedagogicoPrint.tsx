@@ -42,12 +42,15 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
     const totalFaltas = boletim.reduce((acc, b) => acc + (Number(b.faltas) || 0), 0);
 
     return (
-      <div ref={ref} className="print-container bg-white text-black" style={{ width: '210mm', minHeight: '297mm', boxSizing: 'border-box' }}>
+      <div ref={ref} className="print-container bg-white text-black w-full" style={{ boxSizing: 'border-box' }}>
         <style type="text/css" media="print">
           {`
             @page { 
               size: A4; 
-              margin: 0mm; /* Hide browser headers/footers */
+              margin-top: 1.5cm;
+              margin-bottom: 1.5cm;
+              margin-left: 1cm;
+              margin-right: 1cm;
             }
             body { 
               -webkit-print-color-adjust: exact !important; 
@@ -57,7 +60,9 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
             .print-container { 
               background-color: white !important; 
               color: black !important; 
-              padding: 15mm; 
+              padding: 0 !important; 
+              margin: 0 !important;
+              width: 100% !important;
             }
             .badge-aprovado { background-color: #dcfce7 !important; color: black !important; border: 1px solid #bbf7d0 !important; }
             .badge-reprovado { background-color: #fee2e2 !important; color: black !important; border: 1px solid #fecaca !important; }

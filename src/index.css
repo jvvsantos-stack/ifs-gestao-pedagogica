@@ -1,3 +1,19 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@media print {
+  @page {
+    size: A4;
+    margin-top: 1.5cm; /* Espaço para o topo (cabeçalho) */
+    margin-bottom: 1.5cm; /* Espaço para o rodapé */
+    margin-left: 1cm;
+    margin-right: 1cm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background-color: white !important;
+  }
+}
