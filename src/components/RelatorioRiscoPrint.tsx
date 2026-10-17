@@ -89,6 +89,9 @@ export const RelatorioRiscoPrint = forwardRef<HTMLDivElement, RelatorioRiscoPrin
               <div className="text-center mt-12 text-[10px] text-gray-400 font-medium uppercase tracking-wider">
                 Documento gerado pelo Sistema de Inteligência Pedagógica em {dataHoraEmissao}
               </div>
+              <div className="text-center mt-6 pt-3 border-t border-gray-200 text-[9px] italic text-gray-400">
+                Propriedade Intelectual: Sistema concebido e desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Pedagogo Iracildes Silva Oliveira. Todos os direitos reservados. © 2026.
+              </div>
             </div>
           </div>
         ) : (
@@ -223,6 +226,9 @@ export const RelatorioRiscoPrint = forwardRef<HTMLDivElement, RelatorioRiscoPrin
                   </div>
                   <div className="text-center mt-12 text-[10px] text-gray-400 font-medium uppercase tracking-wider">
                     Documento gerado pelo Sistema de Inteligência Pedagógica em {dataHoraEmissao}
+                  </div>
+                  <div className="text-center mt-6 pt-3 border-t border-gray-200 text-[9px] italic text-gray-400">
+                    Propriedade Intelectual: Sistema concebido e desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Pedagogo Iracildes Silva Oliveira. Todos os direitos reservados. © 2026.
                   </div>
                 </div>
               </div>

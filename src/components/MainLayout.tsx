@@ -86,7 +86,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           })}
         </nav>
 
-
+        {/* Rodapé da Sidebar com Créditos Oficiais */}
+        <div className="p-4 border-t border-slate-800/80 text-center">
+          <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed font-normal">
+            Desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Pedagogo Iracildes Silva Oliveira © 2026
+          </p>
+        </div>
       </aside>
 
       {/* Main Content Area */}

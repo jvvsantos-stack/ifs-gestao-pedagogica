@@ -59,6 +59,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
           </div>
         </div>
       </div>
+
+      <div className="mt-8 text-center px-4">
+        <p className="text-xs text-slate-400 dark:text-slate-500">
+          Desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Pedagogo Iracildes Silva Oliveira © 2026
+        </p>
+      </div>
     </div>
   );
 };
