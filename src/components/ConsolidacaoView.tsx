@@ -351,7 +351,7 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
   const alunosRisco = alunosProcessed.filter(a => a.disciplinasRisco.length > 0).map(a => {
      const isMuitoAlto = a.disciplinasRisco.some(d => (d.percent && d.percent >= 1.0) || (d.media !== undefined && d.media < 4.0));
      return { ...a, nivelRisco: isMuitoAlto ? 'Muito Alto' : 'Alto' };
-  }).sort((a) => (a.nivelRisco === 'Muito Alto' ? -1 : 1));
+  }).sort((a, b) => a.aluno.nome.localeCompare(b.aluno.nome, 'pt-BR'));
 
   useEffect(() => {
     setSelectedAlunoRiscoId('todos');
@@ -367,10 +367,11 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
   }, [alunosRisco, selectedAlunoRiscoId]);
 
   const alunosRiscoFiltrados = useMemo(() => {
-    if (selectedAlunoRiscoId === 'todos') {
-      return alunosRisco;
+    let list = alunosRisco;
+    if (selectedAlunoRiscoId !== 'todos') {
+      list = alunosRisco.filter(item => String(item.aluno.id ?? item.aluno.nome) === selectedAlunoRiscoId);
     }
-    return alunosRisco.filter(item => String(item.aluno.id ?? item.aluno.nome) === selectedAlunoRiscoId);
+    return [...list].sort((a, b) => a.aluno.nome.localeCompare(b.aluno.nome, 'pt-BR'));
   }, [alunosRisco, selectedAlunoRiscoId]);
 
   const alunosRiscoDropdown = useMemo(() => {
@@ -803,7 +804,11 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                     Aluno
                   </th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700">
-                    Disciplinas em Situação de Risco
+                    <div className="flex items-center gap-3 px-3">
+                      <span className="flex-1">Disciplinas em Situação de Risco</span>
+                      <span className="w-28 text-center shrink-0 text-xs uppercase font-bold text-gray-500 dark:text-slate-400">Faltas</span>
+                      <span className="w-28 text-center shrink-0 text-xs uppercase font-bold text-gray-500 dark:text-slate-400">Média</span>
+                    </div>
                   </th>
                   <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 border-b border-gray-200 dark:border-slate-700 w-1/5">
                     Nível de Risco Global
@@ -824,23 +829,41 @@ const DashboardTurma: React.FC<{ turma: Turma; onBack: () => void }> = ({ turma,
                       </div>
                     </td>
                     <td className="px-4 py-3 align-middle">
-                      <div className="flex flex-col gap-1">
-                        {item.disciplinasRisco.map(d => (
-                          <div key={d.disc.id} className="flex justify-between items-center text-sm bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 rounded px-2 py-1">
-                            <span className="text-red-800 dark:text-red-300 truncate mr-2 font-medium">{d.disc.nome}</span>
-                            <div className="flex gap-2 shrink-0">
-                              {d.isRiscoFalta && (
-                                <span className={`px-2 py-0.5 rounded font-bold text-xs ${d.percent && d.percent >= 1.0 ? 'bg-red-200 text-red-800 dark:bg-red-900/60 dark:text-red-200' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'}`}>
-                                  {d.faltasTot} faltas
-                                </span>
-                              )}
-                              {d.isRiscoMedia && d.media !== undefined && (
-                                <span className={`px-2 py-0.5 rounded font-bold text-xs ${d.media < 4.0 ? 'bg-red-200 text-red-800 dark:bg-red-900/60 dark:text-red-200' : 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300'}`}>
-                                  Média: {d.media.toFixed(1)}
-                                </span>
-                              )}
+                      <div className="flex flex-col gap-1.5">
+                        {[...item.disciplinasRisco]
+                          .sort((a, b) => a.disc.nome.localeCompare(b.disc.nome, 'pt-BR'))
+                          .map(d => (
+                            <div key={d.disc.id} className="flex items-center gap-3 text-sm bg-red-50/60 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 rounded px-3 py-1.5">
+                              <span className="flex-1 text-red-800 dark:text-red-300 truncate font-medium" title={d.disc.nome}>
+                                {d.disc.nome}
+                              </span>
+                              <div className="w-28 shrink-0 flex justify-center items-center">
+                                {d.faltasTot && d.faltasTot > 0 ? (
+                                  <span className={`px-2 py-0.5 rounded font-bold text-xs text-center w-full max-w-[100px] truncate ${
+                                    d.isRiscoFalta
+                                      ? (d.percent && d.percent >= 1.0 ? 'bg-red-200 text-red-800 dark:bg-red-900/60 dark:text-red-200' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300')
+                                      : 'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300'
+                                  }`}>
+                                    {d.faltasTot} {d.faltasTot === 1 ? 'falta' : 'faltas'}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400 dark:text-slate-500 font-bold text-sm">-</span>
+                                )}
+                              </div>
+                              <div className="w-28 shrink-0 flex justify-center items-center">
+                                {d.media !== undefined && d.media !== null && !isNaN(d.media) ? (
+                                  <span className={`px-2 py-0.5 rounded font-bold text-xs text-center w-full max-w-[100px] truncate ${
+                                    d.isRiscoMedia
+                                      ? (d.media < 4.0 ? 'bg-red-200 text-red-800 dark:bg-red-900/60 dark:text-red-200' : 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300')
+                                      : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+                                  }`}>
+                                    Média: {d.media.toFixed(1)}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400 dark:text-slate-500 font-bold text-sm">-</span>
+                                )}
+                              </div>
                             </div>
-                          </div>
                         ))}
                       </div>
                     </td>

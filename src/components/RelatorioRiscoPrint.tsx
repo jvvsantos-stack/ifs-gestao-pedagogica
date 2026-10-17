@@ -32,6 +32,10 @@ export const RelatorioRiscoPrint = forwardRef<HTMLDivElement, RelatorioRiscoPrin
   ({ filtros, alunosRisco }, ref) => {
     const dataHoraEmissao = new Date().toLocaleString('pt-BR');
 
+    const alunosOrdenados = [...alunosRisco].sort((a, b) =>
+      a.aluno.nome.localeCompare(b.aluno.nome, 'pt-BR')
+    );
+
     return (
       <div ref={ref} className="bg-white text-black" style={{ fontFamily: 'Arial, sans-serif' }}>
         {/* CSS para Impressão */}
@@ -43,7 +47,7 @@ export const RelatorioRiscoPrint = forwardRef<HTMLDivElement, RelatorioRiscoPrin
           `}
         </style>
 
-        {alunosRisco.length === 0 ? (
+        {alunosOrdenados.length === 0 ? (
           <div className="p-12 print:p-[1.5cm] flex flex-col justify-between box-border">
             <div>
               {/* Cabeçalho */}
@@ -82,8 +86,8 @@ export const RelatorioRiscoPrint = forwardRef<HTMLDivElement, RelatorioRiscoPrin
             </div>
           </div>
         ) : (
-          alunosRisco.map((item, index) => {
-            const isLast = index === alunosRisco.length - 1;
+          alunosOrdenados.map((item, index) => {
+            const isLast = index === alunosOrdenados.length - 1;
             return (
               <div
                 key={item.aluno.id || index}
@@ -121,7 +125,11 @@ export const RelatorioRiscoPrint = forwardRef<HTMLDivElement, RelatorioRiscoPrin
                           Aluno
                         </th>
                         <th className="px-4 py-3 text-left font-semibold text-gray-700 border-b border-gray-200">
-                          Disciplinas em Situação de Risco
+                          <div className="flex items-center gap-3 px-3">
+                            <span className="flex-1">Disciplinas em Situação de Risco</span>
+                            <span className="w-28 text-center shrink-0 text-xs uppercase font-bold text-gray-600">Faltas</span>
+                            <span className="w-28 text-center shrink-0 text-xs uppercase font-bold text-gray-600">Média</span>
+                          </div>
                         </th>
                       </tr>
                     </thead>
@@ -155,22 +163,38 @@ export const RelatorioRiscoPrint = forwardRef<HTMLDivElement, RelatorioRiscoPrin
                         </td>
                         <td className="px-4 py-3 align-top">
                           <div className="flex flex-col gap-2">
-                            {item.disciplinasRisco.map(d => (
-                              <div key={d.disc.id} className="flex justify-between items-center text-sm bg-gray-50 border border-gray-200 rounded px-3 py-2">
-                                <span className="text-gray-800 font-medium">{d.disc.nome}</span>
-                                <div className="flex gap-2 shrink-0">
-                                  {d.isRiscoFalta && (
-                                    <span className={`px-2 py-1 rounded font-bold text-xs ${d.percent && d.percent >= 1.0 ? 'bg-red-200 text-red-800' : 'bg-red-100 text-red-700'}`}>
-                                      {d.faltasTot} faltas
-                                    </span>
-                                  )}
-                                  {d.isRiscoMedia && d.media !== undefined && (
-                                    <span className={`px-2 py-1 rounded font-bold text-xs ${d.media < 4.0 ? 'bg-red-200 text-red-800' : 'bg-orange-100 text-orange-700'}`}>
-                                      Média: {d.media.toFixed(1)}
-                                    </span>
-                                  )}
+                            {[...item.disciplinasRisco]
+                              .sort((a, b) => a.disc.nome.localeCompare(b.disc.nome, 'pt-BR'))
+                              .map(d => (
+                                <div key={d.disc.id} className="flex items-center gap-3 text-sm bg-gray-50 border border-gray-200 rounded px-3 py-2">
+                                  <span className="flex-1 text-gray-800 font-medium truncate" title={d.disc.nome}>{d.disc.nome}</span>
+                                  <div className="w-28 shrink-0 flex justify-center items-center">
+                                    {d.faltasTot && d.faltasTot > 0 ? (
+                                      <span className={`px-2 py-0.5 rounded font-bold text-xs text-center w-full max-w-[100px] truncate ${
+                                        d.isRiscoFalta
+                                          ? (d.percent && d.percent >= 1.0 ? 'bg-red-200 text-red-800 print:text-red-800' : 'bg-red-100 text-red-700 print:text-red-700')
+                                          : 'bg-gray-100 text-gray-700 border border-gray-200'
+                                      }`}>
+                                        {d.faltasTot} {d.faltasTot === 1 ? 'falta' : 'faltas'}
+                                      </span>
+                                    ) : (
+                                      <span className="text-gray-400 font-bold text-sm">-</span>
+                                    )}
+                                  </div>
+                                  <div className="w-28 shrink-0 flex justify-center items-center">
+                                    {d.media !== undefined && d.media !== null && !isNaN(d.media) ? (
+                                      <span className={`px-2 py-0.5 rounded font-bold text-xs text-center w-full max-w-[100px] truncate ${
+                                        d.isRiscoMedia
+                                          ? (d.media < 4.0 ? 'bg-red-200 text-red-800 print:text-red-800' : 'bg-orange-100 text-orange-700 print:text-orange-700')
+                                          : 'bg-emerald-100 text-emerald-800'
+                                      }`}>
+                                        Média: {d.media.toFixed(1)}
+                                      </span>
+                                    ) : (
+                                      <span className="text-gray-400 font-bold text-sm">-</span>
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
                             ))}
                           </div>
                         </td>
