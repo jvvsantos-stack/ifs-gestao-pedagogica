@@ -241,7 +241,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
             </div>
 
             <div className="text-center mt-6 pt-3 border-t border-gray-200 text-[9px] italic text-gray-400">
-              Propriedade Intelectual: Sistema concebido e desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Pedagogo Iracildes Silva Oliveira. Todos os direitos reservados. © 2026.
+              Propriedade Intelectual: Sistema concebido e desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Técnico em Assuntos Educacionais Iracildes Silva Oliveira. Todos os direitos reservados. © 2026.
             </div>
           </div>
         </div>

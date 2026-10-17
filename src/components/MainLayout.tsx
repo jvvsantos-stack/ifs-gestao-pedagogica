@@ -90,7 +90,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         {/* Rodapé da Sidebar com Versão e Créditos Oficiais */}
         <div className="p-4 border-t border-slate-800/80 text-center">
           <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed font-normal">
-            Desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Pedagogo Iracildes Silva Oliveira © 2026
+            Desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Técnico em Assuntos Educacionais Iracildes Silva Oliveira © 2026
           </p>
           <div className="mt-2.5 flex items-center justify-center">
             <span className="text-[10px] font-mono bg-slate-800 text-slate-400 px-2 py-0.5 rounded-md border border-slate-700/60 inline-flex items-center gap-1.5 shadow-sm">

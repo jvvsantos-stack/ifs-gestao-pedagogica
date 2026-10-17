@@ -63,7 +63,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
 
       <div className="mt-8 text-center px-4">
         <p className="text-xs text-slate-400 dark:text-slate-500">
-          Desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Pedagogo Iracildes Silva Oliveira © 2026
+          Desenvolvido pelo Prof. MsC. José Valter Alves Santos e pelo Técnico em Assuntos Educacionais Iracildes Silva Oliveira © 2026
         </p>
         <div className="mt-2.5 flex items-center justify-center">
           <span className="text-[10px] font-mono bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-300 dark:border-slate-700/60 inline-flex items-center gap-1.5 shadow-sm">
