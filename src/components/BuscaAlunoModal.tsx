@@ -390,10 +390,10 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden dark:text-slate-100">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden dark:text-slate-100">
 
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700/80 flex justify-between items-center bg-gray-50 dark:bg-slate-900/50">
+        {/* Header Fixo */}
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700/80 flex justify-between items-center bg-gray-50 dark:bg-slate-900/50 shrink-0">
           <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
             <Search className="w-5 h-5 text-indigo-600" />
             Busca de Aluno (Raio-X)
@@ -406,8 +406,8 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
           </button>
         </div>
 
-        {/* Search Form */}
-        <div className="p-6 border-b border-gray-100 dark:border-slate-700/80 bg-white dark:bg-slate-800 dark:text-slate-100">
+        {/* Search Form e Filtros Fixos */}
+        <div className="p-6 border-b border-gray-100 dark:border-slate-700/80 bg-white dark:bg-slate-800 dark:text-slate-100 shrink-0">
           <form onSubmit={handleSearch} className="flex flex-col gap-4">
 
             {/* Linha Superior: Nome Livre e Botões de Ação */}
@@ -686,7 +686,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
 
         {/* Faixa Informativa e Ação Rápida quando há seleção para PDF */}
         {selectedAlunosForPdf.length > 0 && (
-          <div className="bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200 dark:border-emerald-800/50 px-6 py-2.5 flex items-center justify-between">
+          <div className="bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200 dark:border-emerald-800/50 px-6 py-2.5 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2 text-sm text-emerald-800 dark:text-emerald-200 font-medium">
               <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>
@@ -714,8 +714,8 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
           </div>
         )}
 
-        {/* Results Area */}
-        <div className="p-6 overflow-y-auto flex-1 bg-gray-50 dark:bg-slate-900/50">
+        {/* Results Area com Rolagem Independente */}
+        <div className="p-6 overflow-y-auto flex-1 min-h-0 bg-gray-50 dark:bg-slate-900/50">
           {!hasSearched ? (
             <div className="text-center py-12 text-gray-400 dark:text-slate-500">
               <Search className="w-12 h-12 mx-auto mb-3 opacity-20" />
