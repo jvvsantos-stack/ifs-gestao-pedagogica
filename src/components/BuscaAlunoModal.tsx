@@ -390,7 +390,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden dark:text-slate-100">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden dark:text-slate-100">
 
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700/80 flex justify-between items-center bg-gray-50 dark:bg-slate-900/50">
@@ -450,10 +450,10 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
               </div>
             </div>
 
-            {/* Linha Inferior: Filtros em Cascata */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 dark:bg-slate-900 p-4 rounded-xl border border-gray-100 dark:border-slate-700/80">
-              {/* 1. Curso */}
-              <div>
+            {/* Linha Inferior: Filtros em Cascata Proporcionais (Grid de 12 Colunas) */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 bg-gray-50 dark:bg-slate-900 p-4 rounded-xl border border-gray-100 dark:border-slate-700/80 items-start">
+              {/* 1. Curso (3 de 12) */}
+              <div className="col-span-12 md:col-span-3">
                 <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
                   1. Curso
                 </label>
@@ -467,8 +467,8 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                 </select>
               </div>
 
-              {/* 2. Período Letivo */}
-              <div>
+              {/* 2. Período Letivo (2 de 12) */}
+              <div className="col-span-12 md:col-span-2">
                 <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
                   2. Período Letivo
                 </label>
@@ -483,8 +483,8 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                 </select>
               </div>
 
-              {/* 3. Turma */}
-              <div>
+              {/* 3. Turma (2 de 12) */}
+              <div className="col-span-12 md:col-span-2">
                 <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
                   3. Turma
                 </label>
@@ -499,20 +499,20 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                 </select>
               </div>
 
-              {/* 4. Aluno (Específico) - Custom Dropdown com suporte a Checkbox e Seleção Visual */}
-              <div className="relative" ref={dropdownRef}>
+              {/* 4. Aluno (Específico) - Custom Dropdown Ampliado (5 de 12) */}
+              <div className="relative col-span-12 md:col-span-5" ref={dropdownRef}>
                 <div className="flex justify-between items-center mb-1">
                   <label className="block text-xs font-medium text-gray-700 dark:text-slate-300">
                     4. Aluno (Específico)
                   </label>
                   {selectedAlunosForPdf.length > 0 && (
-                    <span className="text-[10px] bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-bold px-1.5 py-0.2 rounded-full">
+                    <span className="text-[10px] bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-bold px-2 py-0.5 rounded-full">
                       {selectedAlunosForPdf.length} para PDF
                     </span>
                   )}
                 </div>
 
-                {/* Botão Gatilho do Dropdown */}
+                {/* Botão Gatilho do Dropdown com espaço amplo */}
                 <button
                   type="button"
                   disabled={!selectedTurmaId}
@@ -523,7 +523,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                       : 'bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-100 border-gray-300 dark:border-slate-700 hover:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 cursor-pointer shadow-sm'
                     }`}
                 >
-                  <span className="truncate">
+                  <span className="truncate flex-1 font-medium">
                     {selectedAlunoId
                       ? alunosDisponiveis.find(a => a.id === Number(selectedAlunoId))?.nome || 'Aluno Selecionado'
                       : selectedAlunosForPdf.length > 0
@@ -534,62 +534,70 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                   <ChevronDown className={`w-4 h-4 ml-2 transition-transform duration-200 text-gray-500 shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Menu Dropdown Flutuante */}
+                {/* Menu Dropdown Flutuante com Largura Confortável */}
                 {isDropdownOpen && selectedTurmaId && (
-                  <div className="absolute left-0 right-0 mt-1.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden text-sm animate-in fade-in slide-in-from-top-2 duration-150">
-                    {/* Controles de Cabeçalho do Dropdown */}
-                    <div className="p-2 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/60 space-y-2">
-                      <div className="flex items-center justify-between gap-2">
+                  <div className="absolute left-0 right-0 sm:right-auto sm:min-w-[420px] w-full mt-1.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden text-sm animate-in fade-in slide-in-from-top-2 duration-150">
+                    {/* Controles de Cabeçalho do Dropdown Refatorados */}
+                    <div className="p-3 border-b border-gray-100 dark:border-slate-700 bg-gray-50/90 dark:bg-slate-900/80 space-y-2.5">
+                      {/* Botão Principal: Exibir Todos na Tela */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedAlunoId('');
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`w-full text-xs py-1.5 px-3 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer border ${
+                          !selectedAlunoId
+                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                            : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 border-gray-200 dark:border-slate-700'
+                        }`}
+                      >
+                        <span>👁️</span>
+                        <span>Exibir Todos na Tela</span>
+                        {!selectedAlunoId && (
+                          <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded font-semibold ml-1">Ativo</span>
+                        )}
+                      </button>
+
+                      {/* Botões Secundários Horizontais: Marcar Todos / Desmarcar Todos */}
+                      <div className="flex flex-row items-center justify-between gap-2 pt-0.5">
                         <button
                           type="button"
-                          onClick={() => {
-                            setSelectedAlunoId('');
-                            setIsDropdownOpen(false);
-                          }}
-                          className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer ${
-                            !selectedAlunoId
-                              ? 'bg-indigo-600 text-white shadow-xs'
-                              : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 hover:bg-gray-200 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
-                          }`}
+                          onClick={handleSelectAllForPdf}
+                          className="flex-1 text-xs py-1.5 px-3 rounded-lg font-medium bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                          title="Marcar todos os alunos desta turma para exportação em ZIP"
                         >
-                          👁️ Exibir Todos na Tela
+                          <CheckSquare className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                          <span>Marcar Todos</span>
                         </button>
 
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={handleSelectAllForPdf}
-                            className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline font-semibold cursor-pointer"
-                          >
-                            Marcar Todos
-                          </button>
-                          <span className="text-gray-300 dark:text-slate-600">|</span>
-                          <button
-                            type="button"
-                            onClick={handleClearSelectedForPdf}
-                            className="text-[11px] text-gray-500 dark:text-slate-400 hover:underline cursor-pointer"
-                          >
-                            Desmarcar
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={handleClearSelectedForPdf}
+                          className="flex-1 text-xs py-1.5 px-3 rounded-lg font-medium bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700/60 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                          title="Desmarcar todos os alunos selecionados"
+                        >
+                          <X className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                          <span>Desmarcar Todos</span>
+                        </button>
                       </div>
 
                       {/* Campo de Busca Rápida dentro do Dropdown */}
                       {alunosDisponiveis.length > 5 && (
-                        <div className="relative">
+                        <div className="relative pt-0.5">
                           <input
                             type="text"
                             value={dropdownSearch}
                             onChange={(e) => setDropdownSearch(e.target.value)}
                             placeholder="Filtrar aluno na turma..."
-                            className="w-full text-xs px-2.5 py-1.5 rounded-md border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-100 placeholder-gray-400 outline-none focus:ring-1 focus:ring-indigo-500"
+                            className="w-full text-xs px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-100 placeholder-gray-400 outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
                             onClick={(e) => e.stopPropagation()}
                           />
                           {dropdownSearch && (
                             <button
                               type="button"
                               onClick={() => setDropdownSearch('')}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs cursor-pointer"
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 text-xs cursor-pointer p-0.5"
                             >
                               ✕
                             </button>
@@ -598,10 +606,10 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                       )}
                     </div>
 
-                    {/* Lista Rolável de Alunos */}
-                    <div className="max-h-60 overflow-y-auto divide-y divide-gray-50 dark:divide-slate-700/50 p-1">
+                    {/* Lista Rolável de Alunos com espaço de leitura generoso */}
+                    <div className="max-h-64 overflow-y-auto divide-y divide-gray-50 dark:divide-slate-700/50 p-1.5">
                       {alunosDropdownFiltered.length === 0 ? (
-                        <div className="p-3 text-center text-xs text-gray-400 dark:text-slate-500">
+                        <div className="p-4 text-center text-xs text-gray-400 dark:text-slate-500">
                           Nenhum aluno encontrado
                         </div>
                       ) : (
@@ -614,7 +622,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                           return (
                             <div
                               key={alunoId}
-                              className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg transition-colors group ${
+                              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group ${
                                 isCurrentOnScreen
                                   ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 font-medium'
                                   : 'hover:bg-gray-100 dark:hover:bg-slate-700/50 text-gray-700 dark:text-slate-200'
@@ -633,24 +641,24 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                                 className="w-4 h-4 text-indigo-600 rounded border-gray-300 dark:border-slate-600 focus:ring-indigo-500 cursor-pointer shrink-0 accent-indigo-600"
                               />
 
-                              {/* Nome do aluno: Click define alunoAtual na tela */}
+                              {/* Nome do aluno com leitura completa e sem quebras abruptas */}
                               <div
                                 onClick={() => {
                                   setSelectedAlunoId(alunoId);
                                   setHasSearched(true);
                                   setIsDropdownOpen(false);
                                 }}
-                                className="flex-1 min-w-0 cursor-pointer flex items-center justify-between gap-1 select-none"
+                                className="flex-1 min-w-0 cursor-pointer flex items-center justify-between gap-2 select-none py-0.5"
                                 title="Clique para exibir o Raio-X deste aluno na tela"
                               >
-                                <span className="truncate">
+                                <span className="break-words text-sm leading-snug">
                                   {aluno.nome}
                                   {aluno.isRepetente && (
-                                    <span className="text-red-500 font-bold ml-1 text-xs">(REPT)</span>
+                                    <span className="text-red-500 font-bold ml-1.5 text-xs whitespace-nowrap">(REPT)</span>
                                   )}
                                 </span>
                                 {isCurrentOnScreen && (
-                                  <span className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded font-semibold shrink-0">
+                                  <span className="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded-full font-semibold shrink-0 shadow-2xs">
                                     Na Tela
                                   </span>
                                 )}
@@ -662,7 +670,7 @@ export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => 
                     </div>
 
                     {/* Rodapé informativo do Dropdown */}
-                    <div className="p-2 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/60 flex items-center justify-between text-xs text-gray-500 dark:text-slate-400">
+                    <div className="p-2.5 border-t border-gray-100 dark:border-slate-700 bg-gray-50/90 dark:bg-slate-900/80 flex items-center justify-between text-xs text-gray-500 dark:text-slate-400">
                       <span>Total: {alunosDisponiveis.length} alunos</span>
                       <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                         {selectedAlunosForPdf.length} marcado(s) p/ PDF
