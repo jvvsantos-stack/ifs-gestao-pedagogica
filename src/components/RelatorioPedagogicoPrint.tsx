@@ -43,7 +43,7 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
 
     return (
       <div ref={ref} className="print-container bg-white text-black w-full" style={{ boxSizing: 'border-box' }}>
-        <style type="text/css" media="print">
+        <style type="text/css">
           {`
             @page { 
               size: A4; 
@@ -52,30 +52,41 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
               margin-left: 1cm;
               margin-right: 1cm;
             }
-            body { 
-              -webkit-print-color-adjust: exact !important; 
-              print-color-adjust: exact !important; 
-              background-color: white !important; 
+            @media print {
+              body { 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+                background-color: white !important; 
+              }
+              .print-container { 
+                background-color: white !important; 
+                color: black !important; 
+                padding: 0 !important; 
+                margin: 0 !important;
+                width: 100% !important;
+              }
             }
-            .print-container { 
-              background-color: white !important; 
-              color: black !important; 
-              padding: 0 !important; 
-              margin: 0 !important;
-              width: 100% !important;
+            @media screen {
+              .print-container { 
+                background-color: white !important; 
+                color: black !important; 
+                padding: 24px !important; 
+                margin: 0 !important;
+                width: 100% !important;
+              }
             }
-            .badge-aprovado { background-color: #dcfce7 !important; color: black !important; border: 1px solid #bbf7d0 !important; }
-            .badge-reprovado { background-color: #fee2e2 !important; color: black !important; border: 1px solid #fecaca !important; }
-            .badge-cursando { background-color: #eff6ff !important; color: black !important; border: 1px solid #dbeafe !important; }
-            .badge-alerta { background-color: #fef3c7 !important; color: black !important; border: 1px solid #fde68a !important; }
+            .print-container .badge-aprovado { background-color: #dcfce7 !important; color: black !important; border: 1px solid #bbf7d0 !important; }
+            .print-container .badge-reprovado { background-color: #fee2e2 !important; color: black !important; border: 1px solid #fecaca !important; }
+            .print-container .badge-cursando { background-color: #eff6ff !important; color: black !important; border: 1px solid #dbeafe !important; }
+            .print-container .badge-alerta { background-color: #fef3c7 !important; color: black !important; border: 1px solid #fde68a !important; }
             
-            table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-            th, td { border: 1px solid #d1d5db; padding: 2px 4px; text-align: center; font-size: 10px; word-wrap: break-word; }
-            th { background-color: #f3f4f6 !important; font-weight: bold; }
-            tr { display: table-row !important; page-break-inside: avoid; }
-            tr:nth-child(even) { background-color: #f8fafc !important; }
-            .text-left { text-align: left; }
-            .break-inside-avoid { break-inside: avoid !important; page-break-inside: avoid !important; }
+            .print-container table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+            .print-container th, .print-container td { border: 1px solid #d1d5db; padding: 2px 4px; text-align: center; font-size: 10px; word-wrap: break-word; }
+            .print-container th { background-color: #f3f4f6 !important; font-weight: bold; }
+            .print-container tr { display: table-row !important; page-break-inside: avoid; }
+            .print-container tr:nth-child(even) { background-color: #f8fafc !important; }
+            .print-container .text-left { text-align: left; }
+            .print-container .break-inside-avoid { break-inside: avoid !important; page-break-inside: avoid !important; }
           `}
         </style>
 

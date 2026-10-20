@@ -1,223 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/database';
-import { Search, X, AlertTriangle, GraduationCap, ClipboardList, Briefcase, Gavel, Wallet, Printer } from 'lucide-react';
+import {
+  Search,
+  X,
+  AlertTriangle,
+  GraduationCap,
+  ClipboardList,
+  Briefcase,
+  Gavel,
+  Wallet,
+  Printer,
+  ChevronDown,
+  Archive,
+  Loader2,
+  CheckSquare,
+  Download,
+} from 'lucide-react';
 import { useReactToPrint } from 'react-to-print';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import { RelatorioPedagogicoPrint } from './RelatorioPedagogicoPrint';
 
 interface BuscaAlunoModalProps {
   onClose: () => void;
 }
 
-export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [hasSearched, setHasSearched] = useState(false);
-
-  const [selectedCursoId, setSelectedCursoId] = useState<number | ''>('');
-  const [selectedPeriodo, setSelectedPeriodo] = useState<string>('');
-  const [selectedTurmaId, setSelectedTurmaId] = useState<number | ''>('');
-  const [selectedAlunoId, setSelectedAlunoId] = useState<number | ''>('');
-
-  const turmasAll = useLiveQuery(() => db.turmas.toArray()) || [];
-  const alunosAll = useLiveQuery(() => db.alunos.toArray()) || [];
-  const cursosAll = useLiveQuery(() => db.cursos.toArray()) || [];
-  const disciplinasAll = useLiveQuery(() => db.disciplinas.toArray()) || [];
-  const notasAll = useLiveQuery(() => db.notas.toArray()) || [];
-  const avaliacoesAll = useLiveQuery(() => db.avaliacoes_finais.toArray()) || [];
-  const ocorrenciasAll = useLiveQuery(() => db.ocorrencias.toArray()) || [];
-  const estagiosAll = useLiveQuery(() => db.estagios.toArray()) || [];
-
-  // Limpeza em cascata
-  React.useEffect(() => {
-    setSelectedPeriodo('');
-    setSelectedTurmaId('');
-    setSelectedAlunoId('');
-  }, [selectedCursoId]);
-
-  React.useEffect(() => {
-    setSelectedTurmaId('');
-    setSelectedAlunoId('');
-  }, [selectedPeriodo]);
-
-  React.useEffect(() => {
-    setSelectedAlunoId('');
-  }, [selectedTurmaId]);
-
-  const periodosDisponiveis = React.useMemo(() => {
-    if (!selectedCursoId) return [];
-    const turmasDoCurso = turmasAll.filter(t => t.cursoId === Number(selectedCursoId));
-    const periodos = turmasDoCurso.map(t => t.anoLetivo).filter(Boolean) as string[];
-    return Array.from(new Set(periodos)).sort();
-  }, [selectedCursoId, turmasAll]);
-
-  const turmasDisponiveis = React.useMemo(() => {
-    if (!selectedCursoId || !selectedPeriodo) return [];
-    return turmasAll.filter(t => t.cursoId === Number(selectedCursoId) && t.anoLetivo === selectedPeriodo && !t.arquivado);
-  }, [selectedCursoId, selectedPeriodo, turmasAll]);
-
-  const alunosDisponiveis = React.useMemo(() => {
-    if (!selectedTurmaId) return [];
-    return alunosAll.filter(a => a.turmaId === Number(selectedTurmaId)).sort((a, b) => a.nome.localeCompare(b.nome));
-  }, [selectedTurmaId, alunosAll]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setHasSearched(true);
-  };
-
-  const alunosFiltrados = alunosAll.filter(a => {
-    if (!hasSearched) return false;
-    
-    // Se o aluno foi escolhido no dropdown Nível 4, ignora todos os outros filtros (raio-x direto)
-    if (selectedAlunoId) return a.id === Number(selectedAlunoId);
-
-    const matchName = searchTerm ? a.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true;
-    const matchTurma = selectedTurmaId ? a.turmaId === Number(selectedTurmaId) : true;
-    
-    // Filtros superiores só são checados se a Turma não estiver selecionada
-    const turmaDoAluno = turmasAll.find(t => t.id === a.turmaId);
-    const matchPeriodo = selectedPeriodo && !selectedTurmaId ? turmaDoAluno?.anoLetivo === selectedPeriodo : true;
-    const matchCurso = selectedCursoId && !selectedTurmaId ? turmaDoAluno?.cursoId === Number(selectedCursoId) : true;
-
-    return matchName && matchTurma && matchPeriodo && matchCurso;
+// Função utilitária para converter um elemento HTML no Blob de PDF individual em alta resolução
+async function generatePdfBlob(element: HTMLElement): Promise<Blob> {
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    logging: false,
+    backgroundColor: '#ffffff',
+    windowWidth: 794,
   });
 
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden dark:text-slate-100">
-        
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 dark:bg-slate-900/50">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
-            <Search className="w-5 h-5 text-indigo-600" />
-            Busca de Aluno (Raio-X)
-          </h2>
-          <button onClick={onClose} className="p-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Search Form */}
-        <div className="p-6 border-b border-gray-100 bg-white dark:bg-slate-800 dark:text-slate-100">
-          <form onSubmit={handleSearch} className="flex flex-col gap-4">
-            
-            {/* Linha Superior: Nome Livre e Botão */}
-            <div className="flex gap-4 items-end">
-              <div className="flex-1">
-                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">Nome do Aluno (Busca Livre)</label>
-                <input 
-                  type="text" 
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
-                  placeholder="Digite o nome do aluno (opcional)..."
-                />
-              </div>
-              <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 h-[42px] min-w-[150px]">
-                <Search className="w-4 h-4" />
-                Pesquisar
-              </button>
-            </div>
-
-            {/* Linha Inferior: Filtros em Cascata */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 dark:bg-slate-900 p-4 rounded-xl border border-gray-100">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">1. Curso</label>
-                <select 
-                  value={selectedCursoId}
-                  onChange={e => setSelectedCursoId(e.target.value ? Number(e.target.value) : '')}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-700 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 outline-none bg-white dark:bg-slate-800 dark:text-slate-100"
-                >
-                  <option value="">Todos os Cursos</option>
-                  {cursosAll.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">2. Período Letivo</label>
-                <select 
-                  value={selectedPeriodo}
-                  onChange={e => setSelectedPeriodo(e.target.value)}
-                  disabled={!selectedCursoId}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-700 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 outline-none bg-white dark:bg-slate-800 dark:text-slate-100 disabled:bg-gray-100 disabled:dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 disabled:cursor-not-allowed"
-                >
-                  <option value="">Todos os Períodos</option>
-                  {periodosDisponiveis.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">3. Turma</label>
-                <select 
-                  value={selectedTurmaId}
-                  onChange={e => setSelectedTurmaId(e.target.value ? Number(e.target.value) : '')}
-                  disabled={!selectedPeriodo}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-700 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 outline-none bg-white dark:bg-slate-800 dark:text-slate-100 disabled:bg-gray-100 disabled:dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 disabled:cursor-not-allowed"
-                >
-                  <option value="">Todas as Turmas</option>
-                  {turmasDisponiveis.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">4. Aluno (Específico)</label>
-                <select 
-                  value={selectedAlunoId}
-                  onChange={e => setSelectedAlunoId(e.target.value ? Number(e.target.value) : '')}
-                  disabled={!selectedTurmaId}
-                  className="w-full text-sm border border-gray-300 dark:border-slate-700 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 outline-none bg-white dark:bg-slate-800 dark:text-slate-100 disabled:bg-gray-100 disabled:dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 disabled:cursor-not-allowed"
-                >
-                  <option value="">Todos os Alunos</option>
-                  {alunosDisponiveis.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
-                </select>
-              </div>
-            </div>
-            
-          </form>
-        </div>
-
-        {/* Results Area */}
-        <div className="p-6 overflow-y-auto flex-1 bg-gray-50 dark:bg-slate-900/50">
-          {!hasSearched ? (
-            <div className="text-center py-12 text-gray-400 dark:text-slate-500">
-              <Search className="w-12 h-12 mx-auto mb-3 opacity-20" />
-              <p>Digite o nome do aluno e clique em pesquisar.</p>
-            </div>
-          ) : alunosFiltrados.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-slate-400">
-              <p>Nenhum aluno encontrado com esses filtros.</p>
-            </div>
-          ) : (
-            <div className="space-y-8">
-              {alunosFiltrados.map(aluno => (
-                <AlunoRaioXCard 
-                  key={aluno.id}
-                  aluno={aluno}
-                  turmasAll={turmasAll}
-                  cursosAll={cursosAll}
-                  disciplinasAll={disciplinasAll}
-                  notasAll={notasAll}
-                  avaliacoesAll={avaliacoesAll}
-                  ocorrenciasAll={ocorrenciasAll}
-                  estagiosAll={estagiosAll}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll, avaliacoesAll, ocorrenciasAll, estagiosAll }: any) => {
-  const componentRef = React.useRef<HTMLDivElement>(null);
-  
-  const handlePrint = useReactToPrint({
-    contentRef: componentRef,
-    documentTitle: `Relatorio_Pedagogico_${aluno.nome.replace(/\s+/g, '_')}`,
+  const imgData = canvas.toDataURL('image/jpeg', 0.95);
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
   });
 
+  const pageWidth = 210;
+  const pageHeight = 297;
+  const imgWidth = pageWidth;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  let heightLeft = imgHeight;
+  let pageIndex = 0;
+
+  // Página 1
+  pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+  heightLeft -= pageHeight;
+
+  // Páginas subsequentes (caso o relatório ultrapasse 1 página)
+  while (heightLeft > 0) {
+    pageIndex++;
+    pdf.addPage();
+    pdf.addImage(imgData, 'JPEG', 0, -(pageIndex * pageHeight), imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+
+  return pdf.output('blob');
+}
+
+// Cálculo unificado dos dados pedagógicos do aluno para tela e relatório impresso/PDF
+function calculateAlunoRaioXData(
+  aluno: any,
+  turmasAll: any[],
+  cursosAll: any[],
+  disciplinasAll: any[],
+  notasAll: any[],
+  avaliacoesAll: any[],
+  ocorrenciasAll: any[],
+  estagiosAll: any[],
+  responsavelNome: string
+) {
   const turma = turmasAll.find((t: any) => t.id === aluno.turmaId);
   const curso = cursosAll.find((c: any) => c.id === turma?.cursoId);
   const disciplinas = disciplinasAll.filter((d: any) => d.turmaId === aluno.turmaId);
@@ -225,7 +87,7 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
   const estagio = estagiosAll.find((e: any) => e.alunoId === aluno.id);
   const isSubsequente = curso?.modalidade?.includes('Subsequente');
   const numEtapas = isSubsequente ? 2 : 4;
-  
+
   let somaMediasGlobais = 0;
   let countDisciplinasAvaliadas = 0;
   let pendenciasCount = 0;
@@ -237,7 +99,7 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
     const limiteFaltas = Math.floor(disc.chRelogio * 0.25);
     const notasDisc = notasAll.filter((n: any) => n.alunoId === aluno.id && n.disciplinaId === disc.id);
     const af = avaliacoesAll.find((a: any) => a.alunoId === aluno.id && a.disciplinaId === disc.id);
-    
+
     let faltas = 0;
     const notasEtapas: (number | null)[] = Array(numEtapas).fill(null);
     let notasPreenchidas = 0;
@@ -260,7 +122,7 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
 
     let mediaAtual = notasPreenchidas > 0 ? (somaNotas / (notasPreenchidas === numEtapas ? numEtapas : notasPreenchidas)) : null;
     let mediaFinal = mediaAtual;
-    
+
     if (af?.provaFinal !== undefined && af.provaFinal !== null && mediaAtual !== null) {
       mediaFinal = (mediaAtual + Number(af.provaFinal)) / 2;
     }
@@ -277,8 +139,6 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
       somaMediasGlobais += mediaFinal;
       countDisciplinasAvaliadas++;
     }
-
-    // Risco de faltas agora é avaliado globalmente fora do loop
 
     let situacao = 'Cursando';
     const isFinished = notasPreenchidas === numEtapas;
@@ -300,26 +160,741 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
   });
 
   const mediaGeral = countDisciplinasAvaliadas > 0 ? (somaMediasGlobais / countDisciplinasAvaliadas).toFixed(1) : '-';
-  
+
   const freqGlobal = totalCargaHoraria > 0 ? ((totalCargaHoraria - totalFaltasGlobal) / totalCargaHoraria) * 100 : 100;
   const isPeDeMeiaApto = freqGlobal >= 80;
   hasRiscoFaltas = totalCargaHoraria > 0 && totalFaltasGlobal > (totalCargaHoraria * 0.25);
-  
-  // Determina situação no conselho
-  let conselhoGlobal = null;
+
+  let conselhoGlobal: string | null = null;
   const disciplinasEmConselho = boletim.filter((b: any) => b.af?.statusConselho || b.af?.aprovadoConselho);
   if (disciplinasEmConselho.length > 0) {
     const hasReprovacao = disciplinasEmConselho.some((b: any) => b.af?.statusConselho === 'reprovado' || (b.af?.statusConselho === undefined && !b.af?.aprovadoConselho && b.situacao.includes('Reprovado (Conselho)')));
     conselhoGlobal = hasReprovacao ? 'Reprovado pelo Conselho' : 'Aprovado pelo Conselho';
   }
 
-  // Obter nome do usuário logado (simplificado, poderia vir do contexto)
-  const responsavelNome = localStorage.getItem('usuarioLogado') ? JSON.parse(localStorage.getItem('usuarioLogado') || '{}').nome : 'Servidor(a)';
+  return {
+    aluno,
+    turma,
+    curso,
+    disciplinas,
+    boletim,
+    estagio,
+    ocorrencias: ocorrenciasDoAluno,
+    ocorrenciasDoAluno,
+    mediaGeral,
+    pendenciasCount,
+    hasRiscoFaltas,
+    isPeDeMeiaApto,
+    freqGlobal,
+    conselhoGlobal,
+    numEtapas,
+    responsavelNome,
+    totalFaltasGlobal,
+  };
+}
+
+export const BuscaAlunoModal: React.FC<BuscaAlunoModalProps> = ({ onClose }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const [selectedCursoId, setSelectedCursoId] = useState<number | ''>('');
+  const [selectedPeriodo, setSelectedPeriodo] = useState<string>('');
+  const [selectedTurmaId, setSelectedTurmaId] = useState<number | ''>('');
+  const [selectedAlunoId, setSelectedAlunoId] = useState<number | ''>('');
+
+  // Estado para múltiplos alunos selecionados para geração de PDF em lote
+  const [selectedAlunosForPdf, setSelectedAlunosForPdf] = useState<number[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [dropdownSearch, setDropdownSearch] = useState('');
+
+  // Estados para geração em lote do arquivo ZIP
+  const [isGeneratingBatch, setIsGeneratingBatch] = useState(false);
+  const [batchProgress, setBatchProgress] = useState<{ current: number; total: number; alunoNome: string } | null>(null);
+  const [batchStatusMessage, setBatchStatusMessage] = useState<string>('');
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const turmasAll = useLiveQuery(() => db.turmas.toArray()) || [];
+  const alunosAll = useLiveQuery(() => db.alunos.toArray()) || [];
+  const cursosAll = useLiveQuery(() => db.cursos.toArray()) || [];
+  const disciplinasAll = useLiveQuery(() => db.disciplinas.toArray()) || [];
+  const notasAll = useLiveQuery(() => db.notas.toArray()) || [];
+  const avaliacoesAll = useLiveQuery(() => db.avaliacoes_finais.toArray()) || [];
+  const ocorrenciasAll = useLiveQuery(() => db.ocorrencias.toArray()) || [];
+  const estagiosAll = useLiveQuery(() => db.estagios.toArray()) || [];
+
+  const responsavelNome = useMemo(() => {
+    return localStorage.getItem('usuarioLogado')
+      ? JSON.parse(localStorage.getItem('usuarioLogado') || '{}').nome
+      : 'Servidor(a)';
+  }, []);
+
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Limpeza em cascata
+  useEffect(() => {
+    setSelectedPeriodo('');
+    setSelectedTurmaId('');
+    setSelectedAlunoId('');
+    setSelectedAlunosForPdf([]);
+  }, [selectedCursoId]);
+
+  useEffect(() => {
+    setSelectedTurmaId('');
+    setSelectedAlunoId('');
+    setSelectedAlunosForPdf([]);
+  }, [selectedPeriodo]);
+
+  useEffect(() => {
+    setSelectedAlunoId('');
+    setSelectedAlunosForPdf([]);
+    setDropdownSearch('');
+  }, [selectedTurmaId]);
+
+  const periodosDisponiveis = useMemo(() => {
+    if (!selectedCursoId) return [];
+    const turmasDoCurso = turmasAll.filter(t => t.cursoId === Number(selectedCursoId));
+    const periodos = turmasDoCurso.map(t => t.anoLetivo).filter(Boolean) as string[];
+    return Array.from(new Set(periodos)).sort();
+  }, [selectedCursoId, turmasAll]);
+
+  const turmasDisponiveis = useMemo(() => {
+    if (!selectedCursoId || !selectedPeriodo) return [];
+    return turmasAll.filter(t => t.cursoId === Number(selectedCursoId) && t.anoLetivo === selectedPeriodo && !t.arquivado);
+  }, [selectedCursoId, selectedPeriodo, turmasAll]);
+
+  const alunosDisponiveis = useMemo(() => {
+    if (!selectedTurmaId) return [];
+    return alunosAll.filter(a => a.turmaId === Number(selectedTurmaId)).sort((a, b) => a.nome.localeCompare(b.nome));
+  }, [selectedTurmaId, alunosAll]);
+
+  const alunosDropdownFiltered = useMemo(() => {
+    if (!dropdownSearch.trim()) return alunosDisponiveis;
+    return alunosDisponiveis.filter(a => a.nome.toLowerCase().includes(dropdownSearch.toLowerCase()));
+  }, [alunosDisponiveis, dropdownSearch]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setHasSearched(true);
+  };
+
+  const toggleAlunoForPdf = (id: number) => {
+    setSelectedAlunosForPdf(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllForPdf = () => {
+    const allIds = alunosDisponiveis
+      .map(a => a.id)
+      .filter((id): id is number => typeof id === 'number');
+    setSelectedAlunosForPdf(allIds);
+  };
+
+  const handleClearSelectedForPdf = () => {
+    setSelectedAlunosForPdf([]);
+  };
+
+  // Geração em lote dos PDFs empacotados em um único arquivo ZIP
+  const handleBatchGeneratePdfs = async () => {
+    if (selectedAlunosForPdf.length === 0 || isGeneratingBatch) return;
+
+    setIsGeneratingBatch(true);
+    setBatchProgress({ current: 0, total: selectedAlunosForPdf.length, alunoNome: 'Iniciando preparação...' });
+    setBatchStatusMessage(`Preparando lote de ${selectedAlunosForPdf.length} relatórios...`);
+
+    try {
+      // Intervalo inicial para garantir a renderização estável dos nós no DOM
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      const zip = new JSZip();
+
+      for (let i = 0; i < selectedAlunosForPdf.length; i++) {
+        const alunoId = selectedAlunosForPdf[i];
+        const aluno = alunosAll.find(a => a.id === alunoId);
+        if (!aluno) continue;
+
+        setBatchProgress({
+          current: i + 1,
+          total: selectedAlunosForPdf.length,
+          alunoNome: aluno.nome,
+        });
+        setBatchStatusMessage(`Gerando relatório ${i + 1} de ${selectedAlunosForPdf.length}: ${aluno.nome}`);
+
+        // Pequeno intervalo para permitir atualização de estado suave na interface
+        await new Promise(resolve => setTimeout(resolve, 80));
+
+        const containerEl = document.getElementById(`batch-pdf-aluno-${aluno.id}`);
+        if (!containerEl) {
+          console.warn(`Elemento para o aluno ${aluno.nome} (ID: ${aluno.id}) não encontrado no DOM.`);
+          continue;
+        }
+
+        const pdfBlob = await generatePdfBlob(containerEl);
+        const safeNome = aluno.nome
+          .trim()
+          .replace(/\s+/g, '_')
+          .replace(/[/\\?%*:|"<>]/g, '');
+
+        zip.file(`RaioX_${safeNome}.pdf`, pdfBlob);
+      }
+
+      setBatchStatusMessage('Compactando todos os arquivos no pacote ZIP...');
+      await new Promise(resolve => setTimeout(resolve, 150));
+
+      const zipContent = await zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 },
+      });
+
+      saveAs(zipContent, 'Relatorios_Pedagogicos.zip');
+
+      setBatchStatusMessage('Concluído! O download de Relatorios_Pedagogicos.zip foi iniciado.');
+      await new Promise(resolve => setTimeout(resolve, 1200));
+    } catch (error) {
+      console.error('Erro na geração em lote de PDFs:', error);
+      alert('Ocorreu um erro durante a geração dos relatórios em lote. Verifique o console para mais detalhes.');
+    } finally {
+      setIsGeneratingBatch(false);
+      setBatchProgress(null);
+      setBatchStatusMessage('');
+    }
+  };
+
+  const alunosFiltrados = alunosAll.filter(a => {
+    if (!hasSearched) return false;
+
+    // Se o aluno foi escolhido no dropdown Nível 4, ignora todos os outros filtros (raio-x direto)
+    if (selectedAlunoId) return a.id === Number(selectedAlunoId);
+
+    const matchName = searchTerm ? a.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true;
+    const matchTurma = selectedTurmaId ? a.turmaId === Number(selectedTurmaId) : true;
+
+    // Filtros superiores só são checados se a Turma não estiver selecionada
+    const turmaDoAluno = turmasAll.find(t => t.id === a.turmaId);
+    const matchPeriodo = selectedPeriodo && !selectedTurmaId ? turmaDoAluno?.anoLetivo === selectedPeriodo : true;
+    const matchCurso = selectedCursoId && !selectedTurmaId ? turmaDoAluno?.cursoId === Number(selectedCursoId) : true;
+
+    return matchName && matchTurma && matchPeriodo && matchCurso;
+  });
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden dark:text-slate-100">
+
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700/80 flex justify-between items-center bg-gray-50 dark:bg-slate-900/50">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
+            <Search className="w-5 h-5 text-indigo-600" />
+            Busca de Aluno (Raio-X)
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Search Form */}
+        <div className="p-6 border-b border-gray-100 dark:border-slate-700/80 bg-white dark:bg-slate-800 dark:text-slate-100">
+          <form onSubmit={handleSearch} className="flex flex-col gap-4">
+
+            {/* Linha Superior: Nome Livre e Botões de Ação */}
+            <div className="flex flex-wrap sm:flex-nowrap gap-3 items-end">
+              <div className="flex-1 min-w-[200px]">
+                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
+                  Nome do Aluno (Busca Livre)
+                </label>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none"
+                  placeholder="Digite o nome do aluno (opcional)..."
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="submit"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 h-[42px] min-w-[140px] cursor-pointer shadow-sm"
+                >
+                  <Search className="w-4 h-4" />
+                  Pesquisar
+                </button>
+
+                {/* Botão de Geração em Lote - visível quando há seleção */}
+                {selectedAlunosForPdf.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleBatchGeneratePdfs}
+                    disabled={isGeneratingBatch}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-5 rounded-lg transition-all flex items-center justify-center gap-2 h-[42px] cursor-pointer shadow-sm disabled:opacity-50 whitespace-nowrap animate-in fade-in duration-200"
+                    title="Baixar ZIP com os relatórios individuais de todos os alunos selecionados"
+                  >
+                    <Archive className="w-4 h-4" />
+                    Gerar PDFs Selecionados ({selectedAlunosForPdf.length})
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Linha Inferior: Filtros em Cascata */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 dark:bg-slate-900 p-4 rounded-xl border border-gray-100 dark:border-slate-700/80">
+              {/* 1. Curso */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
+                  1. Curso
+                </label>
+                <select
+                  value={selectedCursoId}
+                  onChange={e => setSelectedCursoId(e.target.value ? Number(e.target.value) : '')}
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 outline-none bg-white dark:bg-slate-800 dark:text-slate-100 cursor-pointer"
+                >
+                  <option value="">Todos os Cursos</option>
+                  {cursosAll.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                </select>
+              </div>
+
+              {/* 2. Período Letivo */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
+                  2. Período Letivo
+                </label>
+                <select
+                  value={selectedPeriodo}
+                  onChange={e => setSelectedPeriodo(e.target.value)}
+                  disabled={!selectedCursoId}
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 outline-none bg-white dark:bg-slate-800 dark:text-slate-100 disabled:bg-gray-100 disabled:dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <option value="">Todos os Períodos</option>
+                  {periodosDisponiveis.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+
+              {/* 3. Turma */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1">
+                  3. Turma
+                </label>
+                <select
+                  value={selectedTurmaId}
+                  onChange={e => setSelectedTurmaId(e.target.value ? Number(e.target.value) : '')}
+                  disabled={!selectedPeriodo}
+                  className="w-full text-sm border border-gray-300 dark:border-slate-700 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 outline-none bg-white dark:bg-slate-800 dark:text-slate-100 disabled:bg-gray-100 disabled:dark:bg-slate-800 disabled:text-gray-400 disabled:dark:text-slate-500 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <option value="">Todas as Turmas</option>
+                  {turmasDisponiveis.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
+                </select>
+              </div>
+
+              {/* 4. Aluno (Específico) - Custom Dropdown com suporte a Checkbox e Seleção Visual */}
+              <div className="relative" ref={dropdownRef}>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-slate-300">
+                    4. Aluno (Específico)
+                  </label>
+                  {selectedAlunosForPdf.length > 0 && (
+                    <span className="text-[10px] bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-bold px-1.5 py-0.2 rounded-full">
+                      {selectedAlunosForPdf.length} para PDF
+                    </span>
+                  )}
+                </div>
+
+                {/* Botão Gatilho do Dropdown */}
+                <button
+                  type="button"
+                  disabled={!selectedTurmaId}
+                  onClick={() => setIsDropdownOpen(prev => !prev)}
+                  className={`w-full text-sm border rounded-lg p-2.5 flex items-center justify-between text-left transition-colors outline-none
+                    ${!selectedTurmaId
+                      ? 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 border-gray-300 dark:border-slate-700 cursor-not-allowed'
+                      : 'bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-100 border-gray-300 dark:border-slate-700 hover:border-indigo-400 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-slate-600 cursor-pointer shadow-sm'
+                    }`}
+                >
+                  <span className="truncate">
+                    {selectedAlunoId
+                      ? alunosDisponiveis.find(a => a.id === Number(selectedAlunoId))?.nome || 'Aluno Selecionado'
+                      : selectedAlunosForPdf.length > 0
+                        ? `${selectedAlunosForPdf.length} aluno(s) marcado(s) p/ PDF`
+                        : 'Todos os Alunos'
+                    }
+                  </span>
+                  <ChevronDown className={`w-4 h-4 ml-2 transition-transform duration-200 text-gray-500 shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Menu Dropdown Flutuante */}
+                {isDropdownOpen && selectedTurmaId && (
+                  <div className="absolute left-0 right-0 mt-1.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden text-sm animate-in fade-in slide-in-from-top-2 duration-150">
+                    {/* Controles de Cabeçalho do Dropdown */}
+                    <div className="p-2 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/60 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedAlunoId('');
+                            setIsDropdownOpen(false);
+                          }}
+                          className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+                            !selectedAlunoId
+                              ? 'bg-indigo-600 text-white shadow-xs'
+                              : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 hover:bg-gray-200 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700'
+                          }`}
+                        >
+                          👁️ Exibir Todos na Tela
+                        </button>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={handleSelectAllForPdf}
+                            className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline font-semibold cursor-pointer"
+                          >
+                            Marcar Todos
+                          </button>
+                          <span className="text-gray-300 dark:text-slate-600">|</span>
+                          <button
+                            type="button"
+                            onClick={handleClearSelectedForPdf}
+                            className="text-[11px] text-gray-500 dark:text-slate-400 hover:underline cursor-pointer"
+                          >
+                            Desmarcar
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Campo de Busca Rápida dentro do Dropdown */}
+                      {alunosDisponiveis.length > 5 && (
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={dropdownSearch}
+                            onChange={(e) => setDropdownSearch(e.target.value)}
+                            placeholder="Filtrar aluno na turma..."
+                            className="w-full text-xs px-2.5 py-1.5 rounded-md border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-100 placeholder-gray-400 outline-none focus:ring-1 focus:ring-indigo-500"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          {dropdownSearch && (
+                            <button
+                              type="button"
+                              onClick={() => setDropdownSearch('')}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs cursor-pointer"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Lista Rolável de Alunos */}
+                    <div className="max-h-60 overflow-y-auto divide-y divide-gray-50 dark:divide-slate-700/50 p-1">
+                      {alunosDropdownFiltered.length === 0 ? (
+                        <div className="p-3 text-center text-xs text-gray-400 dark:text-slate-500">
+                          Nenhum aluno encontrado
+                        </div>
+                      ) : (
+                        alunosDropdownFiltered.map(aluno => {
+                          const alunoId = aluno.id;
+                          if (alunoId === undefined) return null;
+                          const isChecked = selectedAlunosForPdf.includes(alunoId);
+                          const isCurrentOnScreen = selectedAlunoId === alunoId;
+
+                          return (
+                            <div
+                              key={alunoId}
+                              className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg transition-colors group ${
+                                isCurrentOnScreen
+                                  ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 font-medium'
+                                  : 'hover:bg-gray-100 dark:hover:bg-slate-700/50 text-gray-700 dark:text-slate-200'
+                              }`}
+                            >
+                              {/* Checkbox para seleção em lote de PDF (não altera a tela) */}
+                              <input
+                                type="checkbox"
+                                id={`check-pdf-${alunoId}`}
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  toggleAlunoForPdf(alunoId);
+                                }}
+                                title="Marcar para gerar relatório em lote no ZIP"
+                                className="w-4 h-4 text-indigo-600 rounded border-gray-300 dark:border-slate-600 focus:ring-indigo-500 cursor-pointer shrink-0 accent-indigo-600"
+                              />
+
+                              {/* Nome do aluno: Click define alunoAtual na tela */}
+                              <div
+                                onClick={() => {
+                                  setSelectedAlunoId(alunoId);
+                                  setHasSearched(true);
+                                  setIsDropdownOpen(false);
+                                }}
+                                className="flex-1 min-w-0 cursor-pointer flex items-center justify-between gap-1 select-none"
+                                title="Clique para exibir o Raio-X deste aluno na tela"
+                              >
+                                <span className="truncate">
+                                  {aluno.nome}
+                                  {aluno.isRepetente && (
+                                    <span className="text-red-500 font-bold ml-1 text-xs">(REPT)</span>
+                                  )}
+                                </span>
+                                {isCurrentOnScreen && (
+                                  <span className="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded font-semibold shrink-0">
+                                    Na Tela
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    {/* Rodapé informativo do Dropdown */}
+                    <div className="p-2 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/60 flex items-center justify-between text-xs text-gray-500 dark:text-slate-400">
+                      <span>Total: {alunosDisponiveis.length} alunos</span>
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                        {selectedAlunosForPdf.length} marcado(s) p/ PDF
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        {/* Faixa Informativa e Ação Rápida quando há seleção para PDF */}
+        {selectedAlunosForPdf.length > 0 && (
+          <div className="bg-emerald-50 dark:bg-emerald-950/40 border-b border-emerald-200 dark:border-emerald-800/50 px-6 py-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-emerald-800 dark:text-emerald-200 font-medium">
+              <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>
+                <strong>{selectedAlunosForPdf.length}</strong> {selectedAlunosForPdf.length === 1 ? 'aluno selecionado' : 'alunos selecionados'} para geração individual em lote.
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleClearSelectedForPdf}
+                className="text-xs text-gray-500 hover:text-gray-700 dark:text-slate-400 hover:underline cursor-pointer"
+              >
+                Limpar seleção
+              </button>
+              <button
+                type="button"
+                onClick={handleBatchGeneratePdfs}
+                disabled={isGeneratingBatch}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-1.5 px-4 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Baixar ZIP ({selectedAlunosForPdf.length})
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Results Area */}
+        <div className="p-6 overflow-y-auto flex-1 bg-gray-50 dark:bg-slate-900/50">
+          {!hasSearched ? (
+            <div className="text-center py-12 text-gray-400 dark:text-slate-500">
+              <Search className="w-12 h-12 mx-auto mb-3 opacity-20" />
+              <p>Selecione os filtros ou digite o nome do aluno e clique em pesquisar.</p>
+            </div>
+          ) : alunosFiltrados.length === 0 ? (
+            <div className="text-center py-12 text-gray-500 dark:text-slate-400">
+              <p>Nenhum aluno encontrado com esses filtros.</p>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {alunosFiltrados.map(aluno => (
+                <AlunoRaioXCard
+                  key={aluno.id}
+                  aluno={aluno}
+                  turmasAll={turmasAll}
+                  cursosAll={cursosAll}
+                  disciplinasAll={disciplinasAll}
+                  notasAll={notasAll}
+                  avaliacoesAll={avaliacoesAll}
+                  ocorrenciasAll={ocorrenciasAll}
+                  estagiosAll={estagiosAll}
+                  responsavelNome={responsavelNome}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Container Oculto para Renderização e Captura dos PDFs em Lote */}
+      {isGeneratingBatch && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '794px',
+            zIndex: -9999,
+            opacity: 0.01,
+            pointerEvents: 'none',
+          }}
+          aria-hidden="true"
+        >
+          {selectedAlunosForPdf.map(alunoId => {
+            const aluno = alunosAll.find(a => a.id === alunoId);
+            if (!aluno) return null;
+            const alunoData = calculateAlunoRaioXData(
+              aluno,
+              turmasAll,
+              cursosAll,
+              disciplinasAll,
+              notasAll,
+              avaliacoesAll,
+              ocorrenciasAll,
+              estagiosAll,
+              responsavelNome
+            );
+            return (
+              <div
+                key={aluno.id}
+                id={`batch-pdf-aluno-${aluno.id}`}
+                style={{
+                  width: '794px',
+                  backgroundColor: '#ffffff',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <RelatorioPedagogicoPrint
+                  aluno={alunoData.aluno}
+                  turma={alunoData.turma}
+                  curso={alunoData.curso}
+                  boletim={alunoData.boletim}
+                  estagio={alunoData.estagio}
+                  ocorrencias={alunoData.ocorrencias}
+                  mediaGeral={alunoData.mediaGeral}
+                  pendenciasCount={alunoData.pendenciasCount}
+                  hasRiscoFaltas={alunoData.hasRiscoFaltas}
+                  isPeDeMeiaApto={alunoData.isPeDeMeiaApto}
+                  freqGlobal={alunoData.freqGlobal}
+                  conselhoGlobal={alunoData.conselhoGlobal}
+                  numEtapas={alunoData.numEtapas}
+                  responsavelNome={alunoData.responsavelNome}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Modal de Loading / Progresso da Geração em Lote */}
+      {isGeneratingBatch && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-2xl max-w-md w-full text-center border border-gray-100 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-950/60 rounded-full flex items-center justify-center mx-auto mb-4 border border-indigo-100 dark:border-indigo-800">
+              <Loader2 className="w-8 h-8 text-indigo-600 dark:text-indigo-400 animate-spin" />
+            </div>
+
+            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100 mb-1">
+              Geração de PDFs em Lote
+            </h3>
+
+            <p className="text-sm text-gray-600 dark:text-slate-300 mb-4 min-h-[40px] flex items-center justify-center">
+              {batchStatusMessage}
+            </p>
+
+            {batchProgress && batchProgress.total > 0 && (
+              <div className="space-y-2">
+                <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden p-0.5 border border-gray-100 dark:border-slate-600">
+                  <div
+                    className="bg-indigo-600 dark:bg-indigo-500 h-full rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.min(100, Math.round((batchProgress.current / batchProgress.total) * 100))}%`,
+                    }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400 font-medium px-1">
+                  <span>
+                    {batchProgress.current} de {batchProgress.total} relatórios
+                  </span>
+                  <span>
+                    {Math.round((batchProgress.current / batchProgress.total) * 100)}%
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-5 p-2.5 bg-gray-50 dark:bg-slate-900/60 rounded-lg border border-gray-200 dark:border-slate-700 text-left">
+              <p className="text-[11px] text-gray-500 dark:text-slate-400">
+                📦 <strong>Relatorios_Pedagogicos.zip</strong>: Todos os arquivos individuais estão sendo compactados em um único arquivo para evitar o bloqueio de múltiplos downloads pelo navegador.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const AlunoRaioXCard = ({
+  aluno,
+  turmasAll,
+  cursosAll,
+  disciplinasAll,
+  notasAll,
+  avaliacoesAll,
+  ocorrenciasAll,
+  estagiosAll,
+  responsavelNome,
+}: any) => {
+  const componentRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = useReactToPrint({
+    contentRef: componentRef,
+    documentTitle: `Relatorio_Pedagogico_${aluno.nome.replace(/\s+/g, '_')}`,
+  });
+
+  const {
+    turma,
+    curso,
+    boletim,
+    estagio,
+    ocorrenciasDoAluno,
+    mediaGeral,
+    pendenciasCount,
+    hasRiscoFaltas,
+    isPeDeMeiaApto,
+    freqGlobal,
+    conselhoGlobal,
+    numEtapas,
+    totalFaltasGlobal,
+  } = calculateAlunoRaioXData(
+    aluno,
+    turmasAll,
+    cursosAll,
+    disciplinasAll,
+    notasAll,
+    avaliacoesAll,
+    ocorrenciasAll,
+    estagiosAll,
+    responsavelNome
+  );
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden dark:text-slate-100">
-      
-      {/* Elemento oculto para impressão */}
+
+      {/* Elemento oculto para impressão nativa individual */}
       <div style={{ display: 'none' }}>
         <RelatorioPedagogicoPrint
           ref={componentRef}
@@ -359,7 +934,7 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
         <div className="mt-5 pt-4 border-t border-indigo-100/80 dark:border-slate-700/60 flex flex-wrap gap-4 items-center justify-between w-full">
           <button
             onClick={() => handlePrint()}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm"
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm cursor-pointer"
           >
             <Printer className="w-4 h-4" />
             Gerar Relatório (PDF)
@@ -384,7 +959,7 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
             </div>
           </div>
         </div>
-        
+
         {hasRiscoFaltas && (
           <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-red-700 bg-red-100 p-3 rounded-lg border border-red-200">
             <AlertTriangle className="w-5 h-5" />
@@ -408,7 +983,7 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
               <th className="px-6 py-4">Situação</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
             {boletim.map((b: any, i: number) => (
               <tr key={i} className="hover:bg-gray-50 dark:hover:bg-slate-900">
                 <td className="px-6 py-3 font-medium text-gray-800 dark:text-slate-200">{b.disc.nome}</td>
@@ -422,14 +997,14 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
                 </td>
                 <td className="px-4 py-3 text-center font-bold text-gray-800 dark:text-slate-200">
                   {b.mediaFinal !== null ? (
-                      b.isAprovadoConselho ? (
-                        <div className="flex flex-col items-center justify-center">
-                            <span className="text-blue-600 font-semibold">{b.mediaFinal.toFixed(1)}</span>
-                            <span className="text-xs text-gray-500 dark:text-slate-400 font-normal">({b.mediaFinalOrig?.toFixed(1)})</span>
-                        </div>
-                      ) : (
-                        <span>{b.mediaFinal.toFixed(1)}</span>
-                      )
+                    b.isAprovadoConselho ? (
+                      <div className="flex flex-col items-center justify-center">
+                        <span className="text-blue-600 font-semibold">{b.mediaFinal.toFixed(1)}</span>
+                        <span className="text-xs text-gray-500 dark:text-slate-400 font-normal">({b.mediaFinalOrig?.toFixed(1)})</span>
+                      </div>
+                    ) : (
+                      <span>{b.mediaFinal.toFixed(1)}</span>
+                    )
                   ) : '-'}
                 </td>
                 <td className="px-4 py-3 text-center">
@@ -440,8 +1015,8 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
                 <td className="px-6 py-3">
                   <div className="flex flex-col items-center justify-center text-center">
                     <span className={`px-2 py-1 rounded text-xs font-bold inline-block
-                      ${b.situacao === 'Cursando' ? 'bg-blue-100 text-blue-800' : 
-                        b.situacao.includes('Aprovado') ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800' : 
+                      ${b.situacao === 'Cursando' ? 'bg-blue-100 text-blue-800' :
+                        b.situacao.includes('Aprovado') ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800' :
                         'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 dark:border dark:border-red-800'}`}>
                       {b.situacao}
                     </span>
@@ -518,7 +1093,7 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
             {ocorrenciasDoAluno.sort((a: any, b: any) => new Date(b.data).getTime() - new Date(a.data).getTime()).map((oc: any) => {
               const isAlerta = oc.tipo.toLowerCase().includes('suspensão') || oc.tipo.toLowerCase().includes('indisciplina') || oc.tipo.toLowerCase().includes('advertência');
               const badgeColor = isAlerta ? 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 dark:border dark:border-red-800' : 'bg-blue-100 text-blue-800';
-              
+
               return (
                 <div key={oc.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex flex-col gap-2 dark:text-slate-100">
                   <div className="flex justify-between items-start">
@@ -537,9 +1112,9 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
                             const newWindow = window.open();
                             if (newWindow) {
                               if (oc.anexoDados.startsWith('data:application/pdf')) {
-                                  newWindow.document.write(`<iframe src="${oc.anexoDados}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
+                                newWindow.document.write(`<iframe src="${oc.anexoDados}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
                               } else {
-                                  newWindow.document.write(`<img src="${oc.anexoDados}" style="max-width: 100%; max-height: 100%;" />`);
+                                newWindow.document.write(`<img src="${oc.anexoDados}" style="max-width: 100%; max-height: 100%;" />`);
                               }
                             } else {
                               const a = document.createElement('a');
@@ -551,7 +1126,7 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
                             }
                           }
                         }}
-                        className="text-indigo-600 hover:text-indigo-800 text-xs font-medium flex items-center gap-1 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded transition-colors"
+                        className="text-indigo-600 hover:text-indigo-800 text-xs font-medium flex items-center gap-1 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded transition-colors cursor-pointer"
                       >
                         📎 Ver Anexo
                       </button>
@@ -567,4 +1142,3 @@ const AlunoRaioXCard = ({ aluno, turmasAll, cursosAll, disciplinasAll, notasAll,
     </div>
   );
 };
-

@@ -4,7 +4,7 @@
  * Para atualizar a versão do sistema, altere o valor da constante APP_VERSION abaixo.
  */
 
-export const APP_VERSION = 'v1.0.1';
+export const APP_VERSION = 'v1.1.0';
 
 export const APP_CONFIG = {
   name: 'IFS Gestão Pedagógica',
