@@ -28,6 +28,38 @@ interface BuscaAlunoModalProps {
   onClose: () => void;
 }
 
+// Utilitário para converter cores oklch para rgb/hex compatível com html2canvas
+function convertOklchToRgb(colorStr: string): string {
+  if (!colorStr || typeof colorStr !== 'string' || !colorStr.includes('oklch')) {
+    return colorStr;
+  }
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 1;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = '#000000';
+      ctx.fillStyle = colorStr;
+      const res = ctx.fillStyle;
+      if (res && !res.includes('oklch')) {
+        return res;
+      }
+    }
+  } catch {
+    // fallback
+  }
+
+  // Fallback seguro caso o navegador não converta diretamente via 2d canvas
+  if (colorStr.includes('red')) return '#dc2626';
+  if (colorStr.includes('green') || colorStr.includes('emerald')) return '#15803d';
+  if (colorStr.includes('blue') || colorStr.includes('indigo')) return '#4f46e5';
+  if (colorStr.includes('white')) return '#ffffff';
+  if (colorStr.includes('black')) return '#000000';
+  if (colorStr.includes('gray') || colorStr.includes('slate')) return '#64748b';
+  return '#1f2937';
+}
+
 // Função utilitária para converter um elemento HTML no Blob de PDF individual em alta resolução
 async function generatePdfBlob(element: HTMLElement): Promise<Blob> {
   const canvas = await html2canvas(element, {
@@ -36,6 +68,52 @@ async function generatePdfBlob(element: HTMLElement): Promise<Blob> {
     logging: false,
     backgroundColor: '#ffffff',
     windowWidth: 794,
+    onclone: (clonedDoc: Document) => {
+      // 1. Substitui qualquer ocorrência de oklch em blocos <style> do documento clonado
+      try {
+        const styleElements = clonedDoc.querySelectorAll('style');
+        styleElements.forEach(style => {
+          if (style.textContent && style.textContent.includes('oklch')) {
+            style.textContent = style.textContent.replace(/oklch\([^)]+\)/g, (match) => {
+              return convertOklchToRgb(match);
+            });
+          }
+        });
+      } catch {
+        // ignore
+      }
+
+      // 2. Substitui cores computadas que contenham oklch nos elementos do documento clonado
+      try {
+        const allElements = clonedDoc.querySelectorAll<HTMLElement>('*');
+        const colorProperties = [
+          'color',
+          'backgroundColor',
+          'borderColor',
+          'borderTopColor',
+          'borderBottomColor',
+          'borderLeftColor',
+          'borderRightColor',
+          'outlineColor',
+        ] as const;
+
+        allElements.forEach(el => {
+          try {
+            const computed = window.getComputedStyle(el);
+            for (const prop of colorProperties) {
+              const val = computed[prop];
+              if (val && typeof val === 'string' && val.includes('oklch')) {
+                el.style[prop] = convertOklchToRgb(val);
+              }
+            }
+          } catch {
+            // ignore
+          }
+        });
+      } catch {
+        // ignore
+      }
+    },
   });
 
   const imgData = canvas.toDataURL('image/jpeg', 0.95);

@@ -8,6 +8,68 @@ const FOLDER_NAME = 'IFS Gestao Pedagogica';
 let gisInited = false;
 let tokenClient: any;
 let memoryToken: string | null = null;
+let autoSyncPaused = false;
+
+export class GoogleAuthExpiredError extends Error {
+  readonly status = 401;
+  constructor(message = 'Permissão expirada ou inválida. Por favor, faça login novamente.') {
+    super(message);
+    this.name = 'GoogleAuthExpiredError';
+  }
+}
+
+export function isAuthExpiredError(error: unknown): boolean {
+  if (!error) return false;
+  if (error instanceof GoogleAuthExpiredError) return true;
+  if (typeof error === 'object') {
+    const err = error as any;
+    if (err.name === 'GoogleAuthExpiredError') return true;
+    if (err.status === 401 || err.status === 403) return true;
+    if (err.message === 'AUTH_REQUIRED') return true;
+    if (typeof err.message === 'string' && (err.message.includes('Permissão expirada') || err.message.includes('401'))) return true;
+  }
+  return false;
+}
+
+type AuthExpiredListener = () => void;
+const authExpiredListeners = new Set<AuthExpiredListener>();
+
+export const onGoogleAuthExpired = (listener: AuthExpiredListener) => {
+  authExpiredListeners.add(listener);
+  return () => {
+    authExpiredListeners.delete(listener);
+  };
+};
+
+export const isAutoSyncPaused = () => autoSyncPaused || !memoryToken;
+
+export const setAutoSyncPaused = (paused: boolean) => {
+  autoSyncPaused = paused;
+};
+
+export const handleAuthExpired = () => {
+  memoryToken = null;
+  autoSyncPaused = true;
+  try {
+    const saved = localStorage.getItem('ifs_auth_session');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      parsed.token = null;
+      parsed.authExpired = true;
+      localStorage.setItem('ifs_auth_session', JSON.stringify(parsed));
+    }
+  } catch {
+    // ignore
+  }
+
+  authExpiredListeners.forEach((fn) => {
+    try {
+      fn();
+    } catch {
+      // ignore
+    }
+  });
+};
 
 export const initGoogleIdentityServices = (): Promise<void> => {
   return new Promise((resolve) => {
@@ -32,11 +94,11 @@ export const initGoogleIdentityServices = (): Promise<void> => {
   });
 };
 
-export const solicitarTokenGoogle = async (): Promise<string> => {
+export const solicitarTokenGoogle = async (forcePrompt = false): Promise<string> => {
   await initGoogleIdentityServices();
   
-  // Return memory token if it exists and we assume it's still valid (ideally should check expiry)
-  if (memoryToken) {
+  // Return memory token if it exists and we're not forcing re-consent
+  if (!forcePrompt && memoryToken) {
     return memoryToken;
   }
 
@@ -47,9 +109,10 @@ export const solicitarTokenGoogle = async (): Promise<string> => {
         return;
       }
       memoryToken = resp.access_token;
+      autoSyncPaused = false;
       resolve(resp.access_token);
     };
-    tokenClient.requestAccessToken({ prompt: 'consent' });
+    tokenClient.requestAccessToken({ prompt: forcePrompt ? 'consent' : '' });
   });
 };
 
@@ -57,6 +120,9 @@ export const getStoredToken = () => memoryToken;
 
 export const setStoredToken = (token: string | null) => {
   memoryToken = token;
+  if (token) {
+    autoSyncPaused = false;
+  }
 };
 
 export interface GoogleUserInfo {
@@ -157,9 +223,9 @@ export const fazerUploadBackup = async (db: AppDatabase, token: string): Promise
   try {
     folderId = await getOrCreateBackupFolder(token);
   } catch (e: any) {
-    if (e.message === 'AUTH_REQUIRED') {
-      setStoredToken(null);
-      throw new Error('Permissão expirada ou inválida. Por favor, faça login novamente.');
+    if (e.message === 'AUTH_REQUIRED' || isAuthExpiredError(e)) {
+      handleAuthExpired();
+      throw new GoogleAuthExpiredError();
     }
     throw e;
   }
@@ -168,9 +234,9 @@ export const fazerUploadBackup = async (db: AppDatabase, token: string): Promise
   try {
     fileId = await procurarArquivoBackup(token, folderId);
   } catch(e: any) {
-    if (e.message === 'AUTH_REQUIRED') {
-      setStoredToken(null);
-      throw new Error('Permissão expirada ou inválida. Por favor, faça login novamente.');
+    if (e.message === 'AUTH_REQUIRED' || isAuthExpiredError(e)) {
+      handleAuthExpired();
+      throw new GoogleAuthExpiredError();
     }
     throw e;
   }
@@ -188,8 +254,8 @@ export const fazerUploadBackup = async (db: AppDatabase, token: string): Promise
     });
 
     if (response.status === 401 || response.status === 403) {
-      setStoredToken(null);
-      throw new Error('Permissão expirada ou inválida. Por favor, faça login novamente.');
+      handleAuthExpired();
+      throw new GoogleAuthExpiredError();
     }
 
     if (!response.ok) {
@@ -217,8 +283,8 @@ export const fazerUploadBackup = async (db: AppDatabase, token: string): Promise
     });
 
     if (response.status === 401 || response.status === 403) {
-      setStoredToken(null);
-      throw new Error('Permissão expirada ou inválida. Por favor, faça login novamente.');
+      handleAuthExpired();
+      throw new GoogleAuthExpiredError();
     }
 
     if (!response.ok) {
@@ -232,9 +298,9 @@ export const fazerDownloadBackup = async (db: AppDatabase, token: string): Promi
   try {
     folderId = await getOrCreateBackupFolder(token);
   } catch (e: any) {
-    if (e.message === 'AUTH_REQUIRED') {
-      setStoredToken(null);
-      throw new Error('Permissão expirada ou inválida. Por favor, faça login novamente.');
+    if (e.message === 'AUTH_REQUIRED' || isAuthExpiredError(e)) {
+      handleAuthExpired();
+      throw new GoogleAuthExpiredError();
     }
     throw e;
   }
@@ -243,9 +309,9 @@ export const fazerDownloadBackup = async (db: AppDatabase, token: string): Promi
   try {
     fileId = await procurarArquivoBackup(token, folderId);
   } catch(e: any) {
-    if (e.message === 'AUTH_REQUIRED') {
-      setStoredToken(null);
-      throw new Error('Permissão expirada ou inválida. Por favor, faça login novamente.');
+    if (e.message === 'AUTH_REQUIRED' || isAuthExpiredError(e)) {
+      handleAuthExpired();
+      throw new GoogleAuthExpiredError();
     }
     throw e;
   }
@@ -263,8 +329,8 @@ export const fazerDownloadBackup = async (db: AppDatabase, token: string): Promi
   });
 
   if (response.status === 401 || response.status === 403) {
-    setStoredToken(null);
-    throw new Error('Permissão expirada ou inválida. Por favor, faça login novamente.');
+    handleAuthExpired();
+    throw new GoogleAuthExpiredError();
   }
 
   if (!response.ok) {

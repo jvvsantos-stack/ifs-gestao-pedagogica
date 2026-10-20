@@ -87,6 +87,30 @@ export const RelatorioPedagogicoPrint = React.forwardRef<HTMLDivElement, Relator
             .print-container tr:nth-child(even) { background-color: #f8fafc !important; }
             .print-container .text-left { text-align: left; }
             .print-container .break-inside-avoid { break-inside: avoid !important; page-break-inside: avoid !important; }
+
+            /* Cores e bordas forçadas em Hexadecimal para prevenir oklch no html2canvas */
+            .print-container { background-color: #ffffff !important; color: #000000 !important; }
+            .print-container .bg-white { background-color: #ffffff !important; }
+            .print-container .text-black { color: #000000 !important; }
+            .print-container .border-black { border-color: #000000 !important; }
+            .print-container .border-gray-300 { border-color: #d1d5db !important; }
+            .print-container .border-gray-200 { border-color: #e5e7eb !important; }
+            .print-container .border-slate-300 { border-color: #cbd5e1 !important; }
+            .print-container .bg-slate-50 { background-color: #f8fafc !important; }
+            .print-container .text-red-600 { color: #dc2626 !important; }
+            .print-container .text-red-700 { color: #b91c1c !important; }
+            .print-container .text-red-800 { color: #991b1b !important; }
+            .print-container .bg-red-50 { background-color: #fef2f2 !important; }
+            .print-container .border-red-500 { border-color: #ef4444 !important; }
+            .print-container .text-green-700 { color: #15803d !important; }
+            .print-container .text-blue-600 { color: #2563eb !important; }
+            .print-container .text-gray-500 { color: #6b7280 !important; }
+            .print-container .text-gray-400 { color: #9ca3af !important; }
+            .print-container .bg-blue-100 { background-color: #dbeafe !important; }
+            .print-container .text-blue-800 { color: #1e40af !important; }
+            .print-container .bg-emerald-100 { background-color: #d1fae5 !important; }
+            .print-container .text-emerald-800 { color: #065f46 !important; }
+            .print-container .bg-red-100 { background-color: #fee2e2 !important; }
           `}
         </style>
 

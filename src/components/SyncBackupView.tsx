@@ -1,7 +1,7 @@
 import React from 'react';
 import { db } from '../db/database';
 import { Cloud, CloudUpload, CloudDownload, RefreshCw, CheckCircle2, AlertTriangle, LogOut, User as UserIcon } from 'lucide-react';
-import { fazerUploadBackup, fazerDownloadBackup, getStoredToken } from '../utils/googleDriveSync';
+import { fazerUploadBackup, fazerDownloadBackup, getStoredToken, isAuthExpiredError } from '../utils/googleDriveSync';
 import { ConfirmModal } from './ConfirmModal';
 import type { GoogleUserInfo } from '../utils/googleDriveSync';
 
@@ -15,8 +15,6 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
   const [statusMessage, setStatusMessage] = React.useState('');
   const [confirmModal, setConfirmModal] = React.useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
 
-
-
   const handleForceUpload = async () => {
     try {
       const token = getStoredToken();
@@ -28,9 +26,14 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
       setStatusMessage('Backup enviado!');
       setTimeout(() => setSyncStatus('idle'), 3000);
     } catch (e) {
-      console.error(e);
-      setSyncStatus('error');
-      setStatusMessage('Erro ao enviar backup.');
+      if (isAuthExpiredError(e)) {
+        setSyncStatus('error');
+        setStatusMessage('Permissão expirada. Por favor, faça login novamente.');
+      } else {
+        console.error(e);
+        setSyncStatus('error');
+        setStatusMessage('Erro ao enviar backup.');
+      }
     }
   };
 
@@ -44,16 +47,21 @@ export const SyncBackupView: React.FC<SyncBackupViewProps> = ({ onLogout, userIn
         try {
           const token = getStoredToken();
           if (!token) throw new Error('Sem token');
-        setSyncStatus('syncing');
-        setStatusMessage('A transferir backup...');
-        await fazerDownloadBackup(db, token);
-        setSyncStatus('success');
-        setStatusMessage('Backup restaurado!');
-        setTimeout(() => setSyncStatus('idle'), 3000);
-      } catch (e) {
-        console.error(e);
-        setSyncStatus('error');
-        setStatusMessage('Erro ao restaurar backup.');
+          setSyncStatus('syncing');
+          setStatusMessage('A transferir backup...');
+          await fazerDownloadBackup(db, token);
+          setSyncStatus('success');
+          setStatusMessage('Backup restaurado!');
+          setTimeout(() => setSyncStatus('idle'), 3000);
+        } catch (e) {
+          if (isAuthExpiredError(e)) {
+            setSyncStatus('error');
+            setStatusMessage('Permissão expirada. Por favor, faça login novamente.');
+          } else {
+            console.error(e);
+            setSyncStatus('error');
+            setStatusMessage('Erro ao restaurar backup.');
+          }
         }
       }
     });
